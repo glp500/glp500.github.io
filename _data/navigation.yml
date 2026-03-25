@@ -1,0 +1,15 @@
+- key: home
+  label: Home
+  url: /
+- key: projects
+  label: Projects
+  url: /projects/
+- key: publications
+  label: Publications
+  url: /publications/
+- key: blog
+  label: Blog
+  url: /blog/
+- key: cv
+  label: CV
+  url: /#cv

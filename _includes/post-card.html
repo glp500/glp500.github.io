@@ -1,0 +1,15 @@
+<article class="card card--post reveal">
+  <div class="card__meta">
+    <span>{{ include.post.date | date: "%b %-d, %Y" }}</span>
+    {% if include.post.tags and include.post.tags.size > 0 %}
+      <span>{{ include.post.tags | join: ", " }}</span>
+    {% endif %}
+  </div>
+  <h3><a href="{{ include.post.url | relative_url }}">{{ include.post.title }}</a></h3>
+  {% if include.post.excerpt %}
+    <p>{{ include.post.excerpt | strip_html | strip }}</p>
+  {% endif %}
+  <div class="card__links">
+    <a href="{{ include.post.url | relative_url }}">Read post</a>
+  </div>
+</article>

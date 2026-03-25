@@ -1,0 +1,179 @@
+{% assign profile = site.data.profile %}
+{% assign visible_projects = site.projects | where_exp: "item", "item.published != false" | sort: "date" | reverse %}
+{% assign visible_publications = site.publications | where_exp: "item", "item.published != false" | sort: "year" | reverse %}
+{% assign visible_posts = site.posts | where_exp: "item", "item.published != false" %}
+
+{% assign featured_projects = visible_projects | where_exp: "item", "item.featured == true" %}
+{% if featured_projects.size == 0 %}
+  {% assign featured_projects = visible_projects %}
+{% endif %}
+{% assign featured_projects = featured_projects | slice: 0, profile.featured.projects_limit %}
+
+{% assign featured_publications = visible_publications | where_exp: "item", "item.highlight == true" %}
+{% if featured_publications.size == 0 %}
+  {% assign featured_publications = visible_publications %}
+{% endif %}
+{% assign featured_publications = featured_publications | slice: 0, profile.featured.publications_limit %}
+
+{% assign recent_posts = visible_posts | slice: 0, profile.featured.posts_limit %}
+
+<section class="hero">
+  <div class="shell hero__grid">
+    <div class="hero__content reveal">
+      <p class="eyebrow">{{ profile.hero.eyebrow }}</p>
+      <h1>{{ profile.name }}</h1>
+      <p class="hero__title">{{ profile.title }}</p>
+      <p class="hero__summary">{{ profile.summary }}</p>
+      <div class="hero__actions">
+        <a class="button button--primary" href="{{ profile.hero.primary_url | relative_url }}">{{ profile.hero.primary_label }}</a>
+        <a class="button button--ghost" href="{{ profile.hero.secondary_url | relative_url }}">{{ profile.hero.secondary_label }}</a>
+      </div>
+      <ul class="hero__keywords" aria-label="Portfolio themes">
+        <li>Projects</li>
+        <li>Publications</li>
+        <li>Writing</li>
+        <li>Interests</li>
+      </ul>
+    </div>
+    <aside class="hero__panel reveal reveal--delay">
+      <p class="hero__panel-label">Built for</p>
+      <ul class="hero__panel-list">
+        <li>PhD applications that need clear evidence of technical depth</li>
+        <li>Academic collaborators who want a fast read on your interests</li>
+        <li>Industry teams that care about what you can ship and explain</li>
+      </ul>
+      <div class="hero__panel-grid">
+        <div>
+          <span class="hero__panel-key">Format</span>
+          <strong>Custom Jekyll portfolio</strong>
+        </div>
+        <div>
+          <span class="hero__panel-key">Content</span>
+          <strong>Markdown-driven archives</strong>
+        </div>
+        <div>
+          <span class="hero__panel-key">Audience</span>
+          <strong>Academic and industry</strong>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="section">
+  <div class="shell">
+    <div class="section__heading reveal">
+      <p class="section__eyebrow">Featured work</p>
+      <h2>Projects</h2>
+      <p>Use this section for the builds or experiments that best show how you think, execute, and iterate.</p>
+    </div>
+    {% if featured_projects.size > 0 %}
+      <div class="card-grid card-grid--projects">
+        {% for project in featured_projects %}
+          {% include project-card.html project=project %}
+        {% endfor %}
+      </div>
+    {% else %}
+      {% include empty-state.html title="No published projects yet" body="Add Markdown files to _projects/ when you are ready to publish them. A sample front matter template lives in content-templates/project.sample.md." link_label="Open the projects archive" link_url="/projects/" %}
+    {% endif %}
+  </div>
+</section>
+
+<section class="section section--paper">
+  <div class="shell">
+    <div class="section__heading reveal">
+      <p class="section__eyebrow">Research</p>
+      <h2>Selected publications</h2>
+      <p>Keep the strongest papers or manuscripts visible on the homepage, then maintain the full list in the archive.</p>
+    </div>
+    {% if featured_publications.size > 0 %}
+      <div class="card-grid card-grid--publications">
+        {% for publication in featured_publications %}
+          {% include publication-card.html publication=publication %}
+        {% endfor %}
+      </div>
+    {% else %}
+      {% include empty-state.html title="No publications published yet" body="The layout is ready for papers, posters, preprints, or manuscripts. Add entries to _publications/ when you want them live." link_label="Open the publications archive" link_url="/publications/" %}
+    {% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="shell two-column">
+    <div class="prose reveal">
+      <p class="section__eyebrow">About</p>
+      <h2>Short bio</h2>
+      <p>{{ profile.bio }}</p>
+    </div>
+    <div class="callout reveal reveal--delay" id="cv">
+      <p class="section__eyebrow">CV snapshot</p>
+      <h2>Highlights and CV</h2>
+      <dl class="highlights">
+        {% for item in profile.cv.highlights %}
+          <div class="highlights__item">
+            <dt>{{ item.label }}</dt>
+            <dd>{{ item.value }}</dd>
+          </div>
+        {% endfor %}
+      </dl>
+      {% if profile.cv.download_url %}
+        <a class="button button--primary button--compact" href="{{ profile.cv.download_url | relative_url }}" download>{{ profile.cv.download_label }}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section section--paper">
+  <div class="shell">
+    <div class="section__heading reveal">
+      <p class="section__eyebrow">Outside the formal record</p>
+      <h2>Interests and hobbies</h2>
+      <p>These cards are intentionally personal. They keep the site from reading like a list of bullet points.</p>
+    </div>
+    <div class="card-grid card-grid--interests">
+      {% for interest in profile.interests %}
+        <article class="card card--interest reveal">
+          <h3>{{ interest.title }}</h3>
+          <p>{{ interest.description }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="shell">
+    <div class="section__heading reveal">
+      <p class="section__eyebrow">Writing</p>
+      <h2>Recent posts</h2>
+      <p>Use the blog for project notes, reading reflections, lab updates, or short essays that show how you reason.</p>
+    </div>
+    {% if recent_posts.size > 0 %}
+      <div class="card-grid card-grid--posts">
+        {% for post in recent_posts %}
+          {% include post-card.html post=post %}
+        {% endfor %}
+      </div>
+    {% else %}
+      {% include empty-state.html title="No posts published yet" body="The blog archive and post layout are live. Add Markdown files to _posts/ when you want to publish writing." link_label="Open the blog archive" link_url="/blog/" %}
+    {% endif %}
+  </div>
+</section>
+
+<section class="section section--contact" id="contact">
+  <div class="shell contact">
+    <div class="section__heading reveal">
+      <p class="section__eyebrow">Contact</p>
+      <h2>Make it easy to reach you</h2>
+      <p>Keep this section minimal: one working email and the external profiles you actually monitor.</p>
+    </div>
+    <div class="contact__panel reveal reveal--delay">
+      {% if profile.contact.email %}
+        <p class="contact__email"><a href="mailto:{{ profile.contact.email }}">{{ profile.contact.email }}</a></p>
+      {% else %}
+        <p class="contact__placeholder">Add your email address in <code>_data/profile.yml</code> before publishing the final version.</p>
+      {% endif %}
+      {% include social-links.html social=profile.contact.social %}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,7 @@
+<div class="empty-state reveal">
+  <h3>{{ include.title }}</h3>
+  <p>{{ include.body }}</p>
+  {% if include.link_url and include.link_label %}
+    <a class="button button--ghost button--compact" href="{{ include.link_url | relative_url }}">{{ include.link_label }}</a>
+  {% endif %}
+</div>

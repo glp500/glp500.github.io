@@ -1,0 +1,12 @@
+{% assign profile = site.data.profile %}
+<footer class="site-footer">
+  <div class="shell site-footer__inner">
+    <div>
+      <p class="site-footer__title">{{ profile.name }}</p>
+      <p class="site-footer__copy">Custom Jekyll portfolio for projects, publications, and writing.</p>
+    </div>
+    <div class="site-footer__links">
+      {% include social-links.html social=profile.contact.social %}
+    </div>
+  </div>
+</footer>

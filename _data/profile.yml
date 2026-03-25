@@ -1,0 +1,40 @@
+name: Gavin
+title: Project builder with room to grow into research
+tagline: Projects, publications, and writing for future collaborators
+summary: I am using this site to collect the work I want PhD committees, collaborators, and hiring teams to see first.
+bio: Replace this paragraph with a short background that explains your current degree or role, the questions you want to study, and the technical strengths that connect your projects to your research direction.
+hero:
+  eyebrow: Personal portfolio
+  primary_label: View projects
+  primary_url: /projects/
+  secondary_label: Read blog
+  secondary_url: /blog/
+cv:
+  download_label: Download CV placeholder
+  download_url: /assets/docs/gavin-cv-placeholder.pdf
+  highlights:
+    - label: Focus
+      value: Add the research themes or technical areas you want to be known for.
+    - label: Best evidence
+      value: Replace with one project or publication that should anchor your applications.
+    - label: Next step
+      value: Add the PhD or career direction this portfolio is meant to support.
+contact:
+  email: ""
+  location: ""
+  social:
+    - label: GitHub
+      url: https://github.com/glp500
+    - label: LinkedIn
+      url: ""
+interests:
+  - title: Research interests
+    description: Replace this with the questions, methods, or domains you want to study in depth.
+  - title: Hobbies
+    description: Add two or three interests outside formal work so the site feels like a profile, not only a resume.
+  - title: Side quests
+    description: Use this space for teaching, community work, labs, clubs, or side explorations worth mentioning.
+featured:
+  projects_limit: 3
+  publications_limit: 3
+  posts_limit: 3

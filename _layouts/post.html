@@ -1,0 +1,19 @@
+<article class="post">
+  <header class="page-hero post__hero">
+    <div class="shell page-hero__content reveal">
+      <p class="section__eyebrow">Blog</p>
+      <h1>{{ page.title }}</h1>
+      <p class="post__meta">
+        <span>{{ page.date | date: "%B %-d, %Y" }}</span>
+        {% if page.tags and page.tags.size > 0 %}
+          <span>Tags: {{ page.tags | join: ", " }}</span>
+        {% endif %}
+      </p>
+    </div>
+  </header>
+  <section class="section">
+    <div class="shell post__content prose">
+      {{ content }}
+    </div>
+  </section>
+</article>

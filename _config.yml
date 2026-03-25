@@ -1,0 +1,37 @@
+title: Gavin Portfolio
+email: ""
+description: Projects, publications, and writing gathered in one place for future collaborators, PhD applications, and hiring conversations.
+url: "https://glp500.github.io"
+baseurl: ""
+lang: en
+timezone: Europe/Berlin
+markdown: kramdown
+permalink: pretty
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+collections:
+  projects:
+    output: false
+  publications:
+    output: false
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
+
+exclude:
+  - README.MD
+  - content-templates
+  - vendor

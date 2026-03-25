@@ -1,0 +1,33 @@
+<article class="card card--publication reveal">
+  <div class="card__meta">
+    {% if include.publication.year %}
+      <span>{{ include.publication.year }}</span>
+    {% endif %}
+    {% if include.publication.venue %}
+      <span>{{ include.publication.venue }}</span>
+    {% endif %}
+  </div>
+  <h3>{{ include.publication.title }}</h3>
+  {% if include.publication.authors %}
+    <p class="card__authors">{{ include.publication.authors }}</p>
+  {% endif %}
+  {% if include.publication.summary %}
+    <p>{{ include.publication.summary }}</p>
+  {% endif %}
+  {% if include.show_body and include.publication.content != blank %}
+    <div class="card__body prose">
+      {{ include.publication.content }}
+    </div>
+  {% endif %}
+  <div class="card__links">
+    {% if include.publication.paper_url %}
+      <a href="{{ include.publication.paper_url }}" target="_blank" rel="noreferrer">Paper</a>
+    {% endif %}
+    {% if include.publication.slides_url %}
+      <a href="{{ include.publication.slides_url }}" target="_blank" rel="noreferrer">Slides</a>
+    {% endif %}
+    {% if include.publication.code_url %}
+      <a href="{{ include.publication.code_url }}" target="_blank" rel="noreferrer">Code</a>
+    {% endif %}
+  </div>
+</article>

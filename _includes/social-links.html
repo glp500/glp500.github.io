@@ -1,0 +1,9 @@
+{% assign links = include.social | default: site.data.profile.contact.social %}
+{% assign visible_links = links | where_exp: "item", "item.url and item.url != ''" %}
+{% if visible_links.size > 0 %}
+  <ul class="social-links">
+    {% for item in visible_links %}
+      <li><a href="{{ item.url }}" target="_blank" rel="noreferrer">{{ item.label }}</a></li>
+    {% endfor %}
+  </ul>
+{% endif %}
