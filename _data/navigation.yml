@@ -1,15 +1,24 @@
 - key: home
   label: Home
   url: /
+  swarm: 0
 - key: projects
   label: Projects
   url: /projects/
-- key: publications
-  label: Publications
-  url: /publications/
+  swarm: 1
 - key: blog
-  label: Blog
+  label: Field notes
   url: /blog/
-- key: cv
-  label: CV
-  url: /#cv
+  swarm: 2
+- key: topics
+  label: Topics
+  url: /topics/
+  swarm: 3
+- key: experience
+  label: Experience
+  url: /experience/
+  swarm: 4
+- key: about
+  label: About
+  url: /about/
+  swarm: 5

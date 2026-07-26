@@ -3,7 +3,11 @@
   <head>
     {% include head.html %}
   </head>
-  <body class="page-{{ page.nav_key | default: page.layout | default: 'default' | slugify }}">
+  <body
+    class="page-{{ page.nav_key | default: page.layout | default: 'default' | slugify }}"
+    data-page="{{ page.nav_key | default: page.layout | default: 'default' | slugify }}"
+    style="--hero-image: url('{{ site.data.profile.images.hero_background | relative_url }}'); --hero-position: {{ site.data.profile.images.hero_position | default: 'center center' }};"
+  >
     <a class="skip-link" href="#main-content">Skip to content</a>
     {% include header.html %}
     <main id="main-content">

@@ -1,9 +1,16 @@
 {% assign links = include.social | default: site.data.profile.contact.social %}
 {% assign visible_links = links | where_exp: "item", "item.url and item.url != ''" %}
-{% if visible_links.size > 0 %}
+{% assign contact = site.data.profile.contact %}
+{% if visible_links.size > 0 or contact.x_url != "" or contact.substack_url != "" %}
   <ul class="social-links">
     {% for item in visible_links %}
       <li><a href="{{ item.url }}" target="_blank" rel="noreferrer">{{ item.label }}</a></li>
     {% endfor %}
+    {% if contact.substack_url != "" %}
+      <li><a href="{{ contact.substack_url }}" target="_blank" rel="noreferrer">Substack</a></li>
+    {% endif %}
+    {% if contact.x_url != "" %}
+      <li><a href="{{ contact.x_url }}" target="_blank" rel="noreferrer">X</a></li>
+    {% endif %}
   </ul>
 {% endif %}

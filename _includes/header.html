@@ -2,12 +2,16 @@
 <header class="site-header">
   <div class="shell site-header__inner">
     <a class="site-header__brand" href="{{ '/' | relative_url }}">
-      <span class="site-header__name">{{ profile.name }}</span>
-      <span class="site-header__tag">{{ profile.tagline }}</span>
+      <span class="site-header__mark" aria-hidden="true">G</span>
+      <span class="site-header__brand-text">
+        <span class="site-header__name">{{ profile.name }}</span>
+        <span class="site-header__tag">{{ profile.tagline }}</span>
+      </span>
     </a>
 
     <button class="site-header__toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
-      Menu
+      <span>Menu</span>
+      <span class="site-header__toggle-mark" aria-hidden="true"></span>
     </button>
 
     <nav class="site-nav" id="site-nav" data-site-nav>
@@ -16,7 +20,7 @@
         {% if page.nav_key == item.key %}
           {% assign is_active = true %}
         {% endif %}
-        <a class="site-nav__link{% if is_active %} is-active{% endif %}" href="{{ item.url | relative_url }}">{{ item.label }}</a>
+        <a class="site-nav__link{% if is_active %} is-active{% endif %}" href="{{ item.url | relative_url }}" data-swarm-link="{{ item.swarm }}">{{ item.label }}</a>
       {% endfor %}
     </nav>
   </div>

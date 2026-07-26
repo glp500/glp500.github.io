@@ -1,19 +1,18 @@
 ---
-title: Launching this portfolio site
-excerpt: A short note on setting up the structure that will hold future projects, publications, and writing.
+title: "Opening the field notes"
+excerpt: "Why this site is becoming a living notebook for systems, histories, prototypes, and questions still in motion."
 tags:
-  - portfolio
-  - website
-  - setup
+  - announcement
+  - practice
 ---
-This site now has a clear structure for projects, publications, and blog posts.
+This site is a place to keep work in motion—not only finished outputs, but the models, reading trails, design decisions, and unanswered questions that make those outputs possible.
 
-The goal is straightforward: keep one public place where future collaborators, PhD committees, and hiring teams can quickly understand what I build, what I study, and how I think.
+The organizing idea is simple: research on complex systems should itself leave useful traces. A project page can describe the formal shape of the work; these field notes can show how it changes over time.
 
-Over time I want this space to do three things well:
+I expect most notes to fall into three loose families:
 
-1. Highlight a small number of strong projects instead of a long undifferentiated list.
-2. Keep research outputs easy to scan without forcing visitors through a CV first.
-3. Leave room for short posts that explain decisions, experiments, and lessons learned.
+1. Updates from **Cybernetics & Artificial Societies**, including models and visual experiments.
+2. Design notes from **Story Machines** as we build local AI tools for institutional knowledge.
+3. Short essays connecting computation to its cultural, economic, and historical settings.
 
-This first post exists partly to verify the blog pipeline and partly to mark the starting point. The next step is replacing the placeholder profile text with real content and adding published project and publication entries.
+The flock moving across the homepage is part of that argument. No bird holds the plan. The pattern appears through local attention, feedback, and continuous adjustment. It is a small model, but also a reminder of the kinds of systems I want to understand.

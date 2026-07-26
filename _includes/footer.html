@@ -1,12 +1,13 @@
 {% assign profile = site.data.profile %}
 <footer class="site-footer">
   <div class="shell site-footer__inner">
-    <div>
-      <p class="site-footer__title">{{ profile.name }}</p>
-      <p class="site-footer__copy">Custom Jekyll portfolio for projects, publications, and writing.</p>
+    <div class="site-footer__lead">
+      <p class="site-footer__kicker">Continue the conversation</p>
+      <p class="site-footer__title">Questions, collaborations,<br>and strange connections welcome.</p>
     </div>
-    <div class="site-footer__links">
+    <div class="site-footer__meta">
       {% include social-links.html social=profile.contact.social %}
+      <p class="site-footer__copy">© {{ site.time | date: "%Y" }} {{ profile.name }} · Built as a living archive.</p>
     </div>
   </div>
 </footer>

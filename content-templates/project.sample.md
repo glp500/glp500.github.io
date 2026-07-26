@@ -6,6 +6,8 @@ status: "Shipped"
 tech:
   - Jekyll
   - JavaScript
+feature_image: "/assets/images/replace-with-project-image.jpg"
+feature_image_alt: "Describe the project image for readers using assistive technology."
 featured: true
 demo_url: "https://example.com"
 repo_url: "https://github.com/your-handle/project-name"

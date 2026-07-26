@@ -1,19 +1,61 @@
+{% assign profile = site.data.profile %}
+{% capture canonical_url %}{{ site.url }}{{ site.baseurl }}{{ page.url }}{% endcapture %}
 <article class="post">
-  <header class="page-hero post__hero">
-    <div class="shell page-hero__content reveal">
-      <p class="section__eyebrow">Blog</p>
-      <h1>{{ page.title }}</h1>
-      <p class="post__meta">
-        <span>{{ page.date | date: "%B %-d, %Y" }}</span>
+  <header class="post__hero">
+    <div class="shell post__hero-grid">
+      <div class="reveal">
+        <a class="post__back" href="{{ '/blog/' | relative_url }}">← Field notes</a>
+        <p class="section__eyebrow">Note · {{ page.date | date: "%d.%m.%Y" }}</p>
+        <h1>{{ page.title }}</h1>
+        {% if page.excerpt %}<p class="post__dek">{{ page.excerpt }}</p>{% endif %}
+      </div>
+      <div class="post__taxonomy reveal reveal--delay">
         {% if page.tags and page.tags.size > 0 %}
-          <span>Tags: {{ page.tags | join: ", " }}</span>
+          <span>Filed under</span>
+          <p>{{ page.tags | join: " · " }}</p>
         {% endif %}
-      </p>
+      </div>
     </div>
   </header>
-  <section class="section">
-    <div class="shell post__content prose">
-      {{ content }}
+
+  {% if page.feature_image %}
+    <figure class="post__media shell">
+      <img src="{{ page.feature_image | relative_url }}" alt="{{ page.feature_image_alt | default: '' }}">
+      {% if page.feature_image_caption %}<figcaption>{{ page.feature_image_caption }}</figcaption>{% endif %}
+    </figure>
+  {% endif %}
+
+  {% if page.video_embed_url %}
+    <div class="post__video shell">
+      <iframe src="{{ page.video_embed_url }}" title="{{ page.video_title | default: page.title }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  {% endif %}
+
+  <section class="section post__section">
+    <div class="shell post__layout">
+      <div class="post__content prose">{{ content }}</div>
+      <aside class="post__aside">
+        {% if page.external_links and page.external_links.size > 0 %}
+          <div>
+            <p class="post__aside-label">Further out</p>
+            <ul>
+              {% for link in page.external_links %}
+                <li><a href="{{ link.url }}" target="_blank" rel="noreferrer">{{ link.label }} ↗</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+        <div>
+          <p class="post__aside-label">Share this note</p>
+          <ul>
+            <li><a href="https://www.linkedin.com/sharing/share-offsite/?url={{ canonical_url | url_encode }}" target="_blank" rel="noreferrer">LinkedIn ↗</a></li>
+            <li><a href="https://twitter.com/intent/tweet?url={{ canonical_url | url_encode }}&text={{ page.title | url_encode }}" target="_blank" rel="noreferrer">X ↗</a></li>
+          </ul>
+        </div>
+        {% if profile.contact.substack_url != "" %}
+          <a class="button button--ink button--compact" href="{{ profile.contact.substack_url }}" target="_blank" rel="noreferrer">Subscribe on Substack</a>
+        {% endif %}
+      </aside>
     </div>
   </section>
 </article>

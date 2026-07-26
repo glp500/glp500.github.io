@@ -9,15 +9,14 @@
     {% assign items = "" | split: "" %}
 {% endcase %}
 
-<section class="page-hero">
+<header class="page-hero page-hero--archive">
+  <canvas class="page-hero__field" data-mini-flock aria-hidden="true"></canvas>
   <div class="shell page-hero__content reveal">
     <p class="section__eyebrow">{{ page.eyebrow }}</p>
     <h1>{{ page.title }}</h1>
-    {% if page.intro %}
-      <p>{{ page.intro }}</p>
-    {% endif %}
+    {% if page.intro %}<p>{{ page.intro }}</p>{% endif %}
   </div>
-</section>
+</header>
 
 <section class="section section--archive">
   <div class="shell">
@@ -25,11 +24,11 @@
       <div class="archive-list">
         {% for item in items %}
           {% if page.archive_type == "projects" %}
-            {% include project-card.html project=item show_body=true %}
+            {% include project-card.html project=item show_body=true index=forloop.index %}
           {% elsif page.archive_type == "publications" %}
             {% include publication-card.html publication=item show_body=true %}
           {% elsif page.archive_type == "posts" %}
-            {% include post-card.html post=item %}
+            {% include post-card.html post=item index=forloop.index %}
           {% endif %}
         {% endfor %}
       </div>

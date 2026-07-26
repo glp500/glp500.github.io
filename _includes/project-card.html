@@ -1,37 +1,29 @@
-<article class="card card--project reveal">
-  <div class="card__meta">
-    {% if include.project.date %}
-      <span>{{ include.project.date | date: "%Y" }}</span>
+<article class="project-card reveal">
+  <div class="project-card__number">0{{ include.index | default: 1 }}</div>
+  <div class="project-card__main">
+    <div class="card__meta">
+      {% if include.project.status %}<span>{{ include.project.status }}</span>{% endif %}
+      {% if include.project.date %}<span>{{ include.project.date | date: "%Y" }}</span>{% endif %}
+    </div>
+    {% if include.project.feature_image and include.project.feature_image != "" %}
+      <img class="project-card__image" src="{{ include.project.feature_image | relative_url }}" alt="{{ include.project.feature_image_alt | default: '' }}">
     {% endif %}
-    {% if include.project.status %}
-      <span class="pill">{{ include.project.status }}</span>
+    <h3>{{ include.project.title }}</h3>
+    {% if include.project.summary %}<p>{{ include.project.summary }}</p>{% endif %}
+    {% if include.show_body and include.project.content != blank %}
+      <div class="project-card__body prose">{{ include.project.content }}</div>
     {% endif %}
   </div>
-  <h3>{{ include.project.title }}</h3>
-  {% if include.project.summary %}
-    <p>{{ include.project.summary }}</p>
-  {% endif %}
-  {% if include.project.tech and include.project.tech.size > 0 %}
-    <ul class="tag-list" aria-label="Technologies used">
-      {% for tag in include.project.tech %}
-        <li>{{ tag }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-  {% if include.show_body and include.project.content != blank %}
-    <div class="card__body prose">
-      {{ include.project.content }}
+  <div class="project-card__aside">
+    {% if include.project.tech and include.project.tech.size > 0 %}
+      <ul class="tag-list" aria-label="Methods and technologies">
+        {% for tag in include.project.tech %}<li>{{ tag }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    <div class="card__links">
+      {% if include.project.demo_url %}<a href="{{ include.project.demo_url }}" target="_blank" rel="noreferrer">Visit project ↗</a>{% endif %}
+      {% if include.project.repo_url %}<a href="{{ include.project.repo_url }}" target="_blank" rel="noreferrer">Source ↗</a>{% endif %}
+      {% if include.project.paper_url %}<a href="{{ include.project.paper_url }}" target="_blank" rel="noreferrer">Research note ↗</a>{% endif %}
     </div>
-  {% endif %}
-  <div class="card__links">
-    {% if include.project.demo_url %}
-      <a href="{{ include.project.demo_url }}" target="_blank" rel="noreferrer">Live demo</a>
-    {% endif %}
-    {% if include.project.repo_url %}
-      <a href="{{ include.project.repo_url }}" target="_blank" rel="noreferrer">Source</a>
-    {% endif %}
-    {% if include.project.paper_url %}
-      <a href="{{ include.project.paper_url }}" target="_blank" rel="noreferrer">Related paper</a>
-    {% endif %}
   </div>
 </article>
