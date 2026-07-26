@@ -10,6 +10,7 @@ description: A working record of research, projects, education, and roles.
     <p class="section__eyebrow">A working record</p>
     <h1>Experience</h1>
     <p>Research, building, and learning are presented together here because each continually changes how I approach the others.</p>
+    <p class="page-hero__marker" aria-hidden="true">Field 04 · Practice</p>
   </div>
 </header>
 

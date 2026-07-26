@@ -21,14 +21,14 @@ layout: default
     </div>
   </header>
 
-  {% if page.feature_image %}
+  {% if page.feature_image and page.feature_image != "" %}
     <figure class="post__media shell">
       <img src="{{ page.feature_image | relative_url }}" alt="{{ page.feature_image_alt | default: '' }}">
-      {% if page.feature_image_caption %}<figcaption>{{ page.feature_image_caption }}</figcaption>{% endif %}
+      {% if page.feature_image_caption and page.feature_image_caption != "" %}<figcaption>{{ page.feature_image_caption }}</figcaption>{% endif %}
     </figure>
   {% endif %}
 
-  {% if page.video_embed_url %}
+  {% if page.video_embed_url and page.video_embed_url != "" %}
     <div class="post__video shell">
       <iframe src="{{ page.video_embed_url }}" title="{{ page.video_title | default: page.title }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
@@ -43,7 +43,9 @@ layout: default
             <p class="post__aside-label">Further out</p>
             <ul>
               {% for link in page.external_links %}
-                <li><a href="{{ link.url }}" target="_blank" rel="noreferrer">{{ link.label }} ↗</a></li>
+                {% if link.url and link.url != "" %}
+                  <li><a href="{{ link.url }}" target="_blank" rel="noreferrer">{{ link.label }} ↗</a></li>
+                {% endif %}
               {% endfor %}
             </ul>
           </div>

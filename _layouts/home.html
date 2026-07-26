@@ -12,6 +12,7 @@ layout: default
 {% assign recent_posts = visible_posts | slice: 0, profile.featured.posts_limit %}
 
 <section class="hero hero--flock" data-flock-zone>
+  <div class="hero__aperture" aria-hidden="true"></div>
   <canvas class="flock-canvas" data-flock-canvas aria-hidden="true"></canvas>
   <div class="hero__wash" aria-hidden="true"></div>
   <div class="shell hero__inner">

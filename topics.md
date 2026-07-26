@@ -10,6 +10,7 @@ description: Questions spanning collective intelligence, cybernetics, computatio
     <p class="section__eyebrow">A map of recurring questions</p>
     <h1>Topics of Interest</h1>
     <p>Not separate disciplines so much as different views of the same terrain: people, machines, histories, and the feedback loops that bind them.</p>
+    <p class="page-hero__marker" aria-hidden="true">Field 03 · Questions</p>
   </div>
 </header>
 

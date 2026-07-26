@@ -9,6 +9,7 @@ description: About Gavin's research practice, methods, and interests.
   <div class="shell page-hero__content reveal">
     <p class="section__eyebrow">About this practice</p>
     <h1>Between models<br>and lived systems.</h1>
+    <p class="page-hero__marker" aria-hidden="true">Field 05 · Perspective</p>
   </div>
 </header>
 

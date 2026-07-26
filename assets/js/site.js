@@ -276,7 +276,7 @@ class FlockField {
         const distance = Math.hypot(other.x - boid.x, other.y - boid.y);
         if (distance > maxDistance) continue;
         const alpha = (1 - distance / maxDistance) * (this.focusGroup === boid.group ? 0.34 : 0.12);
-        ctx.strokeStyle = `rgba(218, 230, 222, ${alpha})`;
+        ctx.strokeStyle = `rgba(118, 177, 236, ${alpha})`;
         ctx.lineWidth = 0.55;
         ctx.beginPath();
         ctx.moveTo(boid.x, boid.y);
@@ -292,13 +292,18 @@ class FlockField {
     const angle = Math.atan2(boid.vy, boid.vx);
     const isFocused = this.focusGroup < 0 || this.focusGroup === boid.group;
     const groupAlpha = [0.88, 0.68, 0.76, 0.56][boid.group % 4];
+    const sunDistance = Math.hypot(boid.x - this.width * 0.68, boid.y - this.height * 0.62);
+    const crossesSun = !this.options.compact && sunDistance < Math.min(this.width, this.height) * 0.17;
+    const groupColor = crossesSun
+      ? "7, 22, 47"
+      : ["248, 241, 223", "118, 177, 236", "219, 160, 39", "83, 145, 140"][boid.group % 4];
     const alpha = isFocused ? groupAlpha : 0.18;
     const size = boid.size * (this.options.compact ? 0.9 : 1);
 
     ctx.save();
     ctx.translate(boid.x, boid.y);
     ctx.rotate(angle);
-    ctx.strokeStyle = `rgba(245, 246, 239, ${alpha})`;
+    ctx.strokeStyle = `rgba(${groupColor}, ${alpha})`;
     ctx.lineWidth = isFocused ? 1 : 0.7;
     ctx.lineCap = "round";
     ctx.beginPath();
@@ -327,7 +332,7 @@ class FlockField {
 const mainCanvas = document.querySelector("[data-flock-canvas]");
 let mainFlock = null;
 if (mainCanvas) {
-  mainFlock = new FlockField(mainCanvas, { count: window.innerWidth < 760 ? 54 : 94, groups: 4, graph: true });
+  mainFlock = new FlockField(mainCanvas, { count: window.innerWidth < 760 ? 68 : 128, groups: 4, graph: true });
 
   document.querySelectorAll("[data-swarm-focus], [data-swarm-link]").forEach((link) => {
     const rawGroup = link.dataset.swarmFocus ?? link.dataset.swarmLink;
