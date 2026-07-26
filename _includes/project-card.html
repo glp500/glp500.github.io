@@ -21,9 +21,9 @@
       </ul>
     {% endif %}
     <div class="card__links">
-      {% if include.project.demo_url %}<a href="{{ include.project.demo_url }}" target="_blank" rel="noreferrer">Visit project ↗</a>{% endif %}
-      {% if include.project.repo_url %}<a href="{{ include.project.repo_url }}" target="_blank" rel="noreferrer">Source ↗</a>{% endif %}
-      {% if include.project.paper_url %}<a href="{{ include.project.paper_url }}" target="_blank" rel="noreferrer">Research note ↗</a>{% endif %}
+      {% if include.project.demo_url and include.project.demo_url != "" %}<a href="{{ include.project.demo_url }}" target="_blank" rel="noreferrer">Visit project ↗</a>{% endif %}
+      {% if include.project.repo_url and include.project.repo_url != "" %}<a href="{{ include.project.repo_url }}" target="_blank" rel="noreferrer">Source ↗</a>{% endif %}
+      {% if include.project.paper_url and include.project.paper_url != "" %}<a href="{{ include.project.paper_url }}" target="_blank" rel="noreferrer">Research note ↗</a>{% endif %}
     </div>
   </div>
 </article>

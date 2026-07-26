@@ -1,3 +1,6 @@
+---
+layout: default
+---
 {% case page.archive_type %}
   {% when "projects" %}
     {% assign items = site.projects | where_exp: "item", "item.published != false" | sort: "date" | reverse %}

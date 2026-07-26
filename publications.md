@@ -1,10 +1,10 @@
 ---
-title: Publications
+title: Research Outputs
 layout: archive
-nav_key: publications
+nav_key: projects
 archive_type: publications
-eyebrow: Publication archive
-intro: Papers, posters, preprints, and manuscripts should be easy to scan here without forcing readers through a long CV first.
-empty_title: No publications published yet
-empty_body: Copy content-templates/publication.sample.md into _publications/ and update the front matter with a real publication entry.
+eyebrow: Papers · posters · working materials
+intro: A developing record of formal research outputs, presented alongside the projects and questions from which they emerge.
+empty_title: Research in progress
+empty_body: Papers, preprints, posters, and other formal outputs will be collected here as the current work develops.
 ---

@@ -40,29 +40,35 @@ description: A working record of research, projects, education, and roles.
   </div>
 </section>
 
-<section class="section timeline-section timeline-section--paper">
-  <div class="shell">
-    <div class="timeline-section__heading">
-      <p class="section__eyebrow">Education</p>
-      <h2>Formation</h2>
-      <p class="timeline-section__note">This section is ready for your degree, institution, dates, thesis, and selected coursework.</p>
+{% assign education = site.data.profile.education %}
+{% if education and education.size > 0 %}
+  <section class="section timeline-section timeline-section--paper">
+    <div class="shell">
+      <div class="timeline-section__heading">
+        <p class="section__eyebrow">Education</p>
+        <h2>Formation</h2>
+      </div>
+      <div class="timeline">
+        {% for item in education %}
+          <article class="timeline__entry">
+            <div class="timeline__when">{{ item.dates }}</div>
+            <div class="timeline__what">
+              <h3>{{ item.degree }}</h3>
+              {% if item.detail and item.detail != "" %}<p>{{ item.detail }}</p>{% endif %}
+            </div>
+            <div class="timeline__type">{{ item.institution }}</div>
+          </article>
+        {% endfor %}
+      </div>
     </div>
-    <div class="timeline timeline--placeholder">
-      <article class="timeline__entry">
-        <div class="timeline__when">Add dates</div>
-        <div class="timeline__what">
-          <h3>Your degree &amp; field</h3>
-          <p>Add the institution, thesis or concentration, and the one or two details that best explain your present research direction.</p>
-        </div>
-        <div class="timeline__type">Education</div>
-      </article>
-    </div>
-  </div>
-</section>
+  </section>
+{% endif %}
 
-<section class="section cv-band" id="cv">
-  <div class="shell cv-band__inner">
-    <h2>The concise version,<br>for the formal record.</h2>
-    <a class="button button--light" href="{{ site.data.profile.cv.download_url | relative_url }}" download>{{ site.data.profile.cv.download_label }} ↓</a>
-  </div>
-</section>
+{% if site.data.profile.cv.download_url and site.data.profile.cv.download_url != "" %}
+  <section class="section cv-band" id="cv">
+    <div class="shell cv-band__inner">
+      <h2>The concise version,<br>for the formal record.</h2>
+      <a class="button button--light" href="{{ site.data.profile.cv.download_url | relative_url }}" download>{{ site.data.profile.cv.download_label }} ↓</a>
+    </div>
+  </section>
+{% endif %}

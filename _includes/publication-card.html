@@ -20,13 +20,13 @@
     </div>
   {% endif %}
   <div class="card__links">
-    {% if include.publication.paper_url %}
+    {% if include.publication.paper_url and include.publication.paper_url != "" %}
       <a href="{{ include.publication.paper_url }}" target="_blank" rel="noreferrer">Paper</a>
     {% endif %}
-    {% if include.publication.slides_url %}
+    {% if include.publication.slides_url and include.publication.slides_url != "" %}
       <a href="{{ include.publication.slides_url }}" target="_blank" rel="noreferrer">Slides</a>
     {% endif %}
-    {% if include.publication.code_url %}
+    {% if include.publication.code_url and include.publication.code_url != "" %}
       <a href="{{ include.publication.code_url }}" target="_blank" rel="noreferrer">Code</a>
     {% endif %}
   </div>

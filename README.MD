@@ -47,6 +47,6 @@ Before treating the site as finished, update these items:
 
 1. Refine the draft biography and project language in `_data/profile.yml` and `_projects/`.
 2. Add a real email address and the social profiles you want visible.
-3. Replace `assets/docs/gavin-cv-placeholder.pdf` with your actual CV.
-4. Add your education history in `experience.md`.
+3. Add your actual CV to `assets/docs/`, then set `cv.download_url` in `_data/profile.yml`.
+4. Add education entries to the `education` list in `_data/profile.yml`; the section stays hidden until real details exist.
 5. Copy `content-templates/post.sample.md` when publishing new field notes.

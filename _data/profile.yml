@@ -17,7 +17,8 @@ hero:
   secondary_url: /blog/
 cv:
   download_label: Download CV
-  download_url: /assets/docs/gavin-cv-placeholder.pdf
+  # Add the path to your real CV when it is ready, for example /assets/docs/gavin-cv.pdf.
+  download_url: ""
   highlights:
     - label: Current inquiry
       value: Cybernetics, artificial societies, and the dynamics of collective adaptation.
@@ -46,3 +47,12 @@ featured:
   projects_limit: 3
   publications_limit: 3
   posts_limit: 3
+
+# Education entries remain hidden until real details are added.
+# Example:
+# education:
+#   - dates: "2022–2025"
+#     degree: "Degree and field"
+#     institution: "University name"
+#     detail: "Thesis, concentration, or selected work."
+education: []
