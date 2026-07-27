@@ -6,14 +6,16 @@
   <body
     class="page-{{ page.nav_key | default: page.layout | default: 'default' | slugify }}"
     data-page="{{ page.nav_key | default: page.layout | default: 'default' | slugify }}"
-    style="--hero-image: url('{{ site.data.profile.images.hero_background | relative_url }}'); --hero-position: {{ site.data.profile.images.hero_position | default: 'center center' }};"
+    data-world-mode="{{ page.world_mode | default: page.nav_key | default: 'home' }}"
   >
     <a class="skip-link" href="#main-content">Skip to content</a>
+    <canvas class="agent-world" data-agent-world aria-hidden="true"></canvas>
+    <noscript><div class="agent-world-fallback" aria-hidden="true"></div></noscript>
     {% include header.html %}
     <main id="main-content">
       {{ content }}
     </main>
     {% include footer.html %}
-    <script src="{{ '/assets/js/site.js' | relative_url }}"></script>
+    <script src="{{ '/assets/js/site.js' | relative_url }}" defer></script>
   </body>
 </html>

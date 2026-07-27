@@ -1,10 +1,10 @@
-title: Gavin · Research & Practice
-email: ""
-description: Research, projects, and field notes on collective intelligence, cybernetics, computational history, and machine learning.
+title: Gavin Lip
+email: "lip.gavin@gmail.com"
+description: Research and projects in cybernetic systems, cultural AI, informatics, and computational history.
 url: "https://glp500.github.io"
 baseurl: ""
 lang: en
-timezone: Europe/Berlin
+timezone: Europe/Amsterdam
 markdown: kramdown
 permalink: pretty
 
@@ -14,9 +14,18 @@ plugins:
   - jekyll-sitemap
 
 collections:
+  research:
+    output: true
+    permalink: /research/:name/
   projects:
-    output: false
+    output: true
+    permalink: /projects/:name/
   publications:
+    output: true
+    permalink: /publications/:name/
+  media:
+    output: false
+  resources:
     output: false
 
 defaults:
@@ -25,6 +34,25 @@ defaults:
       type: posts
     values:
       layout: post
+      world_mode: notes
+  - scope:
+      path: ""
+      type: research
+    values:
+      layout: research-detail
+      world_mode: research
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: project-detail
+      world_mode: projects
+  - scope:
+      path: ""
+      type: publications
+    values:
+      layout: publication-detail
+      world_mode: publications
   - scope:
       path: ""
       type: pages

@@ -1,0 +1,18 @@
+<div class="filter-controls" aria-label="{{ include.label | default: 'Archive filters' }}">
+  <label class="filter-search">
+    <span>Search</span>
+    <input type="search" placeholder="{{ include.placeholder | default: 'Search the archive' }}" data-filter-search>
+  </label>
+  {% if include.options and include.options.size > 0 %}
+    <div class="filter-buttons" role="group" aria-label="Filter by type">
+      <button class="is-active" type="button" data-filter-button data-filter-value="all">All</button>
+      {% for option in include.options %}
+        <button type="button" data-filter-button data-filter-value="{{ option | downcase | slugify }}">{{ option }}</button>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="filter-status" aria-live="polite">
+    <span data-filter-count></span>
+    <button type="button" data-filter-reset>Reset</button>
+  </div>
+</div>

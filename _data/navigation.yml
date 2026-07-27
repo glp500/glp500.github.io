@@ -1,24 +1,28 @@
 - key: home
   label: Home
   url: /
-  swarm: 0
+  world_mode: home
+- key: research
+  label: Research
+  url: /research/
+  world_mode: research
 - key: projects
   label: Projects
   url: /projects/
-  swarm: 1
-- key: blog
-  label: Field notes
-  url: /blog/
-  swarm: 2
-- key: topics
-  label: Topics
-  url: /topics/
-  swarm: 3
+  world_mode: projects
+- key: publications
+  label: Publications
+  url: /publications/
+  world_mode: publications
+- key: media
+  label: Media & Literature
+  url: /media/
+  world_mode: media
+- key: resources
+  label: Open Source
+  url: /open-source/
+  world_mode: resources
 - key: experience
-  label: Experience
+  label: Experience / CV
   url: /experience/
-  swarm: 4
-- key: about
-  label: About
-  url: /about/
-  swarm: 5
+  world_mode: experience

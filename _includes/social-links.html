@@ -1,16 +1,9 @@
-{% assign links = include.social | default: site.data.profile.contact.social %}
-{% assign visible_links = links | where_exp: "item", "item.url and item.url != ''" %}
-{% assign contact = site.data.profile.contact %}
-{% if visible_links.size > 0 or contact.x_url != "" or contact.substack_url != "" %}
-  <ul class="social-links">
-    {% for item in visible_links %}
-      <li><a href="{{ item.url }}" target="_blank" rel="noreferrer">{{ item.label }}</a></li>
+{% if include.social and include.social.size > 0 %}
+  <nav class="social-links" aria-label="External profiles">
+    {% for item in include.social %}
+      {% if item.url and item.url != "" %}
+        <a href="{{ item.url }}" target="_blank" rel="me noreferrer">{{ item.label }} ↗</a>
+      {% endif %}
     {% endfor %}
-    {% if contact.substack_url != "" %}
-      <li><a href="{{ contact.substack_url }}" target="_blank" rel="noreferrer">Substack</a></li>
-    {% endif %}
-    {% if contact.x_url != "" %}
-      <li><a href="{{ contact.x_url }}" target="_blank" rel="noreferrer">X</a></li>
-    {% endif %}
-  </ul>
+  </nav>
 {% endif %}

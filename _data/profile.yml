@@ -1,58 +1,110 @@
-name: Gavin
-title: "Researcher, builder, and student of complex systems"
-tagline: "Research · Systems · Culture"
-summary: "I study how intelligence, coordination, and culture emerge from many interacting parts—and build tools for institutions navigating that complexity."
-bio: "My work moves between computational research, institutional technology, and the longer histories of how people organize knowledge. I am especially drawn to questions that resist a single disciplinary lens: how groups learn, how feedback reshapes behavior, and how technical systems become cultural systems."
+name: Gavin Lip
+title: "Cybernetic Systems, Cultural AI, and Informatics"
+summary: "I study how intelligence, coordination, and culture emerge from interacting people, machines, and institutions."
+bio: "Lifelong learner with experience in computational modelling, multimodal data integration, and transparent artificial intelligence systems for complex real-world contexts. I am drawn to interdisciplinary and open-source projects that make technical systems more legible, useful, and accountable."
+
 images:
-  # Put replacement images in assets/images/ and update these paths.
-  hero_background: /assets/images/wetland-blue-hour.webp
-  hero_position: center 55%
-  portrait: ""
-  portrait_alt: "Portrait of Gavin"
-hero:
-  eyebrow: An evolving field guide · 2026
-  primary_label: Explore the work
-  primary_url: /projects/
-  secondary_label: Read field notes
-  secondary_url: /blog/
-cv:
-  download_label: Download CV
-  # Add the path to your real CV when it is ready, for example /assets/docs/gavin-cv.pdf.
-  download_url: ""
-  highlights:
-    - label: Current inquiry
-      value: Cybernetics, artificial societies, and the dynamics of collective adaptation.
-    - label: Current build
-      value: Local AI infrastructure for institutional knowledge ecosystems.
-    - label: Methods
-      value: Computational modelling, historical research, prototyping, and systems design.
+  portrait: /assets/images/gavin-lip-portrait.webp
+  portrait_alt: "Gavin Lip smiling in front of a blue geometric backdrop"
+
 contact:
-  email: ""
-  location: Europe
-  substack_url: ""
-  x_url: ""
+  email: lip.gavin@gmail.com
+  location: Amsterdam, Netherlands
   social:
     - label: GitHub
       url: https://github.com/glp500
     - label: LinkedIn
-      url: ""
-interests:
-  - title: Collective intelligence
-    description: How local rules, partial knowledge, and feedback produce coordination at the scale of groups.
-  - title: Histories of computation
-    description: The cultural and economic histories embedded in technologies that are often described as entirely new.
-  - title: Tools for thought
-    description: Small, local, legible systems that extend institutional memory without flattening its context.
-featured:
-  projects_limit: 3
-  publications_limit: 3
-  posts_limit: 3
+      url: https://www.linkedin.com/in/gavin-lip
+  substack_url: ""
+  x_url: ""
 
-# Education entries remain hidden until real details are added.
-# Example:
-# education:
-#   - dates: "2022–2025"
-#     degree: "Degree and field"
-#     institution: "University name"
-#     detail: "Thesis, concentration, or selected work."
-education: []
+cv:
+  download_label: Download the original CV
+  download_url: /assets/docs/gavin-lip-cv.pdf
+
+experience:
+  - dates: Feb 2026 — Jul 2026
+    role: AI Research Intern
+    institution: Center for Neurogenomics & Cognitive Research
+    summary: "Clustered patient features using pairwise correlation similarity to identify stable, prevalent features across a patient cohort. Developed low-dimensional multi-view representations for visualization, downstream modelling, and patient stratification."
+    methods:
+      - Multi-view learning
+      - Patient stratification
+      - Computational modelling
+  - dates: Dec 2024 — Dec 2025
+    role: AI Research Assistant
+    institution: Netherlands Royal Academy of Arts & Sciences
+    summary: "Developed a machine-learning pipeline for boundary detection in archival collections, integrating multiple signals to model document membership at page-scan level. Framed multimodal archival data with historians to support accessible computational analysis of UNESCO-listed colonial archives."
+    methods:
+      - Machine learning
+      - Multimodal archival data
+      - Boundary detection
+  - dates: Sep 2024 — Oct 2025
+    role: Data Science Research Assistant
+    institution: Network Institute
+    summary: "Built a pipeline that transformed documents into validated, queryable datasets through schema-constrained extraction and structured-output parsing, supporting quantitative, historical, and network-oriented research."
+    methods:
+      - Structured extraction
+      - Data validation
+      - Computational history
+  - dates: Dec 2023 — Jul 2024
+    role: AI Research Intern
+    institution: Netherlands Royal Academy of Arts & Sciences
+    summary: "Designed a reproducible framework for fine-tuning and evaluating large language models for Early Modern Dutch translation, comparing model variants with preference-based and parameter-efficient methods."
+    methods:
+      - Language models
+      - Model evaluation
+      - Reproducible research
+
+education:
+  - dates: Sep 2024 — Jul 2026
+    degree: Master of Science, Artificial Intelligence
+    institution: Vrije Universiteit Amsterdam
+    thesis: "Multi-view Learning for High-Dimensional & Heterogeneous EEG & Phenotype Data"
+    coursework:
+      - Statistical Modelling & Experimental Design
+      - Advanced Machine Learning
+      - Neural Models of Cognition
+      - Reinforcement Learning
+  - dates: Sep 2021 — Jul 2024
+    degree: Bachelor of Science, Artificial Intelligence
+    institution: Vrije Universiteit Amsterdam
+    thesis: "Fine-Tuning Large-Language Models for Early Modern Dutch Translation"
+    detail: "Grade: 9.0/10 · Published in Computational Humanities Research, Cambridge University Press"
+    coursework:
+      - Machine Learning
+      - Probability
+      - Statistics
+      - Multivariate Calculus
+      - Human-Computer Interaction
+
+skills:
+  - title: Modelling & AI
+    items:
+      - Multimodal modelling
+      - Machine and reinforcement learning
+      - AI evaluation & interoperability
+      - PyTorch, Transformers & scikit-learn
+  - title: Research Practice
+    items:
+      - Experimental design
+      - Applied computational thinking
+      - Technical writing
+      - System-based problem-solving
+  - title: Building & Collaboration
+    items:
+      - Python, C++ & Java
+      - Pandas & Matplotlib
+      - Project management
+      - Interdisciplinary communication
+
+interests:
+  - Bouldering, climbing & outdoor activities
+  - Sound design & music production
+  - Board games
+  - Creative, collaborative technology projects
+
+featured:
+  research_limit: 3
+  projects_limit: 3
+  posts_limit: 1

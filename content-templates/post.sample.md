@@ -1,19 +1,16 @@
 ---
-title: "Replace with post title"
-date: 2026-03-25
-excerpt: "Short summary for cards and SEO."
+title: "Post title"
+date: 2026-01-01
+kind: Essay
+excerpt: "A concise introduction shown in the writing archive."
 tags:
-  - notes
-  - research
-feature_image: "/assets/images/replace-with-image.jpg"
-feature_image_alt: "Describe the image for readers using assistive technology."
-feature_image_caption: ""
-video_embed_url: ""
-video_title: ""
+  - Topic
+feature_image: /assets/images/your-post-image.webp
+feature_image_alt: "A specific description of the image"
+image_caption: ""
+video_url: ""
 external_links:
-  - label: "Related reading"
+  - label: "Related source"
     url: "https://example.com"
 ---
-Write the post in Markdown. It supports headings, lists, blockquotes, inline images, and normal external links.
-
-For video, use an embeddable URL in `video_embed_url` (for example, a YouTube `/embed/…` URL). Remove unused media fields rather than leaving example values in a live post.
+Write the post in Markdown. Valid `kind` values are Announcement, Essay, Project Update, and Reading Note.

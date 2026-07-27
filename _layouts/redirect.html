@@ -1,0 +1,13 @@
+---
+layout: default
+---
+<meta http-equiv="refresh" content="0; url={{ page.redirect_to | relative_url }}">
+<link rel="canonical" href="{{ page.redirect_to | absolute_url }}">
+<section class="redirect-page">
+  <div class="shell">
+    <p class="kicker">This route has moved</p>
+    <h1>{{ page.title }}</h1>
+    <p>You will be redirected automatically.</p>
+    <a class="button button--dark" href="{{ page.redirect_to | relative_url }}">Continue →</a>
+  </div>
+</section>

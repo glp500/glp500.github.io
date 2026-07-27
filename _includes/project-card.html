@@ -1,29 +1,30 @@
-<article class="project-card reveal">
-  <div class="project-card__number">0{{ include.index | default: 1 }}</div>
-  <div class="project-card__main">
-    <div class="card__meta">
+{% assign project_stack = include.project.stack | default: include.project.tech %}
+<article
+  class="project-card reveal"
+  data-filter-item
+  data-filter="{{ include.project.status | default: 'project' | downcase | slugify }}"
+  data-search="{{ include.project.title }} {{ include.project.summary }} {{ include.project.role }} {{ project_stack | join: ' ' }} {{ include.project.topics | join: ' ' }}"
+>
+  <a class="project-card__visual" href="{{ include.project.url | relative_url }}" aria-label="View {{ include.project.title }}">
+    {% if include.project.image and include.project.image != "" %}
+      <img src="{{ include.project.image | relative_url }}" alt="{{ include.project.image_alt | default: '' }}">
+    {% else %}
+      {% include specimen.html kind="projects" %}
+    {% endif %}
+    <span class="project-card__index">0{{ include.index | default: 1 }}</span>
+  </a>
+  <div class="project-card__content">
+    <p class="card-meta">
       {% if include.project.status %}<span>{{ include.project.status }}</span>{% endif %}
-      {% if include.project.date %}<span>{{ include.project.date | date: "%Y" }}</span>{% endif %}
-    </div>
-    {% if include.project.feature_image and include.project.feature_image != "" %}
-      <img class="project-card__image" src="{{ include.project.feature_image | relative_url }}" alt="{{ include.project.feature_image_alt | default: '' }}">
-    {% endif %}
-    <h3>{{ include.project.title }}</h3>
-    {% if include.project.summary %}<p>{{ include.project.summary }}</p>{% endif %}
-    {% if include.show_body and include.project.content != blank %}
-      <div class="project-card__body prose">{{ include.project.content }}</div>
-    {% endif %}
-  </div>
-  <div class="project-card__aside">
-    {% if include.project.tech and include.project.tech.size > 0 %}
+      {% if include.project.role %}<span>{{ include.project.role }}</span>{% endif %}
+    </p>
+    <h3><a href="{{ include.project.url | relative_url }}">{{ include.project.title }}</a></h3>
+    <p>{{ include.project.summary }}</p>
+    {% if project_stack and project_stack.size > 0 %}
       <ul class="tag-list" aria-label="Methods and technologies">
-        {% for tag in include.project.tech %}<li>{{ tag }}</li>{% endfor %}
+        {% for tag in project_stack %}<li>{{ tag }}</li>{% endfor %}
       </ul>
     {% endif %}
-    <div class="card__links">
-      {% if include.project.demo_url and include.project.demo_url != "" %}<a href="{{ include.project.demo_url }}" target="_blank" rel="noreferrer">Visit project ↗</a>{% endif %}
-      {% if include.project.repo_url and include.project.repo_url != "" %}<a href="{{ include.project.repo_url }}" target="_blank" rel="noreferrer">Source ↗</a>{% endif %}
-      {% if include.project.paper_url and include.project.paper_url != "" %}<a href="{{ include.project.paper_url }}" target="_blank" rel="noreferrer">Research note ↗</a>{% endif %}
-    </div>
+    <a class="arrow-link" href="{{ include.project.url | relative_url }}">Open project →</a>
   </div>
 </article>

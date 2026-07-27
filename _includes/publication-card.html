@@ -1,33 +1,20 @@
-<article class="card card--publication reveal">
-  <div class="card__meta">
-    {% if include.publication.year %}
-      <span>{{ include.publication.year }}</span>
-    {% endif %}
-    {% if include.publication.venue %}
-      <span>{{ include.publication.venue }}</span>
-    {% endif %}
+<article
+  class="publication-entry reveal"
+  data-filter-item
+  data-filter="{{ include.publication.status | default: 'published' | downcase | slugify }}"
+  data-search="{{ include.publication.title }} {{ include.publication.authors }} {{ include.publication.venue }} {{ include.publication.year }} {{ include.publication.topics | join: ' ' }}"
+>
+  <div class="publication-entry__year">{{ include.publication.year }}</div>
+  <div class="publication-entry__body">
+    <p class="card-meta"><span>{{ include.publication.status | default: "Published" }}</span><span>{{ include.publication.venue }}</span></p>
+    <h2><a href="{{ include.publication.url | relative_url }}">{{ include.publication.title }}</a></h2>
+    <p class="citation-text">{{ include.publication.citation }}</p>
+    {% if include.publication.summary %}<p>{{ include.publication.summary }}</p>{% endif %}
   </div>
-  <h3>{{ include.publication.title }}</h3>
-  {% if include.publication.authors %}
-    <p class="card__authors">{{ include.publication.authors }}</p>
-  {% endif %}
-  {% if include.publication.summary %}
-    <p>{{ include.publication.summary }}</p>
-  {% endif %}
-  {% if include.show_body and include.publication.content != blank %}
-    <div class="card__body prose">
-      {{ include.publication.content }}
-    </div>
-  {% endif %}
-  <div class="card__links">
-    {% if include.publication.paper_url and include.publication.paper_url != "" %}
-      <a href="{{ include.publication.paper_url }}" target="_blank" rel="noreferrer">Paper</a>
-    {% endif %}
-    {% if include.publication.slides_url and include.publication.slides_url != "" %}
-      <a href="{{ include.publication.slides_url }}" target="_blank" rel="noreferrer">Slides</a>
-    {% endif %}
-    {% if include.publication.code_url and include.publication.code_url != "" %}
-      <a href="{{ include.publication.code_url }}" target="_blank" rel="noreferrer">Code</a>
+  <div class="publication-entry__links">
+    <a href="{{ include.publication.url | relative_url }}">Details →</a>
+    {% if include.publication.doi and include.publication.doi != "" %}
+      <a href="https://doi.org/{{ include.publication.doi }}" target="_blank" rel="noreferrer">DOI ↗</a>
     {% endif %}
   </div>
 </article>

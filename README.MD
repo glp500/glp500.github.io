@@ -1,52 +1,65 @@
-# `glp500.github.io`
+# Gavin Lip — Research Portfolio
 
-Custom Jekyll research portfolio for projects, field notes, topics, experience, and personal interests. The homepage includes a live canvas flocking model over an original generated landscape.
+A custom Jekyll portfolio for research programs, projects, publications, field notes, media, open-source resources, and a web CV. The visual system is based on Gavin's Canva layouts and includes a persistent interactive multi-agent field.
 
-## Local development
+## Local preview
 
-```powershell
+```bash
 bundle install
 bundle exec jekyll serve
 ```
 
-The local preview will be available at `http://127.0.0.1:4000`.
+Open `http://127.0.0.1:4000`. Run a production build with:
 
-## Content structure
+```bash
+JEKYLL_ENV=production bundle exec jekyll build
+```
 
-- `_data/profile.yml`: name, tagline, hero text, contact links, CV link, and homepage highlights.
-- `_data/navigation.yml`: top navigation labels and routes.
-- `_projects/`: project entries written in Markdown front matter.
-- `_publications/`: publication entries written in Markdown front matter.
-- `_posts/`: dated blog posts.
-- `content-templates/`: starter files you can copy when adding real content.
+## Publishing content
 
-Posts can include a feature image, image caption, embedded video, and related external links through front matter. LinkedIn and X sharing links are generated automatically on every post. Add `substack_url`, `x_url`, and your LinkedIn URL in `_data/profile.yml` to connect your real profiles.
+Long-form entries are Markdown files:
 
-## Replacing or adding images
+- `_research/`: enduring questions and research programs.
+- `_projects/`: concrete studies, tools, ventures, and experiments.
+- `_publications/`: papers and formal outputs.
+- `_posts/`: dated announcements, essays, project updates, and reading notes.
+- `_media/`: Read, Watch, and Listen shelf entries.
+- `_resources/`: original and curated code, data, templates, tools, and references.
 
-1. Copy your image into `assets/images/`.
-2. To replace the landscape used by the homepage and closing sections, change `images.hero_background` in `_data/profile.yml`. Adjust `images.hero_position` if the crop needs to move.
-3. To add an About portrait, set `images.portrait` and `images.portrait_alt` in `_data/profile.yml`.
-4. Posts and projects support their own `feature_image` and `feature_image_alt` fields. See the files in `content-templates/` for examples.
+Copy the corresponding starter file from `content-templates/`, remove `.sample` from the filename, complete the front matter, and write any longer content below it. A post filename must begin with `YYYY-MM-DD-`.
 
-JPG, PNG, AVIF, and WebP files all work. WebP or AVIF generally provide the best page weight.
+Use `published: false` in front matter to keep a draft out of the built site. Set `featured: true` to make an eligible item appear on the homepage.
 
-## Publish workflow
+## Replacing and adding images
 
-The repo includes a GitHub Actions workflow at `.github/workflows/pages.yml`.
+1. Add JPG, PNG, WebP, AVIF, or SVG files under `assets/images/`.
+2. Set the entry's `image` or `feature_image` field to a site path such as `/assets/images/my-image.webp`.
+3. Write meaningful `image_alt` or `feature_image_alt` text.
+4. Leave the image field blank to use the site's original procedural specimen instead.
 
-To use it:
+The homepage portrait is configured in `_data/profile.yml`. WebP or AVIF is recommended for photographs.
 
-1. Push the repository to `main`.
-2. In GitHub repository settings, set Pages to deploy from **GitHub Actions**.
-3. Wait for the workflow to build and publish the generated `_site` artifact.
+## Profile, navigation, and CV
 
-## First content pass
+- `_data/profile.yml` contains identity, contact links, CV experience, education, methods, and interests.
+- `_data/navigation.yml` controls the seven primary navigation links and their agent-world modes.
+- The downloadable PDF is `assets/docs/gavin-lip-cv.pdf`.
 
-Before treating the site as finished, update these items:
+Blank profile URLs are not rendered. The public HTML intentionally omits the phone number; the downloadable source CV contains the contact information present in the original document.
 
-1. Refine the draft biography and project language in `_data/profile.yml` and `_projects/`.
-2. Add a real email address and the social profiles you want visible.
-3. Add your actual CV to `assets/docs/`, then set `cv.download_url` in `_data/profile.yml`.
-4. Add education entries to the `education` list in `_data/profile.yml`; the section stays hidden until real details exist.
-5. Copy `content-templates/post.sample.md` when publishing new field notes.
+## Interactive field
+
+The fixed canvas in `assets/js/site.js` changes species and organization by page or section. Pointer movement creates currents, clicks create temporary attractors, dragging paints a flow field, and double-clicking triggers a coordinated regime shift. A compact state is stored in `sessionStorage` so movement continues across internal navigation.
+
+Visitors using reduced-motion preferences, and small touch-only devices, receive a static procedural field. The canvas is decorative, ignores pointer input, and is hidden from assistive technology.
+
+## GitHub Pages
+
+The workflow at `.github/workflows/pages.yml` builds and deploys the site.
+
+1. Push changes to `main`.
+2. In the repository's **Settings → Pages**, choose **GitHub Actions** as the source.
+3. Monitor the **Actions** tab for the `Deploy Jekyll site` workflow.
+4. Open the deployment URL shown by the completed workflow.
+
+No database, CMS, or paid hosting is required.

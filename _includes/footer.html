@@ -1,13 +1,19 @@
 {% assign profile = site.data.profile %}
-<footer class="site-footer">
-  <div class="shell site-footer__inner">
-    <div class="site-footer__lead">
-      <p class="site-footer__kicker">Continue the conversation</p>
-      <p class="site-footer__title">Questions, collaborations,<br>and strange connections welcome.</p>
+<footer class="site-footer" id="contact" data-world-mode="home">
+  <div class="site-footer__signal" aria-hidden="true">CONTACT</div>
+  <div class="site-footer__inner shell">
+    <div>
+      <p class="kicker kicker--dark">Questions · collaborations · strange connections</p>
+      <h2>Let’s compare notes.</h2>
     </div>
-    <div class="site-footer__meta">
+    <div class="site-footer__contact">
+      <a href="mailto:{{ profile.contact.email }}">{{ profile.contact.email }} ↗</a>
+      <p>{{ profile.contact.location }}</p>
       {% include social-links.html social=profile.contact.social %}
-      <p class="site-footer__copy">© {{ site.time | date: "%Y" }} {{ profile.name }} · Built as a living archive.</p>
     </div>
+  </div>
+  <div class="site-footer__base shell">
+    <p>© {{ site.time | date: "%Y" }} {{ profile.name }}</p>
+    <p>Research portfolio · built as a living system</p>
   </div>
 </footer>

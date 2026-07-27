@@ -2,179 +2,150 @@
 layout: default
 ---
 {% assign profile = site.data.profile %}
-{% assign visible_projects = site.projects | where_exp: "item", "item.published != false" | sort: "date" | reverse %}
-{% assign visible_posts = site.posts | where_exp: "item", "item.published != false" %}
-{% assign featured_projects = visible_projects | where_exp: "item", "item.featured == true" %}
-{% if featured_projects.size == 0 %}
-  {% assign featured_projects = visible_projects %}
-{% endif %}
-{% assign featured_projects = featured_projects | slice: 0, profile.featured.projects_limit %}
-{% assign recent_posts = visible_posts | slice: 0, profile.featured.posts_limit %}
+{% assign research_items = site.research | where_exp: "item", "item.published != false" %}
+{% assign featured_research = research_items | where: "featured", true | slice: 0, profile.featured.research_limit %}
+{% assign project_items = site.projects | where_exp: "item", "item.published != false" | sort: "date" | reverse %}
+{% assign featured_projects = project_items | where: "featured", true | slice: 0, profile.featured.projects_limit %}
+{% assign latest_post = site.posts | where_exp: "item", "item.published != false" | first %}
+{% assign featured_publication = site.publications | where: "featured", true | first %}
 
-<section class="hero hero--flock" data-flock-zone>
-  <div class="hero__aperture" aria-hidden="true"></div>
-  <canvas class="flock-canvas" data-flock-canvas aria-hidden="true"></canvas>
-  <div class="hero__wash" aria-hidden="true"></div>
-  <div class="shell hero__inner">
-    <div class="hero__content reveal">
-      <p class="eyebrow eyebrow--light">{{ profile.hero.eyebrow }}</p>
-      <h1>How do systems<br><em>learn to live?</em></h1>
-      <p class="hero__summary">{{ profile.summary }}</p>
-      <div class="hero__actions">
-        <a class="button button--light" href="{{ profile.hero.primary_url | relative_url }}">{{ profile.hero.primary_label }} <span aria-hidden="true">↗</span></a>
-        <a class="text-link text-link--light" href="{{ profile.hero.secondary_url | relative_url }}">{{ profile.hero.secondary_label }} <span aria-hidden="true">→</span></a>
-      </div>
-    </div>
-
-    <nav class="swarm-index" aria-label="Explore by theme">
-      <p class="swarm-index__label">Signals in this field</p>
-      <a href="{{ '/projects/' | relative_url }}" data-swarm-focus="1"><span>01</span> Artificial societies</a>
-      <a href="{{ '/blog/' | relative_url }}" data-swarm-focus="2"><span>02</span> Field notes</a>
-      <a href="{{ '/topics/' | relative_url }}" data-swarm-focus="3"><span>03</span> Collective intelligence</a>
-      <a href="{{ '/about/' | relative_url }}" data-swarm-focus="5"><span>04</span> Practice &amp; perspective</a>
-    </nav>
-
-    <div class="hero__legend" aria-hidden="true">
-      <span class="hero__legend-line"></span>
-      Live model · move through the field
-    </div>
+<section class="masthead" data-world-mode="home">
+  <div class="masthead__orbit" aria-hidden="true"></div>
+  <div class="masthead__inner shell">
+    <p class="masthead__edition">Independent research portfolio · Amsterdam · 2026</p>
+    <h1>{{ profile.name }}</h1>
+    <p class="masthead__discipline">{{ profile.title }}</p>
+    <p class="masthead__intro">{{ profile.summary }}</p>
+    <a class="scroll-cue" href="#about">Enter the field <span aria-hidden="true">↓</span></a>
   </div>
 </section>
 
-<section class="manifesto">
-  <div class="shell manifesto__grid">
-    <div class="manifesto__index reveal">
-      <span>001</span>
-      <span>Orientation</span>
+<section class="home-about section-rule" id="about" data-world-mode="home">
+  <div class="shell home-about__grid">
+    <div class="section-index reveal"><span>001</span><span>About</span></div>
+    <div class="home-about__portrait reveal">
+      <img src="{{ profile.images.portrait | relative_url }}" alt="{{ profile.images.portrait_alt }}">
+      <span class="image-caption">Portrait · {{ profile.contact.location }}</span>
     </div>
-    <div class="manifesto__content reveal reveal--delay">
-      <p class="section__eyebrow">Research &amp; practice</p>
-      <h2>A field guide to<br>intelligence in the wild.</h2>
-      <div class="manifesto__copy">
-        <p>{{ profile.bio }}</p>
-        <a class="text-link" href="{{ '/about/' | relative_url }}">More about my practice <span aria-hidden="true">→</span></a>
+    <div class="home-about__copy reveal">
+      <p class="kicker">Researcher · builder · lifelong learner</p>
+      <h2>Working between models and lived systems.</h2>
+      <p>{{ profile.bio }}</p>
+      <p>I follow questions across disciplinary borders—moving between code, archives, theory, and collaborative design to understand how systems learn, remember, and coordinate.</p>
+      <div class="link-row">
+        <a class="arrow-link" href="{{ '/experience/' | relative_url }}">Experience & CV →</a>
+        <a class="arrow-link" href="mailto:{{ profile.contact.email }}">Write to me ↗</a>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section section--projects">
+<section class="announcement section-rule" data-world-mode="notes">
   <div class="shell">
-    <div class="section__topline reveal">
+    <div class="section-heading reveal">
+      <div class="section-index"><span>002</span><span>Announcements</span></div>
       <div>
-        <p class="section__eyebrow">Selected work</p>
-        <h2>Projects in motion</h2>
+        <p class="kicker">Latest signal from the archive</p>
+        <h2>Notes from work in motion.</h2>
       </div>
-      <a class="text-link" href="{{ '/projects/' | relative_url }}">View all projects <span aria-hidden="true">→</span></a>
+      <a class="arrow-link" href="{{ '/blog/' | relative_url }}">All field notes →</a>
     </div>
-
-    {% if featured_projects.size > 0 %}
-      <div class="project-ledger">
-        {% for project in featured_projects %}
-          {% include project-card.html project=project index=forloop.index %}
-        {% endfor %}
+    {% if latest_post %}
+      <div class="announcement__feature">
+        <div class="announcement__specimen reveal">{% include specimen.html kind="notes" %}</div>
+        <article class="announcement__copy reveal">
+          <p class="card-meta"><span>{{ latest_post.kind | default: "Field Note" }}</span><time datetime="{{ latest_post.date | date_to_xmlschema }}">{{ latest_post.date | date: "%d.%m.%Y" }}</time></p>
+          <h3><a href="{{ latest_post.url | relative_url }}">{{ latest_post.title }}</a></h3>
+          <p>{{ latest_post.excerpt | strip_html | strip }}</p>
+          <a class="arrow-link" href="{{ latest_post.url | relative_url }}">Read the note →</a>
+        </article>
       </div>
-    {% else %}
-      {% include empty-state.html title="The project archive is taking shape" body="The structure is ready for research, tools, and experiments. Add Markdown files to _projects/ to publish the first entry." link_label="Open the project archive" link_url="/projects/" %}
     {% endif %}
   </div>
 </section>
 
-<section class="section section--topics">
-  <div class="shell topics">
-    <div class="topics__intro reveal">
-      <p class="section__eyebrow">Recurring questions</p>
-      <h2>Four ways into<br>the same system.</h2>
-      <p>The subjects change. The deeper question remains: how do relationships become structures, and structures begin to act?</p>
+<section class="home-research section-rule" data-world-mode="research">
+  <div class="shell">
+    <div class="section-heading reveal">
+      <div class="section-index"><span>003</span><span>Research</span></div>
+      <div>
+        <p class="kicker">Enduring questions · changing methods</p>
+        <h2>Research fields</h2>
+      </div>
+      <a class="arrow-link" href="{{ '/research/' | relative_url }}">View all research →</a>
     </div>
-    <ol class="topic-list">
-      <li class="reveal">
-        <span>01</span>
-        <a href="{{ '/topics/#collective-intelligence' | relative_url }}">
-          <h3>Collective intelligence</h3>
-          <p>Emergence, coordination, and complex adaptive systems.</p>
-        </a>
-      </li>
-      <li class="reveal">
-        <span>02</span>
-        <a href="{{ '/topics/#cybernetics' | relative_url }}">
-          <h3>Cybernetics &amp; design</h3>
-          <p>Feedback, control, institutional learning, and unintended effects.</p>
-        </a>
-      </li>
-      <li class="reveal">
-        <span>03</span>
-        <a href="{{ '/topics/#histories' | relative_url }}">
-          <h3>Computational histories</h3>
-          <p>Cultural and economic histories of knowledge technologies.</p>
-        </a>
-      </li>
-      <li class="reveal">
-        <span>04</span>
-        <a href="{{ '/topics/#machine-learning' | relative_url }}">
-          <h3>Machine learning</h3>
-          <p>Big data, reinforcement learning, and artificial social worlds.</p>
-        </a>
-      </li>
-    </ol>
+    <div class="research-grid">
+      {% for item in featured_research %}
+        {% include research-card.html research=item index=forloop.index %}
+      {% endfor %}
+    </div>
   </div>
 </section>
 
-<section class="section section--notes">
+<section class="home-projects section-rule" data-world-mode="projects">
   <div class="shell">
-    <div class="section__topline reveal">
+    <div class="section-heading reveal">
+      <div class="section-index"><span>004</span><span>Projects</span></div>
       <div>
-        <p class="section__eyebrow">Field notes</p>
-        <h2>Thinking in public</h2>
+        <p class="kicker">Studies · tools · ventures · experiments</p>
+        <h2>Things taking form</h2>
       </div>
-      <a class="text-link" href="{{ '/blog/' | relative_url }}">Enter the archive <span aria-hidden="true">→</span></a>
+      <a class="arrow-link" href="{{ '/projects/' | relative_url }}">Project archive →</a>
     </div>
-    {% if recent_posts.size > 0 %}
-      <div class="notes-grid">
-        {% for post in recent_posts %}
-          {% include post-card.html post=post index=forloop.index %}
-        {% endfor %}
-      </div>
-    {% else %}
-      {% include empty-state.html title="Notes coming soon" body="This archive will hold project logs, essays, announcements, and research fragments." link_label="Open the field notes" link_url="/blog/" %}
+    <div class="project-grid">
+      {% for project in featured_projects %}
+        {% include project-card.html project=project index=forloop.index %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="home-publication section-rule" data-world-mode="publications">
+  <div class="shell home-publication__grid">
+    <div class="section-index reveal"><span>005</span><span>Publication</span></div>
+    <div class="home-publication__visual reveal">{% include specimen.html kind="publications" %}</div>
+    {% if featured_publication %}
+      <article class="home-publication__copy reveal">
+        <p class="kicker">{{ featured_publication.year }} · {{ featured_publication.status }}</p>
+        <h2><a href="{{ featured_publication.url | relative_url }}">{{ featured_publication.title }}</a></h2>
+        <p class="citation-text">{{ featured_publication.citation }}</p>
+        <p>{{ featured_publication.summary }}</p>
+        <div class="link-row">
+          <a class="arrow-link" href="{{ featured_publication.url | relative_url }}">Publication details →</a>
+          <a class="arrow-link" href="https://doi.org/{{ featured_publication.doi }}" target="_blank" rel="noreferrer">Open DOI ↗</a>
+        </div>
+      </article>
     {% endif %}
   </div>
 </section>
 
-<section class="section section--record">
-  <div class="shell record">
-    <div class="record__heading reveal">
-      <p class="section__eyebrow">Working record</p>
-      <h2>Research is a path,<br>not a position.</h2>
-    </div>
-    <div class="record__body reveal reveal--delay">
-      <p>I work across research and practice: building computational models, tracing the histories inside technical systems, and designing tools that help groups think with their own knowledge.</p>
-      <dl class="record__list">
-        <div><dt>Now</dt><dd>Research assistance on cybernetics and artificial societies</dd></div>
-        <div><dt>Building</dt><dd>Story Machines · local AI for institutional ecosystems</dd></div>
-        <div><dt>Based</dt><dd>{{ profile.contact.location }}</dd></div>
-      </dl>
-      <div class="record__actions">
-        <a class="button button--ink" href="{{ '/experience/' | relative_url }}">View experience</a>
-        {% if profile.cv.download_url and profile.cv.download_url != "" %}
-          <a class="text-link" href="{{ profile.cv.download_url | relative_url }}" download>{{ profile.cv.download_label }} <span aria-hidden="true">↓</span></a>
-        {% endif %}
+<section class="home-shelves section-rule" data-world-mode="media">
+  <div class="shell">
+    <div class="section-heading reveal">
+      <div class="section-index"><span>006</span><span>Media & Literature</span></div>
+      <div>
+        <p class="kicker">Read · watch · listen</p>
+        <h2>A working constellation of influences.</h2>
       </div>
+      <a class="arrow-link" href="{{ '/media/' | relative_url }}">Open the shelves →</a>
+    </div>
+    <div class="shelf-preview">
+      <a href="{{ '/media/#read' | relative_url }}"><span>01</span><strong>Read</strong><em>Books, papers, long-form work</em></a>
+      <a href="{{ '/media/#watch' | relative_url }}"><span>02</span><strong>Watch</strong><em>Lectures, films, visual essays</em></a>
+      <a href="{{ '/media/#listen' | relative_url }}"><span>03</span><strong>Listen</strong><em>Sound, conversation, field recordings</em></a>
     </div>
   </div>
 </section>
 
-<section class="closing">
-  <div class="shell closing__inner reveal">
-    <p class="section__eyebrow">A standing invitation</p>
-    <h2>If these questions resonate,<br><em>let’s compare notes.</em></h2>
-    <div class="closing__links">
-      {% if profile.contact.email != "" %}
-        <a href="mailto:{{ profile.contact.email }}">{{ profile.contact.email }} <span aria-hidden="true">↗</span></a>
-      {% else %}
-        <a href="https://github.com/glp500" target="_blank" rel="noreferrer">Start a conversation on GitHub <span aria-hidden="true">↗</span></a>
-      {% endif %}
-      {% include social-links.html social=profile.contact.social %}
+<section class="home-resources section-rule" data-world-mode="resources">
+  <div class="shell home-resources__grid">
+    <div class="section-index reveal"><span>007</span><span>Open Source</span></div>
+    <div class="home-resources__copy reveal">
+      <p class="kicker">Code · data · methods · references</p>
+      <h2>Useful things should remain inspectable.</h2>
+      <p>This growing resource space will separate things I publish from external tools and references I return to. Each entry can carry provenance, licensing, and practical notes.</p>
+      <a class="button" href="{{ '/open-source/' | relative_url }}">Explore open resources →</a>
     </div>
+    <div class="home-resources__visual reveal">{% include specimen.html kind="resources" %}</div>
   </div>
 </section>

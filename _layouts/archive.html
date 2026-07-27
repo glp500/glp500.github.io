@@ -1,51 +1,10 @@
 ---
 layout: default
 ---
-{% case page.archive_type %}
-  {% when "projects" %}
-    {% assign items = site.projects | where_exp: "item", "item.published != false" | sort: "date" | reverse %}
-  {% when "publications" %}
-    {% assign items = site.publications | where_exp: "item", "item.published != false" | sort: "year" | reverse %}
-  {% when "posts" %}
-    {% assign items = site.posts | where_exp: "item", "item.published != false" %}
-  {% else %}
-    {% assign items = "" | split: "" %}
-{% endcase %}
-
-<header class="page-hero page-hero--archive">
-  <canvas class="page-hero__field" data-mini-flock aria-hidden="true"></canvas>
-  <div class="shell page-hero__content reveal">
-    <p class="section__eyebrow">{{ page.eyebrow }}</p>
-    <h1>{{ page.title }}</h1>
-    {% if page.intro %}<p>{{ page.intro }}</p>{% endif %}
-    <p class="page-hero__marker" aria-hidden="true">
-      {% if page.archive_type == "projects" %}
-        Field 01 · Work
-      {% elsif page.archive_type == "posts" %}
-        Field 02 · Notes
-      {% else %}
-        Field 01B · Outputs
-      {% endif %}
-    </p>
-  </div>
-</header>
-
-<section class="section section--archive">
+{% capture archive_intro %}{{ page.intro }}{% endcapture %}
+{% include page-hero.html mode=page.world_mode index="ARCHIVE" label=page.title kicker=page.eyebrow intro=archive_intro %}
+<section class="archive-section">
   <div class="shell">
-    {% if items.size > 0 %}
-      <div class="archive-list">
-        {% for item in items %}
-          {% if page.archive_type == "projects" %}
-            {% include project-card.html project=item show_body=true index=forloop.index %}
-          {% elsif page.archive_type == "publications" %}
-            {% include publication-card.html publication=item show_body=true %}
-          {% elsif page.archive_type == "posts" %}
-            {% include post-card.html post=item index=forloop.index %}
-          {% endif %}
-        {% endfor %}
-      </div>
-    {% else %}
-      {% include empty-state.html title=page.empty_title body=page.empty_body %}
-    {% endif %}
+    {% include empty-state.html title=page.empty_title body=page.empty_body %}
   </div>
 </section>

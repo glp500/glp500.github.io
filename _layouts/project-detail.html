@@ -1,0 +1,39 @@
+---
+layout: default
+---
+{% assign project_stack = page.stack | default: page.tech %}
+<article class="detail-page" data-world-mode="projects">
+  <header class="detail-hero">
+    <div class="shell detail-hero__grid">
+      <div class="detail-hero__index"><span>{{ page.status }}</span><a href="{{ '/projects/' | relative_url }}">Return to projects ↗</a></div>
+      <div class="detail-hero__title reveal">
+        <p class="kicker">{{ page.role }} · {{ page.date | date: "%Y" }}</p>
+        <h1>{{ page.title }}</h1>
+        <p class="detail-hero__question">{{ page.summary }}</p>
+      </div>
+      <div class="detail-hero__visual reveal">
+        {% if page.image and page.image != "" %}
+          <img src="{{ page.image | relative_url }}" alt="{{ page.image_alt | default: '' }}">
+        {% else %}
+          {% include specimen.html kind="projects" %}
+        {% endif %}
+      </div>
+    </div>
+  </header>
+  <div class="detail-body shell">
+    <aside>
+      <p class="kicker">Methods & technologies</p>
+      <ul class="tag-list">{% for item in project_stack %}<li>{{ item }}</li>{% endfor %}</ul>
+      {% if page.outcomes and page.outcomes.size > 0 %}
+        <p class="kicker">Outcomes</p>
+        <ul class="detail-list">{% for item in page.outcomes %}<li>{{ item }}</li>{% endfor %}</ul>
+      {% endif %}
+      <div class="detail-links">
+        {% if page.demo_url and page.demo_url != "" %}<a href="{{ page.demo_url }}" target="_blank" rel="noreferrer">Visit project ↗</a>{% endif %}
+        {% if page.repo_url and page.repo_url != "" %}<a href="{{ page.repo_url }}" target="_blank" rel="noreferrer">Repository ↗</a>{% endif %}
+        {% if page.paper_url and page.paper_url != "" %}<a href="{{ page.paper_url }}" target="_blank" rel="noreferrer">Research output ↗</a>{% endif %}
+      </div>
+    </aside>
+    <div class="prose">{{ content }}</div>
+  </div>
+</article>
