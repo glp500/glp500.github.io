@@ -25,8 +25,8 @@ image_alt: "Mixed-association feature graph divided into Leiden communities and 
 demo_url: ""
 repo_url: ""
 paper_url: ""
-research_programs:
-  - multiview-neuroinformatics
+fields:
+  - machine-learning
 related_publication: ""
 visuals:
   - type: diagram

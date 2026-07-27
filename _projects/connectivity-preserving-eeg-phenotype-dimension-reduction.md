@@ -26,8 +26,8 @@ image_alt: "EEG latent modes connected to symptom dimensions in a validated bipa
 demo_url: ""
 repo_url: ""
 paper_url: ""
-research_programs:
-  - multiview-neuroinformatics
+fields:
+  - machine-learning
 related_publication: ""
 visuals:
   - type: chart

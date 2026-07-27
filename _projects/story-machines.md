@@ -23,7 +23,7 @@ image_alt: "Diagram of local institutional knowledge nodes converging into a pro
 demo_url: ""
 repo_url: ""
 paper_url: ""
-research_programs: []
+fields: []
 related_publication: ""
 visuals:
   - type: diagram

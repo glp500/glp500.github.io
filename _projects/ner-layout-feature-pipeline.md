@@ -25,8 +25,8 @@ image_alt: "Synthetic archive page with layout regions and named entities aligne
 demo_url: ""
 repo_url: "https://github.com/glp500/NER-Feature-Extraction-for-Downstream-Document-Analysis"
 paper_url: ""
-research_programs:
-  - archival-intelligence-document-systems
+fields:
+  - computational-history
 related_publication: ""
 visuals:
   - type: diagram

@@ -1,6 +1,6 @@
 ---
 title: Topics of Interest
 layout: redirect
-redirect_to: /research/
+redirect_to: /my-work/
 sitemap: false
 ---

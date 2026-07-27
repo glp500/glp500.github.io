@@ -5,8 +5,7 @@ nav_key: publications
 world_mode: publications
 description: Papers, formal research outputs, and working materials.
 ---
-{% capture publications_intro %}Formal outputs presented with the projects, methods, and questions from which they emerged.{% endcapture %}
-{% include page-hero.html mode="publications" index="FIELD 03" label="Publications" kicker="Papers · citations · open materials" intro=publications_intro %}
+{% include page-hero.html mode="publications" index="FIELD 02" label="Publications" %}
 
 {% assign items = site.publications | where_exp: "item", "item.published != false" | sort: "year" | reverse %}
 {% assign status_options = items | map: "status" | uniq %}

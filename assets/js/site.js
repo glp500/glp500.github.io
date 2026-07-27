@@ -83,9 +83,15 @@
 
       items.forEach((item) => {
         const searchable = (item.dataset.search || item.textContent || "").toLowerCase();
-        const itemFilter = slug(item.dataset.filter);
+        // An item may belong to several groups at once (e.g. a project's
+        // context plus each research field it sits in), so treat the
+        // attribute as a whitespace-separated token list.
+        const itemFilters = String(item.dataset.filter || "")
+          .split(/\s+/)
+          .map(slug)
+          .filter(Boolean);
         const matchesText = !query || searchable.includes(query);
-        const matchesFilter = activeFilter === "all" || itemFilter === activeFilter;
+        const matchesFilter = activeFilter === "all" || itemFilters.includes(activeFilter);
         const show = matchesText && matchesFilter;
         item.hidden = !show;
         if (show) visible += 1;

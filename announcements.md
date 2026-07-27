@@ -6,8 +6,7 @@ nav_key: announcements
 world_mode: notes
 description: Announcements, essays, project updates, and reading notes, newest first.
 ---
-{% capture notes_intro %}Everything I post, newest first: announcements, essays, project updates, reading traces, and questions still taking shape.{% endcapture %}
-{% include page-hero.html mode="notes" index="FIELD 07" label="Announcements" kicker="Announcements · essays · updates" intro=notes_intro %}
+{% include page-hero.html mode="notes" index="FIELD 04" label="Announcements" %}
 
 {% assign items = site.posts | where_exp: "item", "item.published != false" %}
 {% assign note_options = "Announcement|Essay|Project Update|Reading Note" | split: "|" %}

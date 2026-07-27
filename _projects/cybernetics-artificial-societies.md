@@ -22,9 +22,9 @@ image_alt: "Feedback loops connecting clusters of artificial agents into changin
 demo_url: ""
 repo_url: ""
 paper_url: ""
-research_programs:
+fields:
   - collective-intelligence
-  - cybernetics-feedback-design
+  - cybernetics-feedback
 related_publication: ""
 visuals:
   - type: diagram

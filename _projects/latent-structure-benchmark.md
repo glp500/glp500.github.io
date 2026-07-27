@@ -25,8 +25,8 @@ image_alt: "Two heterogeneous data views projected into a shared latent space an
 demo_url: ""
 repo_url: ""
 paper_url: ""
-research_programs:
-  - multiview-neuroinformatics
+fields:
+  - machine-learning
 related_publication: ""
 visuals:
   - type: diagram

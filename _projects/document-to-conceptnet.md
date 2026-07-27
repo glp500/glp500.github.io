@@ -25,8 +25,8 @@ image_alt: "Research document concepts linked through a small knowledge graph an
 demo_url: ""
 repo_url: "https://github.com/glp500/Document-to-ConceptNet"
 paper_url: ""
-research_programs:
-  - machine-learning-artificial-worlds
+fields:
+  - machine-learning
 related_publication: ""
 visuals:
   - type: diagram

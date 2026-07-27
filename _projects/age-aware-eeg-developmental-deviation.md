@@ -27,9 +27,8 @@ image_alt: "Diagram contrasting strong EEG age prediction with a null age-adjust
 demo_url: ""
 repo_url: ""
 paper_url: ""
-research_programs:
-  - multiview-neuroinformatics
-  - machine-learning-artificial-worlds
+fields:
+  - machine-learning
 related_publication: ""
 visuals:
   - type: chart

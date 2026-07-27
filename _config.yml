@@ -14,9 +14,6 @@ plugins:
   - jekyll-sitemap
 
 collections:
-  research:
-    output: true
-    permalink: /research/:name/
   projects:
     output: true
     permalink: /projects/:name/
@@ -24,8 +21,6 @@ collections:
     output: true
     permalink: /publications/:name/
   media:
-    output: false
-  resources:
     output: false
 
 defaults:
@@ -35,12 +30,6 @@ defaults:
     values:
       layout: post
       world_mode: notes
-  - scope:
-      path: ""
-      type: research
-    values:
-      layout: research-detail
-      world_mode: research
   - scope:
       path: ""
       type: projects

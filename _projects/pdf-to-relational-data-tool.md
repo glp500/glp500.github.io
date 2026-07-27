@@ -27,9 +27,8 @@ image_alt: "Workflow converting a PDF through schema-constrained extraction into
 demo_url: ""
 repo_url: "https://github.com/glp500/Multi-Shot-Inference-for-NER-and-Relational-Database-Mapping"
 paper_url: ""
-research_programs:
-  - archival-intelligence-document-systems
-  - computational-histories
+fields:
+  - computational-history
 related_publication: ""
 visuals:
   - type: diagram

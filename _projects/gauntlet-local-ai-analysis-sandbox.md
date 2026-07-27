@@ -26,7 +26,7 @@ image_alt: "Gauntlet workflow from local task and data through generated code, s
 demo_url: ""
 repo_url: "https://github.com/glp500/Gauntlet"
 paper_url: ""
-research_programs: []
+fields: []
 related_publication: ""
 visuals:
   - type: diagram

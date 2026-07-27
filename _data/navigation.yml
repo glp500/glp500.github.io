@@ -2,39 +2,23 @@
   label: Home
   url: /
   world_mode: home
-  description: Start at the portfolio overview
-- key: announcements
-  label: Announcements
-  url: /announcements/
-  world_mode: notes
-  description: Posts, essays, updates, and reading notes
-- key: research
-  label: Research
-  url: /research/
-  world_mode: research
-  description: Questions, methods, and research programs
-- key: projects
-  label: Projects
-  url: /projects/
+- key: my-work
+  label: My Work
+  url: /my-work/
   world_mode: projects
-  description: Studies, tools, ventures, and experiments
 - key: publications
   label: Publications
   url: /publications/
   world_mode: publications
-  description: Papers, citations, and formal outputs
+- key: announcements
+  label: Announcements
+  url: /announcements/
+  world_mode: notes
 - key: media
   label: Media & Literature
   url: /media/
   world_mode: media
-  description: A working shelf of ideas and influences
-- key: resources
-  label: Open Source
-  url: /open-source/
-  world_mode: resources
-  description: Code, data, methods, and references
 - key: experience
   label: Experience / CV
   url: /experience/
   world_mode: experience
-  description: Roles, education, skills, and contact

@@ -27,8 +27,8 @@ image_alt: "Pumped-hydroelectric reservoir moving water between pumping and gene
 demo_url: ""
 repo_url: "https://github.com/glp500/Dam-Energy-Stock-Trading-with-Q-Learning"
 paper_url: ""
-research_programs:
-  - machine-learning-artificial-worlds
+fields:
+  - machine-learning
 related_publication: ""
 visuals:
   - type: diagram

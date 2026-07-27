@@ -2,7 +2,7 @@
 <article
   class="project-ledger__item reveal"
   data-filter-item
-  data-filter="{{ include.project.context | default: 'project' | downcase | slugify }}"
+  data-filter="{{ include.project.context | default: 'project' | downcase | slugify }} {{ include.project.fields | join: ' ' }}"
   data-search="{{ include.project.title }} {{ include.project.summary }} {{ include.project.role }} {{ include.project.context }} {{ include.project.dates_display }} {{ project_stack | join: ' ' }} {{ include.project.topics | join: ' ' }}"
 >
   <a class="project-ledger__index" href="{{ include.project.url | relative_url }}" aria-label="View {{ include.project.title }}">
@@ -22,6 +22,11 @@
         {% for tag in project_stack limit: 3 %}<li>{{ tag }}</li>{% endfor %}
       </ul>
     {% endif %}
-    <a class="arrow-link" href="{{ include.project.url | relative_url }}">Open →</a>
+    <div class="link-row">
+      <a class="arrow-link" href="{{ include.project.url | relative_url }}">Open →</a>
+      {% if include.project.repo_url and include.project.repo_url != "" %}
+        <a class="arrow-link" href="{{ include.project.repo_url }}" target="_blank" rel="noreferrer">Code ↗</a>
+      {% endif %}
+    </div>
   </div>
 </article>

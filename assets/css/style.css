@@ -267,7 +267,7 @@ a {
 
 .masthead {
   position: relative;
-  min-height: 100svh;
+  min-height: 78svh;
   display: grid;
   align-items: center;
   background: rgba(157, 183, 190, 0.77);
@@ -493,14 +493,21 @@ a {
 
 .section-heading h2,
 .home-about h2,
-.home-resources h2,
-.site-footer h2,
 .cv-interests h2 {
   margin: 0;
   font-size: clamp(2.4rem, 5.2vw, 5.5rem);
   font-weight: 500;
   letter-spacing: -0.065em;
   line-height: 0.98;
+}
+
+.site-footer h2 {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .arrow-link {
@@ -1085,10 +1092,10 @@ a {
 }
 
 .page-hero {
-  min-height: 72svh;
+  min-height: 0;
   display: grid;
   align-items: end;
-  padding: 10rem 0 5rem;
+  padding: 9rem 0 3rem;
   background: rgba(157, 183, 190, 0.79);
   border-bottom: 1px solid var(--line-light);
 }
@@ -1914,36 +1921,34 @@ a {
 
 .site-footer {
   overflow: hidden;
-  padding: clamp(5rem, 12vw, 11rem) 0 2rem;
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--ink);
   background: rgba(237, 236, 237, 0.98);
   color: var(--ink);
 }
 
-.site-footer__signal {
-  margin-left: -0.035em;
-  color: var(--ink);
-  font-size: clamp(5.5rem, 21vw, 19rem);
-  font-weight: 600;
-  letter-spacing: -0.1em;
-  line-height: 0.67;
-  white-space: nowrap;
-}
-
 .site-footer__inner {
-  display: grid;
-  grid-template-columns: 1.3fr 0.7fr;
-  gap: 4rem;
-  align-items: end;
-  margin-top: clamp(4rem, 10vw, 9rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1rem 2.5rem;
 }
 
 .site-footer__contact {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.8rem;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1.6rem;
+  margin-right: auto;
   font-family: var(--mono);
-  font-size: 0.66rem;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.site-footer__copy {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.56rem;
   text-transform: uppercase;
 }
 
@@ -1956,18 +1961,6 @@ a {
 .social-links a {
   text-decoration: none;
   border-bottom: 1px solid currentColor;
-}
-
-.site-footer__base {
-  display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  margin-top: 6rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--ink);
-  font-family: var(--mono);
-  font-size: 0.56rem;
-  text-transform: uppercase;
 }
 
 .reveal {
@@ -2570,14 +2563,6 @@ a {
     grid-template-columns: 1fr;
   }
 
-  .site-footer__signal {
-    font-size: 25vw;
-  }
-
-  .site-footer__base {
-    flex-direction: column;
-    gap: 0;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -27,8 +27,8 @@ image_alt: "Sequence of synthetic archival pages labelled start, middle, and end
 demo_url: ""
 repo_url: "https://github.com/glp500/Multi-View-Learning-for-Archival-Document-Segmentation"
 paper_url: ""
-research_programs:
-  - archival-intelligence-document-systems
+fields:
+  - computational-history
 related_publication: ""
 visuals:
   - type: diagram

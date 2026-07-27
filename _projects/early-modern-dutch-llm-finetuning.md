@@ -27,9 +27,8 @@ image_alt: "Paired bar chart comparing mean BERTScore and METEOR results across 
 demo_url: ""
 repo_url: "https://github.com/glp500/EMDutch-LLM-Finetune"
 paper_url: "https://doi.org/10.1017/chr.2026.10022"
-research_programs:
-  - archival-intelligence-document-systems
-  - computational-histories
+fields:
+  - computational-history
 related_publication: "fine-tuning-early-modern-dutch"
 visuals:
   - type: chart

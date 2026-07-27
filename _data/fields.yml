@@ -1,0 +1,10 @@
+# Research fields used as filters on /my-work/.
+# Each project lists the keys it belongs to in its `fields:` front matter.
+- key: collective-intelligence
+  label: Collective Intelligence
+- key: cybernetics-feedback
+  label: Cybernetics & Feedback
+- key: computational-history
+  label: Computational History
+- key: machine-learning
+  label: Machine Learning

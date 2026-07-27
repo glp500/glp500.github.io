@@ -5,7 +5,7 @@ layout: default
 <article class="detail-page" data-world-mode="projects">
   <header class="detail-hero">
     <div class="shell detail-hero__grid">
-      <div class="detail-hero__index"><span>{{ page.status }}</span><a href="{{ '/projects/' | relative_url }}">Return to projects ↗</a></div>
+      <div class="detail-hero__index"><span>{{ page.status }}</span><a href="{{ '/my-work/' | relative_url }}">Return to my work ↗</a></div>
       <div class="detail-hero__title reveal">
         <p class="kicker">{{ page.context | default: page.status }} · {% if page.dates_display %}{{ page.dates_display }}{% else %}{{ page.date | date: "%Y" }}{% endif %}</p>
         <h1>{{ page.title }}</h1>
@@ -39,12 +39,12 @@ layout: default
         {% if page.repo_url and page.repo_url != "" %}<a href="{{ page.repo_url }}" target="_blank" rel="noreferrer">Repository ↗</a>{% endif %}
         {% if page.paper_url and page.paper_url != "" %}<a href="{{ page.paper_url }}" target="_blank" rel="noreferrer">Research output ↗</a>{% endif %}
       </div>
-      {% if page.research_programs and page.research_programs.size > 0 %}
-        <p class="kicker">Related research</p>
+      {% if page.fields and page.fields.size > 0 %}
+        <p class="kicker">Fields</p>
         <div class="detail-links">
-          {% for program_slug in page.research_programs %}
-            {% assign program = site.research | where: "slug", program_slug | first %}
-            {% if program %}<a href="{{ program.url | relative_url }}">{{ program.title }} →</a>{% endif %}
+          {% for field_key in page.fields %}
+            {% assign field = site.data.fields | where: "key", field_key | first %}
+            {% if field %}<a href="{{ '/my-work/?filter=' | append: field.key | relative_url }}">{{ field.label }} →</a>{% endif %}
           {% endfor %}
         </div>
       {% endif %}

@@ -6,8 +6,7 @@ world_mode: experience
 description: Gavin Lip's research experience, education, methods, skills, publication, and interests.
 ---
 {% assign profile = site.data.profile %}
-{% capture cv_intro %}Research experience across multimodal modelling, archival AI, computational history, and language-model evaluation.{% endcapture %}
-{% include page-hero.html mode="experience" index="FIELD 06" label="Experience / CV" kicker="A working record · 2023—2026" intro=cv_intro %}
+{% include page-hero.html mode="experience" index="FIELD 05" label="Experience / CV" %}
 
 <section class="cv-intro section-rule" data-world-mode="experience">
   <div class="shell cv-intro__grid">

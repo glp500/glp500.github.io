@@ -26,8 +26,9 @@ image_alt: "Particles exploring a neural-controller search landscape above a sty
 demo_url: "https://www.youtube.com/watch?v=ZqaMjd1E4ZI"
 repo_url: "https://github.com/glp500/Particle-Swarm-Optimisation-for-RL-Game-Environments"
 paper_url: ""
-research_programs:
-  - machine-learning-artificial-worlds
+fields:
+  - machine-learning
+  - collective-intelligence
 related_publication: ""
 video_embed: "https://www.youtube-nocookie.com/embed/ZqaMjd1E4ZI"
 video_title: "Particle swarm trained Evoman agent gameplay"
