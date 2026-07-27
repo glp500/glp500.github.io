@@ -1,0 +1,69 @@
+# Curated models for the Mini-Lab.
+#
+# Sizes are the real byte sizes reported by the Hugging Face API, not estimates.
+# `min_budget_gb` is the memory the model needs once loaded (weights plus KV
+# cache and runtime overhead), which is always more than the download size.
+#
+# The browser cannot load a single file larger than 2 GB (ArrayBuffer limit).
+# Models above that are listed with `blocked_reason` so the picker can explain
+# why they are unavailable rather than silently hiding them.
+
+- id: qwen3.5-0.8b
+  label: Qwen3.5 0.8B
+  repo: unsloth/Qwen3.5-0.8B-GGUF
+  file: Qwen3.5-0.8B-Q4_K_M.gguf
+  quant: Q4_K_M
+  size_bytes: 530000000
+  min_budget_gb: 1.2
+  context: 4096
+  tier: low
+  note: Fastest to download and run. Best on integrated graphics or a modest GPU.
+
+- id: qwen3.5-2b
+  label: Qwen3.5 2B
+  repo: unsloth/Qwen3.5-2B-GGUF
+  file: Qwen3.5-2B-Q4_K_M.gguf
+  quant: Q4_K_M
+  size_bytes: 1280000000
+  min_budget_gb: 2.4
+  context: 8192
+  tier: standard
+  default: true
+  note: The default. Clearly better reasoning than the 0.8B at roughly twice the download.
+
+- id: qwen3-vl-2b
+  label: Qwen3-VL 2B
+  repo: unsloth/Qwen3-VL-2B-Instruct-GGUF
+  file: Qwen3-VL-2B-Instruct-Q4_K_M.gguf
+  quant: Q4_K_M
+  size_bytes: 1110000000
+  min_budget_gb: 2.4
+  context: 8192
+  tier: standard
+  note: Reads images as well as text. Useful for charts and scanned tables.
+
+- id: qwen3.5-4b
+  label: Qwen3.5 4B
+  repo: unsloth/Qwen3.5-4B-GGUF
+  file: Qwen3.5-4B-Q4_K_M.gguf
+  quant: Q4_K_M
+  size_bytes: 2740000000
+  min_budget_gb: 4.5
+  context: 8192
+  tier: large
+  blocked_reason: >-
+    2.74 GB exceeds the 2 GB single-file limit browsers place on model
+    downloads. It becomes available if the publisher ships a split GGUF.
+
+- id: gemma-4-e2b
+  label: Gemma 4 E2B
+  repo: unsloth/gemma-4-E2B-it-GGUF
+  file: gemma-4-E2B-it-Q4_K_M.gguf
+  quant: Q4_K_M
+  size_bytes: 3110000000
+  min_budget_gb: 5.0
+  context: 8192
+  tier: large
+  blocked_reason: >-
+    Every quant of this repo is over the 2 GB single-file limit; the smallest
+    is 2.29 GB and no split files are published.

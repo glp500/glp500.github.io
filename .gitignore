@@ -3,4 +3,7 @@ _site/
 .jekyll-metadata
 .sass-cache/
 .bundle/
-vendor/
+
+# Bundler's gem directory only. Anchored with a leading slash so it cannot
+# also swallow assets/js/vendor/, which holds libraries the site must ship.
+/vendor/
