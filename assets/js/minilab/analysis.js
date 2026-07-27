@@ -50,13 +50,19 @@ export const PLAN_SCHEMA = {
  *
  * @returns {{plan: object, source: "model"|"fallback", reason: string}}
  */
-export async function planAnalysis(schema, { signal, onProgress, profile, nCtx = 4096, limits = {} } = {}) {
+export async function planAnalysis(schema, { signal, onProgress, profile, nCtx = 4096, limits = {}, constraints = null } = {}) {
   const columnNames = new Set(schema.columns.map((c) => c.name));
 
   // Select rather than dump. A wide file otherwise fills the context window
   // with column names, which is slow to evaluate on CPU and a worse prompt.
   const context = buildPlanContext(profile, { nCtx });
-  const userMessage = JSON.stringify(context.payload);
+  // The free-text answer is domain context for the prompt only. It never
+  // reaches generated code, and it cannot widen what the plan may do.
+  const payload = { ...context.payload };
+  if (constraints?.notes) payload.context = constraints.notes;
+  if (constraints?.columns?.length) payload.focus_columns = constraints.columns;
+  if (constraints?.tasks?.length) payload.wanted = constraints.tasks;
+  const userMessage = JSON.stringify(payload);
   record("plan.prompt", {
     chars: userMessage.length,
     tokens: context.tokens,
@@ -95,7 +101,7 @@ export async function planAnalysis(schema, { signal, onProgress, profile, nCtx =
   record("plan.result", { ok: result.ok, reason: result.reason, attempts: result.attempts.length });
 
   // validatePlan runs either way — it is the guarantee, not a formality.
-  const plan = validatePlan(result.ok ? result.value : null, schema);
+  const plan = validatePlan(result.ok ? result.value : null, schema, constraints);
   return {
     plan,
     source: result.ok ? "model" : "fallback",
@@ -108,10 +114,23 @@ export async function planAnalysis(schema, { signal, onProgress, profile, nCtx =
  * pick impossible targets, so every field is checked against the real schema
  * and silently corrected rather than trusted.
  */
-export function validatePlan(plan, schema) {
+export function validatePlan(plan, schema, constraints = null) {
   const byName = new Map(schema.columns.map((c) => [c.name, c]));
-  const numeric = schema.columns.filter((c) => c.type === "number" || c.type === "integer");
-  const categorical = schema.columns.filter((c) => c.type === "categorical" || c.type === "binary");
+
+  // The visitor's answers narrow the field before the model's choice is even
+  // considered. If they said which columns matter, those are the only columns
+  // eligible to be a target — otherwise the questions would be decorative.
+  const chosen = constraints?.columns?.filter((n) => byName.has(n)) || [];
+  const pool = chosen.length ? schema.columns.filter((c) => chosen.includes(c.name)) : schema.columns;
+
+  const numeric = pool.filter((c) => c.type === "number" || c.type === "integer");
+  const categorical = pool.filter((c) => c.type === "categorical" || c.type === "binary");
+
+  // Charts are illustration, not the answer, so they may use any column. Only
+  // the target is restricted to what the visitor chose — restricting charts too
+  // meant picking one column produced exactly one chart.
+  const allNumeric = schema.columns.filter((c) => c.type === "number" || c.type === "integer");
+  const allCategorical = schema.columns.filter((c) => c.type === "categorical" || c.type === "binary");
 
   const corrections = [];
   const safe = {
@@ -124,9 +143,24 @@ export function validatePlan(plan, schema) {
   };
 
   if (!plan || typeof plan !== "object") {
-    safe.rationale = "The model did not return a usable plan, so the data is summarised instead.";
-    corrections.push("Fell back to a summary because the model returned no valid plan.");
-    safe.charts = defaultCharts(numeric, categorical);
+    // Even with no plan from the model, the answers still decide the task —
+    // they are the visitor's instruction, not a hint to the model.
+    const wanted = constraints?.tasks?.[0];
+    safe.task = wanted || "summary";
+    safe.rationale = wanted
+      ? "Based on what you chose."
+      : "The model did not return a usable plan, so the data is summarised instead.";
+    if (!wanted) {
+      corrections.push("Fell back to a summary because the model returned no valid plan.");
+    }
+    if (safe.task === "regression") safe.target = numeric[0]?.name || allNumeric[0]?.name || null;
+    if (safe.task === "classification") safe.target = categorical[0]?.name || allCategorical[0]?.name || null;
+    if (safe.task !== "summary" && !safe.target) {
+      corrections.push(`No suitable column for ${safe.task}; summarised instead.`);
+      safe.task = "summary";
+    }
+    safe.features = schema.columns.filter((c) => c.name !== safe.target && c.type !== "identifier").map((c) => c.name);
+    safe.charts = defaultCharts(allNumeric, allCategorical, safe.target);
     return safe;
   }
 
@@ -138,9 +172,20 @@ export function validatePlan(plan, schema) {
     task = "summary";
   }
 
+  // An explicit choice of intent overrides the model's.
+  const allowed = constraints?.tasks;
+  if (allowed?.length && !allowed.includes(task)) {
+    corrections.push(`You asked for ${allowed.join(" or ")}, so ${task} was replaced.`);
+    task = allowed[0];
+  }
+
   let target = typeof plan.target === "string" && byName.has(plan.target) ? plan.target : null;
   if (plan.target && !target) {
     corrections.push(`Target "${plan.target}" is not a column in this file.`);
+  }
+  if (target && chosen.length && !chosen.includes(target)) {
+    corrections.push(`"${target}" was not one of the columns you chose.`);
+    target = null;
   }
 
   if (task === "classification") {
@@ -192,21 +237,43 @@ export function validatePlan(plan, schema) {
     .slice(0, 3)
     .map((c) => ({ kind: ["histogram", "bar", "scatter"].includes(c.kind) ? c.kind : "histogram", x: c.x, y: c.y || null }));
 
-  if (!safe.charts.length) safe.charts = defaultCharts(numeric, categorical);
+  if (!safe.charts.length) safe.charts = defaultCharts(allNumeric, allCategorical, target);
 
   safe.task = task;
   safe.target = target;
   return safe;
 }
 
-function defaultCharts(numeric, categorical) {
+function defaultCharts(numeric, categorical, target = null) {
   const charts = [];
-  if (numeric[0]) charts.push({ kind: "histogram", x: numeric[0].name, y: null });
-  if (categorical[0]) charts.push({ kind: "bar", x: categorical[0].name, y: null });
-  if (numeric.length >= 2) {
-    charts.push({ kind: "scatter", x: numeric[0].name, y: numeric[1].name });
+  const targetCol = numeric.find((c) => c.name === target) || categorical.find((c) => c.name === target);
+
+  // Lead with the target: it is what the reader came for.
+  if (targetCol) {
+    charts.push(
+      numeric.includes(targetCol)
+        ? { type: "histogram", x: targetCol.name, y: null, title: `Distribution of ${targetCol.name}` }
+        : { type: "bar", x: targetCol.name, y: null, title: `${targetCol.name} by count` }
+    );
   }
-  return charts.slice(0, 3);
+
+  if (numeric[0] && !charts.some((c) => c.x === numeric[0].name)) {
+    charts.push({ type: "histogram", x: numeric[0].name, y: null, title: `Distribution of ${numeric[0].name}` });
+  }
+  if (categorical[0] && !charts.some((c) => c.x === categorical[0].name)) {
+    charts.push({ type: "bar", x: categorical[0].name, y: null, title: `${categorical[0].name} by count` });
+  }
+  if (numeric.length >= 2) {
+    charts.push({
+      type: "scatter",
+      x: numeric[0].name,
+      y: numeric[1].name,
+      colorBy: categorical[0]?.name || null,
+      title: `${numeric[1].name} against ${numeric[0].name}`,
+    });
+  }
+
+  return charts.slice(0, 4);
 }
 
 // ---------------------------------------------------------------------------

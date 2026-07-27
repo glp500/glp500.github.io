@@ -3247,3 +3247,187 @@ a {
 .ml-more summary + .ml-caveat {
   margin-top: 0.6rem;
 }
+
+/* ---------- Mini-Lab: questions ---------- */
+
+.ml-questions {
+  display: grid;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.ml-question {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ml-question legend,
+.ml-question > span {
+  padding: 0;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.ml-option {
+  display: flex;
+  gap: 0.55rem;
+  align-items: baseline;
+  padding: 0.4rem 0;
+  cursor: pointer;
+  font-size: 0.86rem;
+}
+
+.ml-question--text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ml-question--text input {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: inherit;
+  font-size: 0.86rem;
+}
+
+/* ---------- Mini-Lab: charts ---------- */
+
+.viz-block {
+  padding-bottom: 1.6rem;
+  margin-bottom: 1.6rem;
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.viz-block:last-child {
+  border-bottom: 0;
+}
+
+.viz {
+  margin: 0;
+}
+
+.viz svg {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line-dark);
+}
+
+.viz__title {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.viz__caption,
+.viz__warning {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  opacity: 0.85;
+}
+
+.viz--empty {
+  padding: 2rem;
+  border: 1px dashed var(--line-dark);
+  font-size: 0.85rem;
+}
+
+/* Legend: identity is never carried by colour alone. */
+.viz-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  margin-bottom: 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  text-transform: uppercase;
+}
+
+.viz-legend__item {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.viz-legend__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* ---------- Mini-Lab: chart controls ---------- */
+
+.viz-controls,
+.viz-table {
+  margin-top: 0.8rem;
+}
+
+.viz-controls > summary,
+.viz-table > summary {
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.viz-controls__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+  margin-top: 0.9rem;
+}
+
+.viz-controls fieldset {
+  margin: 0;
+  padding: 0.8rem;
+  border: 1px solid var(--line-dark);
+}
+
+.viz-controls legend {
+  padding: 0 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.viz-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.55rem;
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.viz-control--check {
+  flex-direction: row;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.viz-control select,
+.viz-control input[type="text"],
+.viz-control input[type="number"] {
+  padding: 0.35rem 0.4rem;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: inherit;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.viz-controls__note {
+  margin: 0.4rem 0 0;
+  font-size: 0.7rem;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.8;
+}

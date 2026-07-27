@@ -1,7 +1,11 @@
 // Generates the Python the visitor can take away.
 //
-// This is real, runnable pandas/scikit-learn code assembled from the same plan
-// the browser executed, so what they run locally matches what they were shown.
+// Real, runnable pandas/scikit-learn/matplotlib code assembled from the same
+// plan and the same chart specs the browser rendered. Because the control panel
+// edits those specs, the exported figures reproduce what is on screen —
+// palette, scale, labels, ordering and all — rather than approximating it.
+
+import { theme } from "./palette.js";
 
 export function buildPython(plan, profile, fileName) {
   const lines = [
@@ -65,23 +69,14 @@ export function buildPython(plan, profile, fileName) {
     }
   }
 
-  plan.charts.forEach((chart, i) => {
-    lines.push(`# --- Chart ${i + 1}: ${chart.kind} ---------------------------------------`);
-    if (chart.kind === "histogram") {
-      lines.push(
-        `df[${py(chart.x)}].plot(kind='hist', bins=20, edgecolor='black')`,
-        `plt.xlabel(${py(chart.x)})`
-      );
-    } else if (chart.kind === "bar") {
-      lines.push(
-        `df[${py(chart.x)}].value_counts().head(12).plot(kind='bar')`,
-        `plt.xlabel(${py(chart.x)})`
-      );
-    } else if (chart.kind === "scatter") {
-      lines.push(`df.plot(kind='scatter', x=${py(chart.x)}, y=${py(chart.y)}, alpha=0.6)`);
-    }
-    lines.push("plt.tight_layout()", "plt.show()", "");
-  });
+  const specs = plan.charts || [];
+  if (specs.length) {
+    lines.push(...matplotlibStyle(specs[0].mode || "light"));
+    specs.forEach((spec, i) => {
+      lines.push(...matplotlibChart(spec, i + 1));
+    });
+  }
+
 
   if (plan.task === "classification" || plan.task === "regression") {
     const isClf = plan.task === "classification";
@@ -151,4 +146,111 @@ export function buildRequirements(plan) {
 
 function py(value) {
   return JSON.stringify(value);
+}
+
+
+// ---------------------------------------------------------------------------
+// Chart code, generated from the same spec the SVG renderer drew from
+// ---------------------------------------------------------------------------
+
+/** rcParams that reproduce the on-screen theme. */
+function matplotlibStyle(mode) {
+  const th = theme(mode);
+  return [
+    "# --- Figure style ------------------------------------------------------",
+    "# Mirrors the Mini-Lab's on-screen theme. The palette is validated for",
+    "# colour-vision deficiency and contrast; changing the hexes may break that.",
+    `CATEGORICAL = ${py(th.categorical)}`,
+    `SURFACE = ${py(th.surface)}`,
+    "plt.rcParams.update({",
+    `    "figure.facecolor": SURFACE,`,
+    `    "axes.facecolor": SURFACE,`,
+    `    "axes.edgecolor": ${py(th.grid)},`,
+    `    "axes.labelcolor": ${py(th.text.secondary)},`,
+    `    "text.color": ${py(th.text.primary)},`,
+    `    "xtick.color": ${py(th.text.secondary)},`,
+    `    "ytick.color": ${py(th.text.secondary)},`,
+    `    "grid.color": ${py(th.grid)},`,
+    '    "grid.linewidth": 0.8,',
+    '    "axes.spines.top": False,',
+    '    "axes.spines.right": False,',
+    '    "font.size": 10,',
+    "})",
+    "",
+  ];
+}
+
+/** One chart, honouring type, scale, ordering, labels and layout. */
+function matplotlibChart(spec, n) {
+  const th = theme(spec.mode || "light");
+  const out = [
+    `# --- Chart ${n}: ${spec.type} -------------------------------------------`,
+    `fig, ax = plt.subplots(figsize=(8, ${((spec.height || 320) / 60).toFixed(1)}))`,
+  ];
+
+  if (spec.type === "histogram") {
+    out.push(
+      `ax.hist(df[${py(spec.x)}].dropna(), bins=${spec.bins || 20}, color=CATEGORICAL[0], edgecolor=SURFACE, linewidth=1.2)`,
+      `ax.set_ylabel(${py(spec.yLabel || "Rows")})`
+    );
+  } else if (spec.type === "bar") {
+    const asc = spec.sort === "value-asc";
+    out.push(
+      `counts = df[${py(spec.x)}].value_counts()${
+        spec.sort === "label" ? ".sort_index()" : `.sort_values(ascending=${asc ? "True" : "False"})`
+      }.head(${spec.maxCategories || 12})`,
+      `bars = ax.bar(counts.index.astype(str), counts.values, color=CATEGORICAL[0], edgecolor=SURFACE, linewidth=1.2)`,
+      `ax.set_ylabel(${py(spec.yLabel || "Rows")})`,
+      "plt.setp(ax.get_xticklabels(), rotation=35, ha='right')"
+    );
+    if (spec.valueLabels) out.push("ax.bar_label(bars, padding=3, fontsize=9)");
+  } else if (spec.type === "scatter") {
+    if (spec.colorBy) {
+      out.push(
+        `for i, (name, grp) in enumerate(df.groupby(${py(spec.colorBy)})):`,
+        `    if i >= 3:  # scatter caps at three colours for colourblind safety`,
+        "        break",
+        `    ax.scatter(grp[${py(spec.x)}], grp[${py(spec.y)}], s=28, alpha=0.85,`,
+        "               color=CATEGORICAL[i], edgecolors=SURFACE, linewidths=1.5, label=str(name))",
+        "ax.legend(frameon=False)"
+      );
+    } else {
+      out.push(
+        `ax.scatter(df[${py(spec.x)}], df[${py(spec.y)}], s=28, alpha=0.85,`,
+        "           color=CATEGORICAL[0], edgecolors=SURFACE, linewidths=1.5)"
+      );
+    }
+    out.push(`ax.set_ylabel(${py(spec.yLabel || spec.y)})`);
+  } else if (spec.type === "line") {
+    out.push(
+      `ordered = df[[${py(spec.x)}, ${py(spec.y)}]].dropna().sort_values(${py(spec.x)})`,
+      `ax.plot(ordered[${py(spec.x)}], ordered[${py(spec.y)}], linewidth=2, solid_joinstyle='round', color=CATEGORICAL[0])`,
+      `ax.set_ylabel(${py(spec.yLabel || spec.y)})`
+    );
+  } else if (spec.type === "heatmap") {
+    out.push(
+      "numeric = df.select_dtypes('number')",
+      "corr = numeric.corr(method='pearson')",
+      "# Correlation is polarity data: a diverging map centred on zero, never a",
+      "# sequential ramp and never a rainbow.",
+      "im = ax.imshow(corr, cmap='RdBu_r', vmin=-1, vmax=1)",
+      "ax.set_xticks(range(len(corr.columns)), corr.columns, rotation=45, ha='right')",
+      "ax.set_yticks(range(len(corr.columns)), corr.columns)",
+      "fig.colorbar(im, ax=ax, shrink=0.8, label='Pearson r')"
+    );
+  }
+
+  if (spec.type !== "heatmap") {
+    out.push(`ax.set_xlabel(${py(spec.xLabel || spec.x)})`);
+    if (spec.scaleY === "log") out.push("ax.set_yscale('log')");
+    if (spec.grid === "none") out.push("ax.grid(False)");
+    else out.push(`ax.grid(True, axis=${spec.grid === "both" ? "'both'" : "'y'"}, linewidth=0.8)`);
+    out.push("ax.set_axisbelow(True)");
+  }
+
+  if (spec.title) out.push(`ax.set_title(${py(spec.title)}, loc='left', fontsize=12)`);
+  if (spec.caption) out.push(`fig.text(0.01, -0.02, ${py(spec.caption)}, fontsize=9, color=${py(th.text.muted)})`);
+
+  out.push("fig.tight_layout()", "plt.show()", "");
+  return out;
 }

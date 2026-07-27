@@ -20,6 +20,20 @@ let constraintWorks = false;
 let constraintAffordable = false;
 let loadedCtx = PLANNING_CTX;
 let speed = null;
+// Resolved promise chain that serialises generations onto the one context.
+let generationQueue = Promise.resolve();
+
+/** wllama signals a deliberate abort with its own error type and message. */
+function isAbort(error) {
+  const name = error?.name || "";
+  const message = String(error?.message || "");
+  return (
+    name === "AbortError" ||
+    name === "WllamaAbortError" ||
+    /abort/i.test(name) ||
+    /operation aborted/i.test(message)
+  );
+}
 
 async function getWllama() {
   if (!WllamaCtor) {
@@ -113,7 +127,6 @@ export async function loadModel(model, hardware, handlers = {}) {
     }
   );
 
-  loadedId = model.id;
   loadedCtx = params.n_ctx;
   record("model.load.done", { model: model.id, ms: Math.round(performance.now() - began) });
 
@@ -136,6 +149,15 @@ export async function loadModel(model, hardware, handlers = {}) {
     used: supportsConstraint(),
     why: constraintAffordable ? "gpu present" : "skipped: too slow without a GPU",
   });
+
+  // Only now is the model genuinely usable.
+  //
+  // Setting this before the preflight let the UI report "loaded" while a
+  // generation was still running, so a click on Analyse started a second
+  // generation on the same llama context. The two contended: 23s to first
+  // token, an aborted preflight, and a speed reading of 0.61 tok/s that
+  // described the collision rather than the machine.
+  loadedId = model.id;
 
   onStage?.("Ready");
   return instance;
@@ -239,6 +261,25 @@ export async function* chatStream({
 } = {}) {
   if (!instance) throw new Error("No model is loaded.");
 
+  // Single-flight. There is one llama context, so two concurrent generations
+  // corrupt each other's decoding. Rather than trust every caller to sequence
+  // itself, later callers queue here and run when the current one finishes.
+  const ticket = generationQueue;
+  let release;
+  generationQueue = new Promise((resolve) => {
+    release = resolve;
+  });
+  await ticket;
+
+  try {
+    yield* generate({ messages, maxTokens, temperature, schema, signal, onThinking });
+  } finally {
+    release();
+  }
+}
+
+async function* generate({ messages, maxTokens, temperature, schema, signal, onThinking }) {
+
   const options = {
     messages,
     stream: true,
@@ -265,8 +306,30 @@ export async function* chatStream({
     };
   }
 
-  const stream = await instance.createChatCompletion(options);
-  for await (const chunk of stream) {
+  let stream;
+  try {
+    stream = await instance.createChatCompletion(options);
+  } catch (error) {
+    // Aborting is how the harness enforces its deadline; it is an expected
+    // outcome, not a failure to report.
+    if (isAbort(error) || signal?.aborted) return;
+    throw error;
+  }
+
+  // Take the iterator once: calling [Symbol.asyncIterator]() per loop would
+  // restart the stream every tick.
+  const iterator = stream[Symbol.asyncIterator]();
+
+  for (;;) {
+    let chunk;
+    try {
+      const step = await iterator.next();
+      if (step.done) break;
+      chunk = step.value;
+    } catch (error) {
+      if (isAbort(error) || signal?.aborted) return;
+      throw error;
+    }
     if (signal?.aborted) return;
     const delta = chunk?.choices?.[0]?.delta || {};
     const piece = delta.content || "";

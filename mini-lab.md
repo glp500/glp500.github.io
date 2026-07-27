@@ -82,6 +82,12 @@ description: Small language models running locally in your browser over WebGPU, 
 
           <section class="ml-step" data-profile hidden></section>
 
+          <section class="ml-step" data-questions-step hidden>
+            <h2>A few questions</h2>
+            <p class="ml-status" data-questions-status></p>
+            <div class="ml-questions" data-questions></div>
+          </section>
+
           <section class="ml-step" data-analysis-step hidden>
             <div class="ml-actions">
               <button type="button" class="button button--dark" data-run-analysis disabled>Analyse</button>

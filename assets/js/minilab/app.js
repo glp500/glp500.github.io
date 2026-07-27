@@ -26,7 +26,9 @@ import {
 import { searchRepos, resolveRepo } from "./hf.js";
 import { readTable, profileTable, schemaForModel, IngestError } from "./ingest.js";
 import { planAnalysis, validatePlan, runAnalysis } from "./analysis.js";
-import { renderChart } from "./charts.js";
+import { renderChart, normaliseSpec } from "./charts.js";
+import { renderControls, readControl, reconcileSpec } from "./controls.js";
+import { buildQuestions, answersToConstraints, fallbackQuestions } from "./questions.js";
 import { buildPython, buildRequirements } from "./export.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -43,6 +45,10 @@ const state = {
   results: null,
   abort: null,
   analysing: false,
+  questions: null,
+  questionSource: null,
+  answers: null,
+  specs: [],
   analysisAbort: null,
   isolation: null,
 };
@@ -89,6 +95,7 @@ export async function init(root) {
   renderCatalogue(root);
   bindModelControls(root);
   bindDataControls(root);
+  bindChartControls(root);
   renderDiagnostics(root);
 }
 
@@ -434,6 +441,7 @@ async function handleFile(root, file) {
       profile.columnCount
     } columns. Nothing was uploaded.${truncNote}`;
     renderProfile(root, profile);
+    await presentQuestions(root);
     $("[data-analysis-step]", root).hidden = false;
     $("[data-run-analysis]", root).disabled = false;
     markModelReady(root, Boolean(loadedModelId()));
@@ -491,6 +499,12 @@ async function runPipeline(root) {
   output.hidden = true;
 
   const schema = schemaForModel(state.profile);
+  const constraints = collectAnswers(root);
+  record("analysis.constraints", {
+    tasks: constraints?.tasks || null,
+    columns: constraints?.columns?.length || 0,
+    hasNotes: Boolean(constraints?.notes),
+  });
   let plan = null;
   let note = "";
 
@@ -515,6 +529,7 @@ async function runPipeline(root) {
       const outcome = await planAnalysis(schema, {
         profile: state.profile,
         nCtx: contextWindow(),
+        constraints,
         limits,
         signal: state.analysisAbort.signal,
         onProgress: ({ attempt, tokens, thinking, rate, elapsedMs, phase }) => {
@@ -538,12 +553,12 @@ async function runPipeline(root) {
         note = FALLBACK_NOTES[outcome.reason] || "The model did not return a usable plan.";
       }
     } else {
-      plan = validatePlan(null, schema);
+      plan = validatePlan(null, schema, constraints);
       note = "No model loaded, so the default analysis was used.";
     }
   } catch (error) {
     recordError("runPipeline.plan", error);
-    plan = validatePlan(null, schema);
+    plan = validatePlan(null, schema, constraints);
     note = "Planning failed, so the default analysis was used.";
   }
 
@@ -581,10 +596,26 @@ const FALLBACK_NOTES = {
 };
 
 function renderResults(root, plan, results) {
-  const charts = plan.charts
-    .map((spec) => renderChart(spec, state.table))
-    .filter(Boolean)
-    .join("");
+  // Charts become live specs so the control panel has something to edit.
+  const specs = [...(plan.charts || [])];
+
+  // Correlation is polarity data — it runs through a meaningful zero — so when
+  // one was computed it becomes a diverging heatmap rather than the grid of
+  // bare numbers it used to be, which left the reader to do the comparing.
+  const matrix = (results.tables || []).find((tbl) => tbl.matrix)?.matrix;
+  if (matrix && matrix.names.length >= 2) {
+    specs.push({
+      type: "heatmap",
+      matrix,
+      title: "How the numeric columns move together",
+      caption: "Pearson correlation. Blue is negative, red positive, grey near zero.",
+      height: 380,
+    });
+  }
+
+  state.specs = specs.map((c, i) =>
+    normaliseSpec({ ...c, id: `chart-${i}`, mode: state.chartMode || "light" })
+  );
 
   $("[data-plan]", root).innerHTML = `
     <p class="ml-plan"><strong>${escapeHtml(labelForTask(plan.task))}</strong>${
@@ -601,14 +632,109 @@ function renderResults(root, plan, results) {
         : ""
     }`;
 
-  $("[data-charts]", root).innerHTML = charts || "<p>No chart suited these columns.</p>";
+  renderChartsAndControls(root);
   $("[data-metrics]", root).innerHTML = renderMetrics(results);
+}
 
-  const code = buildPython(plan, state.profile, state.table.name);
-  $("[data-code-output]", root).textContent = code;
+/** Draw every chart with its control panel, and regenerate the code to match. */
+function renderChartsAndControls(root) {
+  const target = $("[data-charts]", root);
+  if (!state.specs.length) {
+    target.innerHTML = "<p>No chart suited these columns.</p>";
+    refreshCode(root);
+    return;
+  }
+
+  target.innerHTML = state.specs
+    .map(
+      (spec, i) => `<div class="viz-block" data-block="${spec.id}">
+        <div data-viz-figure></div>
+        ${renderControls(spec, state.profile, i)}
+        <div data-viz-table></div>
+      </div>`
+    )
+    .join("");
+
+  state.specs.forEach((spec) => paintChart(root, spec));
+  refreshCode(root);
+}
+
+/**
+ * Repaint one chart in place.
+ *
+ * Deliberately not a full re-render of the container: replacing that markup
+ * would close every open control panel and, worse, destroy the input being
+ * typed into — a title field would lose focus after each keystroke.
+ */
+function paintChart(root, spec) {
+  const block = $(`[data-block="${spec.id}"]`, root);
+  if (!block) return;
+  const { svg, table, warning } = renderChart(spec, state.table);
+  $("[data-viz-figure]", block).innerHTML = svg;
+  $("[data-viz-table]", block).innerHTML = tableView(table, warning);
+}
+
+/**
+ * The table view is not optional decoration.
+ *
+ * Several palette slots sit below 3:1 against the light surface, which the
+ * colour validator flags as needing relief — a text alternative that does not
+ * depend on distinguishing hues. This is that relief, so it ships with every
+ * chart rather than on request.
+ */
+function tableView(table, warning) {
+  if (!table?.columns?.length) return "";
+  return `<details class="viz-table">
+    <summary>Table view${warning ? " · note" : ""}</summary>
+    ${warning ? `<p class="ml-caveat">${escapeHtml(warning)}</p>` : ""}
+    <div class="ml-table-scroll"><table class="ml-table">
+      <thead><tr>${table.columns.map((c) => `<th>${escapeHtml(c)}</th>`).join("")}</tr></thead>
+      <tbody>${table.rows
+        .slice(0, 60)
+        .map((r) => `<tr>${r.map((cell) => `<td>${escapeHtml(cell === null ? "—" : cell)}</td>`).join("")}</tr>`)
+        .join("")}</tbody>
+    </table></div>
+  </details>`;
+}
+
+function refreshCode(root) {
+  if (!state.plan) return;
+  const plan = { ...state.plan, charts: state.specs };
+  $("[data-code-output]", root).textContent = buildPython(plan, state.profile, state.table.name);
   $("[data-requirements]", root).textContent = buildRequirements({
     ...plan,
     fileName: state.table.name,
+  });
+}
+
+/** One delegated listener for every control on the page. */
+function bindChartControls(root) {
+  const charts = $("[data-charts]", root);
+  charts.addEventListener("input", (event) => {
+    const input = event.target;
+    if (!input.dataset?.field) return;
+    const panel = input.closest("[data-controls-for]");
+    if (!panel) return;
+
+    const spec = state.specs.find((s) => s.id === panel.dataset.controlsFor);
+    if (!spec) return;
+
+    const change = readControl(input);
+    if (!change) return;
+
+    const patched = normaliseSpec({ ...spec, [change.field]: change.value });
+    // Some combinations cannot be drawn; repair rather than render an error.
+    const { spec: reconciled, notes } = reconcileSpec(patched, state.profile);
+    Object.assign(spec, reconciled);
+    if (change.field === "mode") state.chartMode = change.value;
+
+    record("chart.control", { field: change.field, type: spec.type });
+    paintChart(root, spec);
+    refreshCode(root);
+    if (notes.length) {
+      const status = $("[data-analysis-status]", root);
+      if (status) status.textContent = notes.join(" ");
+    }
   });
 }
 
@@ -683,4 +809,92 @@ function escapeHtml(s) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+
+// ---------------------------------------------------------------------------
+// Guided questions
+// ---------------------------------------------------------------------------
+
+/**
+ * Ask three multiple-choice questions plus a free-text field before analysing.
+ *
+ * The model writes them when it can; otherwise the deterministic set is used.
+ * Either way the answers become hard constraints on the plan, which is what
+ * stops every file being answered with "descriptive summary".
+ */
+async function presentQuestions(root) {
+  const step = $("[data-questions-step]", root);
+  const status = $("[data-questions-status]", root);
+  step.hidden = false;
+
+  let questions = fallbackQuestions(state.profile);
+  let source = "fallback";
+
+  if (loadedModelId()) {
+    status.textContent = "Writing questions about your data…";
+    const controller = new AbortController();
+    state.questionAbort = controller;
+    try {
+      const outcome = await buildQuestions(state.profile, {
+        signal: controller.signal,
+        nCtx: contextWindow(),
+        onProgress: ({ tokens, rate, phase }) => {
+          status.textContent =
+            phase === "thinking"
+              ? "Reasoning…"
+              : `Writing questions — ${tokens} tokens · ${rate.toFixed(1)}/s`;
+        },
+      });
+      questions = outcome.questions;
+      source = outcome.source;
+    } catch (error) {
+      recordError("questions", error);
+    } finally {
+      state.questionAbort = null;
+    }
+  }
+
+  state.questions = questions;
+  state.questionSource = source;
+  status.textContent =
+    source === "model"
+      ? "Written by the model from your columns."
+      : "Standard questions — the model did not write a set in time.";
+
+  $("[data-questions]", root).innerHTML = questions
+    .map(
+      (q, qi) => `
+    <fieldset class="ml-question">
+      <legend>${escapeHtml(q.question)}</legend>
+      ${q.options
+        .map(
+          (opt, oi) => `<label class="ml-option">
+          <input type="checkbox" data-question="${qi}" value="${oi}">
+          <span>${escapeHtml(opt)}</span></label>`
+        )
+        .join("")}
+    </fieldset>`
+    )
+    .join("") +
+    `<label class="ml-question ml-question--text">
+      <span>Anything I should know about this data?</span>
+      <input type="text" data-question-notes placeholder="e.g. monthly sales by branch, 2024">
+    </label>`;
+}
+
+/** Read the form into constraints. Unanswered questions simply do not constrain. */
+function collectAnswers(root) {
+  if (!state.questions) return null;
+  const answers = { intent: [], columns: [], output: [], notes: "" };
+  const keys = ["intent", "columns", "output"];
+
+  $$("[data-question]", root).forEach((input) => {
+    if (!input.checked) return;
+    const key = keys[Number(input.dataset.question)];
+    if (key) answers[key].push(Number(input.value));
+  });
+  answers.notes = $("[data-question-notes]", root)?.value || "";
+
+  return answersToConstraints(answers, state.questions);
 }
