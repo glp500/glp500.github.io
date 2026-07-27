@@ -57,6 +57,17 @@ description: Small language models running locally in your browser over WebGPU, 
           <h2>This machine</h2>
           <div data-hardware><p class="ml-status">Checking…</p></div>
         </div>
+
+        <div class="ml-setup">
+          <details class="ml-more">
+            <summary>Diagnostics <span data-diagnostics-summary></span></summary>
+            <p class="ml-caveat">Recorded in this tab only. Nothing is sent anywhere unless you copy it and send it yourself. Your file's contents, column values and filename are never included.</p>
+            <div class="ml-actions">
+              <button type="button" data-copy-diagnostics>Copy</button>
+              <a class="arrow-link" data-issue-link href="https://github.com/glp500/glp500.github.io/issues/new" target="_blank" rel="noreferrer">Report an issue ↗</a>
+            </div>
+          </details>
+        </div>
       </aside>
 
       <div class="minilab__pane">
@@ -74,6 +85,7 @@ description: Small language models running locally in your browser over WebGPU, 
           <section class="ml-step" data-analysis-step hidden>
             <div class="ml-actions">
               <button type="button" class="button button--dark" data-run-analysis disabled>Analyse</button>
+              <button type="button" data-cancel-analysis hidden>Stop</button>
               <span class="ml-status" data-analysis-status></span>
             </div>
 

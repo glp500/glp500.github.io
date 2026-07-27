@@ -8,9 +8,27 @@
 const TEXT_TYPES = /\.(csv|tsv|txt)$/i;
 const SHEET_TYPES = /\.(xlsx|xls)$/i;
 
+// Caps so a very large file cannot wedge the browser. Profiling is O(rows ×
+// columns) on the main thread, and past these sizes the page stops responding
+// long before the analysis is interesting.
+export const MAX_FILE_BYTES_IN = 64 * 1024 * 1024;
+export const MAX_ROWS = 200_000;
+export const MAX_COLUMNS = 512;
+
 export class IngestError extends Error {}
 
 export async function readTable(file) {
+  if (file.size > MAX_FILE_BYTES_IN) {
+    throw new IngestError(
+      `That file is ${(file.size / 1024 ** 2).toFixed(0)} MB. The Mini-Lab reads up to ${
+        MAX_FILE_BYTES_IN / 1024 ** 2
+      } MB in the browser — take a sample of it first.`
+    );
+  }
+  return readTableInner(file);
+}
+
+async function readTableInner(file) {
   if (SHEET_TYPES.test(file.name)) return readSpreadsheet(file);
   if (TEXT_TYPES.test(file.name)) return readDelimited(file);
   throw new IngestError(
@@ -98,15 +116,27 @@ function parseDelimited(text, delimiter) {
 }
 
 function toTable(rows, name) {
-  const header = rows[0].map((h, i) => (String(h).trim() || `column_${i + 1}`));
-  const body = rows.slice(1).map((r) => {
+  const header = rows[0]
+    .slice(0, MAX_COLUMNS)
+    .map((h, i) => String(h).trim() || `column_${i + 1}`);
+  const truncatedColumns = rows[0].length > MAX_COLUMNS;
+  const dataRows = rows.slice(1, MAX_ROWS + 1);
+  const truncatedRows = rows.length - 1 > MAX_ROWS;
+  const body = dataRows.map((r) => {
     const out = {};
     header.forEach((key, i) => {
       out[key] = r[i] ?? "";
     });
     return out;
   });
-  return { name, columns: header, rows: body };
+  return {
+    name,
+    columns: header,
+    rows: body,
+    truncated: truncatedRows || truncatedColumns,
+    truncatedRows,
+    truncatedColumns,
+  };
 }
 
 // ---------------------------------------------------------------------------

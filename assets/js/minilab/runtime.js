@@ -1,15 +1,22 @@
-// Model runtime: download, cache, load and stream from a GGUF model.
+// Model runtime: download, cache, load, and stream from a GGUF model.
 //
-// wllama already runs llama.cpp inside its own worker, so this module stays on
-// the main thread and only brokers between the UI and that worker.
+// wllama runs llama.cpp inside its own worker, so this module stays on the
+// main thread and only brokers between the UI and that worker.
 
 import { gpuLayersFor } from "./hardware.js";
+import { record } from "./diagnostics.js";
 
 const BASE = "/assets/js/vendor/wllama/";
+
+// Planning needs a couple of hundred tokens, not thousands. A smaller context
+// means a smaller KV cache and less memory traffic per token, which matters a
+// great deal when there is no GPU to hide it.
+const PLANNING_CTX = 2048;
 
 let WllamaCtor = null;
 let instance = null;
 let loadedId = null;
+let constraintWorks = false;
 
 async function getWllama() {
   if (!WllamaCtor) {
@@ -21,6 +28,11 @@ async function getWllama() {
 
 export function loadedModelId() {
   return loadedId;
+}
+
+/** Whether this build honoured a JSON constraint when we probed it. */
+export function supportsConstraint() {
+  return constraintWorks;
 }
 
 /**
@@ -41,13 +53,30 @@ export async function loadModel(model, hardware, handlers = {}) {
 
   instance = new Wllama(
     { default: `${BASE}wllama.wasm` },
-    {
-      parallelDownloads: 3,
-      allowOffline: true,
-      suppressNativeLog: true,
-    }
+    { parallelDownloads: 3, allowOffline: true, suppressNativeLog: true }
   );
 
+  // Only pass n_threads when isolation actually succeeded. Passing 1 does not
+  // mean "let the runtime decide" — it *enforces* single-threaded inference,
+  // which is what was throttling this page to one core.
+  const params = {
+    n_ctx: Math.min(model.context || PLANNING_CTX, PLANNING_CTX),
+    n_gpu_layers: gpuLayersFor(hardware),
+    warmup: true,
+  };
+  if (hardware.crossOriginIsolated && hardware.threads > 1) {
+    params.n_threads = Math.min(hardware.threads, 8);
+  }
+
+  record("model.load.start", {
+    model: model.id,
+    threads: params.n_threads ?? "auto",
+    gpuLayers: params.n_gpu_layers,
+    ctx: params.n_ctx,
+    bytes: model.size_bytes,
+  });
+
+  const began = performance.now();
   onStage?.("Downloading model");
   await instance.loadModelFromHF(
     { repo: model.repo, file: model.file },
@@ -55,17 +84,54 @@ export async function loadModel(model, hardware, handlers = {}) {
       useCache: true,
       signal,
       progressCallback: ({ loaded, total }) => onProgress?.({ loaded, total }),
-      n_ctx: model.context || 4096,
-      n_gpu_layers: gpuLayersFor(hardware),
-      n_threads: hardware.crossOriginIsolated ? Math.min(hardware.threads, 8) : 1,
-      // A short warmup pass makes the first real reply feel much faster.
-      warmup: true,
+      ...params,
     }
   );
 
   loadedId = model.id;
+  record("model.load.done", { model: model.id, ms: Math.round(performance.now() - began) });
+
+  onStage?.("Checking output constraints");
+  constraintWorks = await probeConstraint();
+  record("model.constraint", { supported: constraintWorks });
+
   onStage?.("Ready");
   return instance;
+}
+
+/**
+ * Ask for one tiny constrained generation and see whether the build honours
+ * it. llama.cpp supports GBNF and json_schema, and wllama forwards the whole
+ * options object through to it — but that is not the same as this WASM build
+ * implementing it, so we measure instead of assuming.
+ */
+async function probeConstraint() {
+  const schema = {
+    type: "object",
+    properties: { ok: { type: "boolean" } },
+    required: ["ok"],
+    additionalProperties: false,
+  };
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15_000);
+  try {
+    let text = "";
+    for await (const piece of chatStream({
+      messages: [{ role: "user", content: 'Reply with {"ok":true}' }],
+      maxTokens: 24,
+      schema,
+      signal: controller.signal,
+    })) {
+      text += piece;
+    }
+    const trimmed = text.trim();
+    // If the constraint bound, the reply is JSON and nothing else.
+    return trimmed.startsWith("{") && JSON.parse(trimmed)?.ok !== undefined;
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function unloadModel() {
@@ -78,95 +144,54 @@ export async function unloadModel() {
   }
   instance = null;
   loadedId = null;
+  constraintWorks = false;
 }
 
 /**
- * Stream a chat completion. Calls onToken with each new piece of text and
- * resolves with the full string.
+ * Stream a chat completion as an async iterator of text pieces.
+ *
+ * Yielding rather than accumulating lets the harness measure the rate and
+ * abandon a generation that cannot finish in budget.
  */
-export async function chat(messages, { onToken, signal, maxTokens = 512, temperature = 0.7 } = {}) {
+export async function* chatStream({
+  messages,
+  maxTokens = 220,
+  temperature = 0.1,
+  schema = null,
+  signal,
+} = {}) {
   if (!instance) throw new Error("No model is loaded.");
 
-  let text = "";
-  const stream = await instance.createChatCompletion({
+  const options = {
     messages,
     stream: true,
     max_tokens: maxTokens,
     temperature,
     abortSignal: signal,
-  });
+  };
 
+  // Forwarded verbatim to llama.cpp. Harmless if this build ignores it.
+  if (schema) {
+    options.response_format = {
+      type: "json_schema",
+      json_schema: { name: "plan", schema, strict: true },
+    };
+  }
+
+  const stream = await instance.createChatCompletion(options);
   for await (const chunk of stream) {
+    if (signal?.aborted) return;
     const piece = chunk?.choices?.[0]?.delta?.content || "";
-    if (!piece) continue;
+    if (piece) yield piece;
+  }
+}
+
+/** Convenience wrapper for callers that just want the whole string. */
+export async function chat(messages, { onToken, signal, maxTokens = 220, temperature = 0.1 } = {}) {
+  let text = "";
+  for await (const piece of chatStream({ messages, maxTokens, temperature, signal })) {
     text += piece;
     onToken?.(piece, text);
   }
   return text;
-}
-
-/**
- * Ask the model for JSON matching a shape, and parse it defensively.
- * Small models wander outside the format, so this retries once with the
- * parse error fed back before giving up.
- */
-export async function chatJSON(messages, { signal, maxTokens = 700 } = {}) {
-  const attempt = async (extra) => {
-    const raw = await chat(extra ? [...messages, ...extra] : messages, {
-      signal,
-      maxTokens,
-      temperature: 0.1,
-    });
-    return { raw, parsed: extractJSON(raw) };
-  };
-
-  let { raw, parsed } = await attempt();
-  if (parsed) return parsed;
-
-  ({ raw, parsed } = await attempt([
-    { role: "assistant", content: raw },
-    {
-      role: "user",
-      content:
-        "That was not valid JSON. Reply with the JSON object only — no prose, no code fences.",
-    },
-  ]));
-  return parsed;
-}
-
-/** Pull the first balanced JSON object out of a model reply. */
-export function extractJSON(text) {
-  if (!text) return null;
-  const cleaned = text.replace(/```json/gi, "```").replace(/```/g, "");
-  const start = cleaned.indexOf("{");
-  if (start === -1) return null;
-
-  let depth = 0;
-  let inString = false;
-  let escaped = false;
-  for (let i = start; i < cleaned.length; i += 1) {
-    const ch = cleaned[i];
-    if (escaped) {
-      escaped = false;
-      continue;
-    }
-    if (ch === "\\") {
-      escaped = true;
-      continue;
-    }
-    if (ch === '"') inString = !inString;
-    if (inString) continue;
-    if (ch === "{") depth += 1;
-    if (ch === "}") {
-      depth -= 1;
-      if (depth === 0) {
-        try {
-          return JSON.parse(cleaned.slice(start, i + 1));
-        } catch {
-          return null;
-        }
-      }
-    }
-  }
-  return null;
 }

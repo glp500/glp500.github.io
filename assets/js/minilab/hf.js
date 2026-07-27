@@ -10,7 +10,11 @@ const API = "https://huggingface.co/api";
 
 // Preference order when a repo ships many quants. Q4_K_M is the usual
 // quality/size sweet spot for small models.
-const QUANT_ORDER = ["Q4_K_M", "UD-Q4_K_XL", "Q4_K_S", "IQ4_XS", "Q5_K_M", "Q3_K_M", "Q8_0"];
+//
+// IQ (imatrix) quants rank last deliberately: wllama's own guidance is that
+// they are "not recommended, may result in slow inference and low quality",
+// and slow inference is exactly what we are trying to avoid here.
+const QUANT_ORDER = ["Q4_K_M", "UD-Q4_K_XL", "Q4_K_S", "Q5_K_M", "Q3_K_M", "Q8_0", "IQ4_XS"];
 
 export async function searchRepos(query, { limit = 12, signal } = {}) {
   const url = `${API}/models?search=${encodeURIComponent(query)}&filter=gguf&sort=downloads&direction=-1&limit=${limit}`;

@@ -8,7 +8,8 @@
 // The model never emits Python that gets executed, and never supplies a
 // figure that reaches the report.
 
-import { chatJSON } from "./runtime.js";
+import { runGuarded } from "./harness.js";
+import { record } from "./diagnostics.js";
 
 export const TASKS = {
   summary: "Describe the shape of the data and the distribution of its columns.",
@@ -33,22 +34,80 @@ Rules:
 - Only use column names exactly as given.
 - Choose at most three charts.`;
 
-/** Ask the model for a plan, then repair anything it got wrong. */
-export async function planAnalysis(schema, { signal } = {}) {
-  let plan = null;
-  try {
-    plan = await chatJSON(
-      [
-        { role: "system", content: PLAN_SYSTEM },
-        { role: "user", content: JSON.stringify(schema) },
-      ],
-      { signal }
-    );
-  } catch (error) {
-    if (error?.name === "AbortError") throw error;
-    plan = null;
-  }
-  return validatePlan(plan, schema);
+/** JSON schema for the structural gate. Also sent as a decode constraint. */
+export const PLAN_SCHEMA = {
+  type: "object",
+  properties: {
+    task: { type: "string", enum: ["summary", "correlation", "classification", "regression"] },
+    target: { type: ["string", "null"] },
+    features: { type: "array", items: { type: "string" } },
+    charts: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          kind: { type: "string", enum: ["histogram", "bar", "scatter"] },
+          x: { type: "string" },
+          y: { type: ["string", "null"] },
+        },
+        required: ["kind", "x"],
+      },
+    },
+    rationale: { type: "string" },
+  },
+  required: ["task"],
+};
+
+/**
+ * Ask the model for a plan under the harness, then repair anything it got
+ * wrong. Always returns a runnable plan: if the model is slow, cancelled, or
+ * wrong twice over, the deterministic fallback takes its place.
+ *
+ * @returns {{plan: object, source: "model"|"fallback", reason: string}}
+ */
+export async function planAnalysis(schema, { signal, onProgress } = {}) {
+  const columnNames = new Set(schema.columns.map((c) => c.name));
+
+  const result = await runGuarded({
+    messages: [
+      { role: "system", content: PLAN_SYSTEM },
+      { role: "user", content: JSON.stringify(schema) },
+    ],
+    schema: PLAN_SCHEMA,
+    signal,
+    onProgress,
+    // Semantic gate: schema-valid JSON can still name a column that is not
+    // there. Reject with the specific reason so the repair turn is useful.
+    validate: (parsed) => {
+      if (!parsed || typeof parsed !== "object") {
+        return { ok: false, error: "The reply was not an object." };
+      }
+      if (!(parsed.task in TASKS)) {
+        return {
+          ok: false,
+          error: `"${parsed.task}" is not one of: ${Object.keys(TASKS).join(", ")}.`,
+        };
+      }
+      if (parsed.target && !columnNames.has(parsed.target)) {
+        return { ok: false, error: `Column "${parsed.target}" does not exist in this file.` };
+      }
+      const badChart = (parsed.charts || []).find((c) => c?.x && !columnNames.has(c.x));
+      if (badChart) {
+        return { ok: false, error: `Chart column "${badChart.x}" does not exist in this file.` };
+      }
+      return { ok: true, value: parsed };
+    },
+  });
+
+  record("plan.result", { ok: result.ok, reason: result.reason, attempts: result.attempts.length });
+
+  // validatePlan runs either way — it is the guarantee, not a formality.
+  const plan = validatePlan(result.ok ? result.value : null, schema);
+  return {
+    plan,
+    source: result.ok ? "model" : "fallback",
+    reason: result.reason,
+  };
 }
 
 /**

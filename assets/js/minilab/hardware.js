@@ -171,10 +171,19 @@ export function evaluateModel(model, report) {
   return { ok: true };
 }
 
-/** Best runnable model, preferring the catalogue default at equal capability. */
+/**
+ * Best runnable model for this machine.
+ *
+ * Without a GPU the smallest model is the right default, not the catalogue's:
+ * on one or two CPU threads the difference between 0.5 GB and 1.3 GB is the
+ * difference between a usable wait and one nobody sits through.
+ */
 export function recommendModel(models, report) {
   const runnable = models.filter((m) => evaluateModel(m, report).ok);
   if (!runnable.length) return null;
+  if (!report.webgpu) {
+    return runnable.reduce((a, b) => (b.size_bytes < a.size_bytes ? b : a));
+  }
   const preferred = runnable.find((m) => m.default);
   if (preferred) return preferred;
   return runnable.reduce((a, b) => (b.size_bytes > a.size_bytes ? b : a));
