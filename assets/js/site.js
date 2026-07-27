@@ -121,20 +121,28 @@
     applyFilters();
   });
 
+  // Copy-to-clipboard. Takes its text from data-copy-text when present,
+  // otherwise from the citation block on publication pages.
   document.querySelectorAll("[data-copy-citation]").forEach((button) => {
+    const original = button.textContent;
     button.addEventListener("click", async () => {
-      const citation = document.querySelector("[data-citation-text]")?.textContent?.trim();
-      if (!citation) return;
+      const text =
+        button.dataset.copyText ||
+        document.querySelector("[data-citation-text]")?.textContent?.trim();
+      if (!text) return;
       try {
-        await navigator.clipboard.writeText(citation);
-        button.textContent = "Citation copied";
+        await navigator.clipboard.writeText(text);
+        button.textContent = "Copied";
         button.classList.add("is-copied");
         window.setTimeout(() => {
-          button.textContent = "Copy citation";
+          button.textContent = original;
           button.classList.remove("is-copied");
         }, 1800);
       } catch {
-        button.textContent = "Select citation above";
+        button.textContent = "Copy failed";
+        window.setTimeout(() => {
+          button.textContent = original;
+        }, 1800);
       }
     });
   });

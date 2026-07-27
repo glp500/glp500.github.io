@@ -6,11 +6,10 @@ world_mode: experience
 description: Gavin Lip's research experience, education, methods, skills, publication, and interests.
 ---
 {% assign profile = site.data.profile %}
-{% include page-hero.html mode="experience" index="FIELD 05" label="Experience / CV" %}
+{% include page-hero.html mode="experience" %}
 
 <section class="cv-intro section-rule" data-world-mode="experience">
   <div class="shell cv-intro__grid">
-    <div class="section-index"><span>01</span><span>Profile</span></div>
     <div>
       <p class="cv-intro__lead">{{ profile.bio }}</p>
       <div class="cv-intro__contact">

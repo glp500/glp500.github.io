@@ -2,96 +2,41 @@
 layout: default
 ---
 {% assign profile = site.data.profile %}
-{% assign project_items = site.projects | where_exp: "item", "item.published != false" %}
-{% assign featured_projects = project_items | where: "featured", true | sort: "featured_rank" | slice: 0, profile.featured.projects_limit %}
-{% assign post_items = site.posts | where_exp: "item", "item.published != false" %}
-{% assign recent_posts = post_items | slice: 0, 3 %}
-{% assign featured_publication = site.publications | where: "featured", true | first %}
+{% assign items = site.posts | where_exp: "item", "item.published != false" %}
+{% assign note_options = "Announcement|Essay|Project Update|Reading Note" | split: "|" %}
 
-<section class="masthead" data-world-mode="home">
-  <div class="masthead__orbit" aria-hidden="true"></div>
-  <div class="masthead__inner masthead__grid shell">
-    <div class="masthead__identity">
-      <h1><span>Gavin</span><span>Lip</span></h1>
-      <p class="masthead__discipline">{{ profile.title }}</p>
+<section class="identity-band" data-world-mode="home">
+  <div class="shell identity-band__inner">
+    {% if profile.images.portrait and profile.images.portrait != "" %}
+      <img class="identity-band__portrait" src="{{ profile.images.portrait | relative_url }}" alt="{{ profile.images.portrait_alt }}" width="96" height="96">
+    {% endif %}
+    <div class="identity-band__copy">
+      <h1>{{ profile.name }}</h1>
+      <p class="identity-band__discipline">{{ profile.title }}</p>
+      <p class="identity-band__summary">{{ profile.summary }}</p>
     </div>
-    <div class="masthead__statement">
-      <p class="masthead__intro">{{ profile.summary }}</p>
-      <div class="masthead__actions">
-        <a class="button button--dark" href="{{ '/my-work/' | relative_url }}">My work →</a>
-        <a class="arrow-link" href="{{ '/experience/' | relative_url }}">Experience & CV</a>
-      </div>
+    <div class="identity-band__links">
+      <a class="arrow-link" href="{{ '/my-work/' | relative_url }}">My work →</a>
+      <a class="arrow-link" href="{{ '/experience/' | relative_url }}">Experience & CV →</a>
+      <a class="arrow-link" href="mailto:{{ profile.contact.email }}">Email ↗</a>
     </div>
   </div>
 </section>
 
-<section class="home-about section-rule" id="about" data-world-mode="home">
-  <div class="shell home-about__grid">
-    <div class="section-index reveal"><span>001</span><span>About</span></div>
-    <div class="home-about__portrait reveal">
-      <img src="{{ profile.images.portrait | relative_url }}" alt="{{ profile.images.portrait_alt }}">
-    </div>
-    <div class="home-about__copy reveal">
-      <p>{{ profile.bio }}</p>
-      <div class="link-row">
-        <a class="arrow-link" href="{{ '/experience/' | relative_url }}">Experience & CV →</a>
-        <a class="arrow-link" href="mailto:{{ profile.contact.email }}">Email ↗</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="home-projects section-rule" data-world-mode="projects">
+<section class="archive-section feed" data-filter-root data-world-mode="notes">
   <div class="shell">
-    <div class="section-heading reveal">
-      <div class="section-index"><span>002</span><span>My Work</span></div>
-      <div>
-        <h2>Selected work</h2>
-      </div>
-      <a class="arrow-link" href="{{ '/my-work/' | relative_url }}">All work →</a>
-    </div>
-    <div class="project-grid">
-      {% for project in featured_projects %}
-        {% include project-card.html project=project index=forloop.index %}
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-{% if featured_publication %}
-<section class="home-publication section-rule" data-world-mode="publications">
-  <div class="shell home-publication__grid">
-    <div class="section-index reveal"><span>003</span><span>Publications</span></div>
-    <div class="home-publication__visual reveal">{% include specimen.html kind="publications" %}</div>
-    <article class="home-publication__copy reveal">
-      <h2><a href="{{ featured_publication.url | relative_url }}">{{ featured_publication.title }}</a></h2>
-      <p class="citation-text">{{ featured_publication.citation }}</p>
-      <div class="link-row">
-        <a class="arrow-link" href="{{ featured_publication.url | relative_url }}">Details →</a>
-        <a class="arrow-link" href="https://doi.org/{{ featured_publication.doi }}" target="_blank" rel="noreferrer">DOI ↗</a>
-      </div>
-    </article>
-  </div>
-</section>
-{% endif %}
-
-<section class="announcement section-rule" data-world-mode="notes">
-  <div class="shell">
-    <div class="section-heading reveal">
-      <div class="section-index"><span>004</span><span>Announcements</span></div>
-      <div>
-        <h2>Recent posts</h2>
-      </div>
-      <a class="arrow-link" href="{{ '/announcements/' | relative_url }}">All announcements →</a>
-    </div>
-    {% if recent_posts.size > 0 %}
-      <div class="notes-grid">
-        {% for post in recent_posts %}
-          {% include post-card.html post=post index=forloop.index %}
+    {% include filter-controls.html label="Filter posts" placeholder="Search titles, kinds, and topics" options=note_options %}
+    {% if items.size > 0 %}
+      <div class="feed-list">
+        {% for post in items %}
+          <div data-filter-item data-filter="{{ post.kind | downcase | slugify }}" data-search="{{ post.title }} {{ post.excerpt }} {{ post.kind }} {{ post.tags | join: ' ' }}">
+            {% include post-card.html post=post index=forloop.index %}
+          </div>
         {% endfor %}
       </div>
     {% else %}
-      {% include empty-state.html title="Announcements coming soon" body="New posts will appear here first." %}
+      {% include empty-state.html title="Posts coming soon" body="Announcements, essays, project updates, and reading notes will appear here." %}
     {% endif %}
+    <div class="filter-empty" data-filter-empty hidden>No posts match this combination.</div>
   </div>
 </section>

@@ -1,11 +1,6 @@
 <header class="page-hero" data-world-mode="{{ include.mode | default: page.world_mode }}">
   <div class="shell page-hero__grid">
-    <div class="page-hero__index">
-      <span>{{ include.index | default: "FIELD" }}</span>
-      <span>{{ include.label | default: page.title }}</span>
-    </div>
     <div class="page-hero__content reveal">
-      <p class="kicker">{{ include.kicker }}</p>
       <h1>{{ page.title }}</h1>
       {% if include.intro %}<p>{{ include.intro }}</p>{% endif %}
     </div>

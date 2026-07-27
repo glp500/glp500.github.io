@@ -6,7 +6,7 @@ nav_key: my-work
 world_mode: projects
 description: Research studies, tools, ventures, and experiments, with the code behind them.
 ---
-{% include page-hero.html mode="projects" index="FIELD 01" label="My work" %}
+{% include page-hero.html mode="projects" %}
 
 {% assign items = site.projects | where_exp: "item", "item.published != false" | sort: "date" | reverse %}
 {% assign featured_items = items | where: "featured", true | sort: "featured_rank" %}

@@ -2,6 +2,6 @@
 title: Field Notes
 layout: redirect
 permalink: /blog/
-redirect_to: /announcements/
+redirect_to: /
 sitemap: false
 ---

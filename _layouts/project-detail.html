@@ -5,7 +5,7 @@ layout: default
 <article class="detail-page" data-world-mode="projects">
   <header class="detail-hero">
     <div class="shell detail-hero__grid">
-      <div class="detail-hero__index"><span>{{ page.status }}</span><a href="{{ '/my-work/' | relative_url }}">Return to my work ↗</a></div>
+      <div class="detail-hero__index"><a href="{{ '/my-work/' | relative_url }}">Return to my work ↗</a></div>
       <div class="detail-hero__title reveal">
         <p class="kicker">{{ page.context | default: page.status }} · {% if page.dates_display %}{{ page.dates_display }}{% else %}{{ page.date | date: "%Y" }}{% endif %}</p>
         <h1>{{ page.title }}</h1>

@@ -10,10 +10,10 @@
   label: Publications
   url: /publications/
   world_mode: publications
-- key: announcements
-  label: Announcements
-  url: /announcements/
-  world_mode: notes
+- key: mini-lab
+  label: Mini-Lab
+  url: /mini-lab/
+  world_mode: research
 - key: media
   label: Media & Literature
   url: /media/

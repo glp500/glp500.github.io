@@ -1,0 +1,37 @@
+{% comment %}
+Renders a post's optional media: a self-hosted video, an embedded video, or a
+gallery. Each block only appears when its front-matter field is set.
+{% endcomment %}
+
+{% if include.post.video_file and include.post.video_file != "" %}
+  <figure class="post-video shell">
+    <video controls preload="metadata"
+      {% if include.post.video_poster and include.post.video_poster != "" %}poster="{{ include.post.video_poster | relative_url }}"{% endif %}>
+      <source src="{{ include.post.video_file | relative_url }}">
+      Your browser cannot play this video.
+    </video>
+    {% if include.post.video_caption %}<figcaption>{{ include.post.video_caption }}</figcaption>{% endif %}
+  </figure>
+{% elsif include.post.video_embed and include.post.video_embed != "" %}
+  {% assign embed_src = include.post.video_embed | replace: "youtube.com/embed", "youtube-nocookie.com/embed" %}
+  <figure class="post-video shell">
+    <div class="video-frame">
+      <iframe src="{{ embed_src }}" title="{{ include.post.video_title | default: include.post.title }}"
+        loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
+        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen></iframe>
+    </div>
+    {% if include.post.video_caption %}<figcaption>{{ include.post.video_caption }}</figcaption>{% endif %}
+  </figure>
+{% endif %}
+
+{% if include.post.gallery and include.post.gallery.size > 0 %}
+  <section class="post-gallery shell" aria-label="Images">
+    {% for image in include.post.gallery %}
+      <figure>
+        <img src="{{ image.src | relative_url }}" alt="{{ image.alt | default: '' }}" loading="lazy">
+        {% if image.caption %}<figcaption>{{ image.caption }}</figcaption>{% endif %}
+      </figure>
+    {% endfor %}
+  </section>
+{% endif %}

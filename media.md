@@ -5,7 +5,7 @@ nav_key: media
 world_mode: media
 description: Books, papers, videos, audio, and other influences worth returning to.
 ---
-{% include page-hero.html mode="media" index="FIELD 03" label="Media & literature" %}
+{% include page-hero.html mode="media" %}
 
 {% assign items = site.media | where_exp: "item", "item.published != false" | sort: "date" | reverse %}
 {% assign media_options = "Read|Watch|Listen|Use" | split: "|" %}

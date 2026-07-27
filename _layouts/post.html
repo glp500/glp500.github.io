@@ -1,34 +1,61 @@
 ---
 layout: default
 ---
+{% assign words = content | strip_html | number_of_words %}
+{% assign minutes = words | divided_by: 220 | plus: 1 %}
 <article class="post-page" data-world-mode="notes">
   <header class="post-hero">
     <div class="shell post-hero__grid">
-      <div>
-        <p class="kicker">{{ page.kind | default: "Announcement" }}</p>
-        <a class="arrow-link" href="{{ '/announcements/' | relative_url }}">All announcements ↗</a>
-      </div>
       <div class="reveal">
+        <p class="card-meta">
+          <span>{{ page.kind | default: "Announcement" }}</span>
+          <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d %B %Y" }}</time>
+          <span>{{ minutes }} min read</span>
+        </p>
         <h1>{{ page.title }}</h1>
-        <p class="post-hero__excerpt">{{ page.excerpt }}</p>
-      </div>
-      <div class="post-hero__meta">
-        <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%d %B %Y" }}</time>
-        {% if page.tags %}<p>{{ page.tags | join: " · " }}</p>{% endif %}
+        {% if page.excerpt %}<p class="post-hero__excerpt">{{ page.excerpt | strip_html | strip }}</p>{% endif %}
+        {% if page.tags and page.tags.size > 0 %}
+          <ul class="tag-list">{% for tag in page.tags %}<li>{{ tag }}</li>{% endfor %}</ul>
+        {% endif %}
       </div>
     </div>
   </header>
+
   {% if page.feature_image and page.feature_image != "" %}
     <figure class="post-media shell">
       <img src="{{ page.feature_image | relative_url }}" alt="{{ page.feature_image_alt | default: '' }}">
       {% if page.image_caption %}<figcaption>{{ page.image_caption }}</figcaption>{% endif %}
     </figure>
   {% endif %}
+
   <div class="post-body shell">
-    <div class="post-body__rail">
-      <span>FIELD NOTE</span>
-      <span>{{ page.date | date: "%Y" }}</span>
-    </div>
     <div class="prose">{{ content }}</div>
   </div>
+
+  {% include post-media.html post=page %}
+
+  {% if page.external_links and page.external_links.size > 0 %}
+    <section class="post-links shell" aria-label="Related links">
+      <h2>Links</h2>
+      <ul>
+        {% for link in page.external_links %}
+          <li>
+            <a href="{{ link.url }}" target="_blank" rel="noreferrer">
+              <strong>{{ link.label | default: link.url }}</strong>
+              {% if link.note %}<span>{{ link.note }}</span>{% endif %}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <footer class="post-footer shell">
+    {% include post-share.html post=page %}
+    <nav class="post-pager" aria-label="More posts">
+      {% if page.next %}<a class="arrow-link" href="{{ page.next.url | relative_url }}">← {{ page.next.title }}</a>{% endif %}
+      {% if page.previous %}<a class="arrow-link post-pager__prev" href="{{ page.previous.url | relative_url }}">{{ page.previous.title }} →</a>{% endif %}
+    </nav>
+    <a class="arrow-link" href="{{ '/' | relative_url }}">All posts ↗</a>
+  </footer>
 </article>

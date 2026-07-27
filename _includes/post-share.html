@@ -1,0 +1,11 @@
+{% assign share_url = include.post.url | absolute_url %}
+{% assign share_text = include.post.title | uri_escape %}
+{% assign share_link = share_url | uri_escape %}
+<div class="post-share" aria-label="Share this post">
+  <span>Share</span>
+  <button type="button" class="copy-button" data-copy-citation data-copy-text="{{ share_url }}">Copy link</button>
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ share_link }}" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+  <a href="https://bsky.app/intent/compose?text={{ share_text }}%20{{ share_link }}" target="_blank" rel="noreferrer">Bluesky ↗</a>
+  <a href="https://x.com/intent/post?text={{ share_text }}&url={{ share_link }}" target="_blank" rel="noreferrer">X ↗</a>
+  <a href="mailto:?subject={{ share_text }}&body={{ share_link }}">Email ↗</a>
+</div>
