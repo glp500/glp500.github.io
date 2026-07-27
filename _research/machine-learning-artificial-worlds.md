@@ -1,5 +1,6 @@
 ---
 title: "Big Data, Reinforcement & Machine Learning"
+research_type: field
 summary: "Models that learn through interaction, the worlds represented by datasets, and tools that remain legible to their users."
 question: "What changes when a model becomes a participant rather than an observer?"
 status: "Ongoing inquiry"

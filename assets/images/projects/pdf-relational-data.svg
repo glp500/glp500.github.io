@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img">
+  <title>PDF to relational data workflow</title>
+  <rect width="1200" height="700" fill="#0b1113"/>
+  <rect x="80" y="115" width="240" height="420" fill="#f4f1e7"/><path d="M120 190h160M120 230h120M120 305h160M120 345h145M120 420h160" stroke="#9db7be" stroke-width="16"/>
+  <rect x="460" y="205" width="260" height="230" fill="#f0fd71"/><text x="590" y="292" fill="#0b1113" font-family="Arial" font-size="28" text-anchor="middle">SCHEMA</text><text x="590" y="337" fill="#0b1113" font-family="Georgia" font-size="20" text-anchor="middle">validate relationships</text>
+  <g fill="#9db7be"><rect x="865" y="110" width="250" height="130"/><rect x="865" y="280" width="250" height="130"/><rect x="865" y="450" width="250" height="130"/></g>
+  <g fill="#0b1113" font-family="Arial" font-size="22"><text x="895" y="165">PEOPLE.CSV</text><text x="895" y="335">EVENTS.CSV</text><text x="895" y="505">LINKS.CSV</text></g>
+  <g stroke="#f4f1e7" stroke-width="4" fill="none"><path d="M320 325h140M720 325h145"/><path d="m435 305 25 20-25 20m405-40 25 20-25 20"/></g>
+  <text x="80" y="625" fill="#f4f1e7" font-family="Georgia" font-size="31">Document structure becomes inspectable data.</text>
+</svg>

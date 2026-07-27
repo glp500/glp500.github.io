@@ -2,8 +2,8 @@
 <article
   class="project-card reveal"
   data-filter-item
-  data-filter="{{ include.project.status | default: 'project' | downcase | slugify }}"
-  data-search="{{ include.project.title }} {{ include.project.summary }} {{ include.project.role }} {{ project_stack | join: ' ' }} {{ include.project.topics | join: ' ' }}"
+  data-filter="{{ include.project.context | default: 'project' | downcase | slugify }}"
+  data-search="{{ include.project.title }} {{ include.project.summary }} {{ include.project.role }} {{ include.project.context }} {{ include.project.dates_display }} {{ project_stack | join: ' ' }} {{ include.project.topics | join: ' ' }}"
 >
   <a class="project-card__visual" href="{{ include.project.url | relative_url }}" aria-label="View {{ include.project.title }}">
     {% if include.project.image and include.project.image != "" %}
@@ -15,7 +15,7 @@
   </a>
   <div class="project-card__content">
     <p class="card-meta">
-      {% if include.project.status %}<span>{{ include.project.status }}</span>{% endif %}
+      {% if include.project.context %}<span>{{ include.project.context }}</span>{% elsif include.project.status %}<span>{{ include.project.status }}</span>{% endif %}
       {% if include.project.role %}<span>{{ include.project.role }}</span>{% endif %}
     </p>
     <h3><a href="{{ include.project.url | relative_url }}">{{ include.project.title }}</a></h3>

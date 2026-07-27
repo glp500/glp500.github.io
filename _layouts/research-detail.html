@@ -34,4 +34,18 @@ layout: default
     </aside>
     <div class="prose">{{ content }}</div>
   </div>
+  {% assign related_projects = site.projects | where_exp: "project", "project.research_programs contains page.slug" | sort: "date" | reverse %}
+  {% if related_projects and related_projects.size > 0 %}
+    <section class="related-projects shell" aria-labelledby="related-projects-title">
+      <div class="section-heading">
+        <div><p class="kicker">Program in practice</p><h2 id="related-projects-title">Related projects</h2></div>
+        <p>Specific systems and studies that investigate this wider field.</p>
+      </div>
+      <div class="project-grid">
+        {% for project in related_projects %}
+          {% include project-card.html project=project index=forloop.index %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
 </article>

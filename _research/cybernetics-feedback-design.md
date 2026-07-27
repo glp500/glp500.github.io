@@ -1,5 +1,6 @@
 ---
 title: "Cybernetics, Feedback Systems & Design"
+research_type: field
 summary: "Systems that sense, compare, and act—and the consequences of choosing what they should optimize."
 question: "How do we design feedback without mistaking the signal for the system?"
 status: "Ongoing inquiry"

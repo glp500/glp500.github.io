@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img">
+  <title>Latent structure benchmark</title>
+  <rect width="1200" height="700" fill="#9db7be"/>
+  <g fill="#0b1113" font-family="Arial" font-size="22"><text x="110" y="90">EEG VIEW</text><text x="950" y="90">PHENOTYPE VIEW</text><text x="515" y="610">SHARED SPACE</text></g>
+  <g fill="#f4f1e7"><circle cx="160" cy="180" r="25"/><circle cx="270" cy="275" r="20"/><circle cx="120" cy="390" r="22"/><circle cx="320" cy="470" r="27"/><circle cx="1040" cy="175" r="22"/><circle cx="900" cy="275" r="27"/><circle cx="1060" cy="390" r="20"/><circle cx="880" cy="485" r="24"/></g>
+  <ellipse cx="600" cy="350" rx="180" ry="145" fill="#f0fd71" stroke="#0b1113" stroke-width="3"/>
+  <g stroke="#0b1113" stroke-width="3" opacity=".75"><path d="M160 180 520 285M270 275 540 365M120 390 550 410M320 470 585 455M1040 175 680 285M900 275 660 350M1060 390 650 415M880 485 620 465"/></g>
+  <g fill="#0b1113"><circle cx="550" cy="300" r="15"/><circle cx="650" cy="315" r="15"/><circle cx="580" cy="390" r="15"/><circle cx="670" cy="420" r="15"/></g>
+  <path d="M455 565c95 45 195 45 290 0" fill="none" stroke="#f4f1e7" stroke-width="6" stroke-dasharray="14 12"/>
+</svg>

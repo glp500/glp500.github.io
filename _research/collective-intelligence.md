@@ -1,5 +1,6 @@
 ---
 title: "Collective Intelligence & Emergent Complexity"
+research_type: field
 summary: "Local rules, partial knowledge, and the conditions under which coordinated systems begin to act intelligently."
 question: "When does coordination become intelligence, and who gets to decide?"
 status: "Ongoing inquiry"

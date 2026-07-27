@@ -3,6 +3,11 @@
   url: /
   world_mode: home
   description: Start at the portfolio overview
+- key: announcements
+  label: Announcements
+  url: /announcements/
+  world_mode: notes
+  description: Posts, essays, updates, and reading notes
 - key: research
   label: Research
   url: /research/

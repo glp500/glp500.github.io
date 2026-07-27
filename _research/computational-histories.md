@@ -1,5 +1,6 @@
 ---
 title: "Cultural, Computational & Economic History"
+research_type: field
 summary: "The archives, classifications, labor, and institutional histories embedded in technical systems."
 question: "What old institutions are speaking through our newest machines?"
 status: "Ongoing inquiry"

@@ -1,5 +1,6 @@
 ---
 title: "Research field title"
+research_type: field
 summary: "A concise description of this enduring research program."
 question: "The central question guiding the work?"
 status: "Ongoing inquiry"

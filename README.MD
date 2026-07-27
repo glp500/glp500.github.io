@@ -1,6 +1,6 @@
 # Gavin Lip — Research Portfolio
 
-A custom Jekyll portfolio for research programs, projects, publications, field notes, media, open-source resources, and a web CV. The visual system is based on Gavin's Canva layouts and includes a persistent interactive multi-agent field.
+A custom Jekyll portfolio for research programs, projects, publications, announcements, media, open-source resources, and a web CV. The visual system is based on Gavin's Canva layouts and includes a persistent interactive multi-agent field.
 
 The canonical public homepage is **https://glp500.github.io/**. Do not append the repository name to the URL; `https://glp500.github.io/glp500.github.io/` is not the site root.
 
@@ -32,12 +32,50 @@ Copy the corresponding starter file from `content-templates/`, remove `.sample` 
 
 Use `published: false` in front matter to keep a draft out of the built site. Set `featured: true` to make an eligible item appear on the homepage.
 
+### Announcements
+
+Everything in `_posts/` appears at `/announcements/`, newest first, filtered by the `kind` field: `Announcement`, `Essay`, `Project Update`, or `Reading Note`. The homepage features the newest post and previews the next three. The older `/blog/` URL now redirects to `/announcements/`; individual post URLs are unchanged.
+
+### Open-source resources
+
+`_resources/` entries link outward rather than generating their own pages, so the collection is `output: false`.
+
+- `ownership: own` lists under **My work** and links to `repo_url`.
+- `ownership: curated` lists under **Curated resources** and links to `external_url`.
+- `type` drives the archive filter: `Code`, `Dataset`, `Template`, `Tool`, or `Reference`.
+- `language` and `license` should match what the repository actually declares. Leave `license` blank rather than asserting one the repository does not state; blank values are hidden rather than rendered as empty chips.
+
+### Project records
+
+Projects are curated snapshots rather than live GitHub feeds. Repository content should be reviewed, copy-edited, and committed to this site so a README change cannot silently alter the public portfolio.
+
+The project template supports:
+
+- `context`: the archive filter label, such as `Research`, `Startup`, or `Graduate coursework`.
+- `dates_display`: reader-facing dates when one machine-sortable `date` is insufficient.
+- `featured_rank`: the order of featured case studies; only use it with `featured: true`.
+- `research_programs`: one or more `_research/` slugs used to create project/program cross-links.
+- `related_publication`: a `_publications/` slug.
+- `visuals`: an ordered gallery of images or diagrams with alt text, captions, and provenance links.
+- `video_embed`: a privacy-respecting embed URL. YouTube embeds should use `youtube-nocookie.com`.
+
+When refreshing a project from GitHub:
+
+1. Review the repository README, implementation, aggregate outputs, and commit dates.
+2. Confirm the role, collaborators, institutional context, and claims against the CV or another authoritative source.
+3. Copy or re-render only visuals you have permission to publish.
+4. Remove participant-level data, credentials, local paths, and private repository URLs.
+5. Preserve null findings and limitations; never infer numerical results from an image when the underlying values are unavailable.
+6. Build the site and inspect the project, research-program backlink, and archive filters before publishing.
+
 ## Replacing and adding images
 
 1. Add JPG, PNG, WebP, AVIF, or SVG files under `assets/images/`.
 2. Set the entry's `image` or `feature_image` field to a site path such as `/assets/images/my-image.webp`.
 3. Write meaningful `image_alt` or `feature_image_alt` text.
 4. Leave the image field blank to use the site's original procedural specimen instead.
+
+Project gallery visuals belong under `assets/images/projects/`. Every gallery entry should include a caption explaining whether it is a result, screenshot, or explanatory diagram. Add `source_url` when a public repository or paper supports the visual. Private-source aggregate figures must remain de-identified and must not link to the private repository.
 
 The homepage portrait is configured in `_data/profile.yml`. WebP or AVIF is recommended for photographs.
 

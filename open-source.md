@@ -16,30 +16,42 @@ description: Original and curated code, data, methods, templates, and references
     {% if items.size > 0 %}
       {% assign own_items = items | where: "ownership", "own" %}
       {% assign curated_items = items | where: "ownership", "curated" %}
-      <div class="resource-group">
-        <div class="resource-group__heading"><span>01</span><h2>My work</h2></div>
-        <div class="resource-list">
-          {% for item in own_items %}
-            <article class="resource-card reveal" data-filter-item data-filter="{{ item.type | downcase | slugify }}" data-search="{{ item.title }} {{ item.summary }} {{ item.language }} {{ item.topics | join: ' ' }}">
-              <p class="card-meta"><span>{{ item.type }}</span><span>{{ item.license }}</span></p>
-              <h3><a href="{{ item.repo_url | default: item.external_url }}" target="_blank" rel="noreferrer">{{ item.title }} ↗</a></h3>
-              <p>{{ item.summary }}</p>
-            </article>
-          {% endfor %}
+      {% if own_items.size > 0 %}
+        <div class="resource-group">
+          <div class="resource-group__heading"><span>01</span><h2>My work</h2></div>
+          <div class="resource-list">
+            {% for item in own_items %}
+              <article class="resource-card reveal" data-filter-item data-filter="{{ item.type | downcase | slugify }}" data-search="{{ item.title }} {{ item.summary }} {{ item.language }} {{ item.license }} {{ item.topics | join: ' ' }}">
+                <p class="card-meta">
+                  <span>{{ item.type }}</span>
+                  {% if item.language and item.language != "" %}<span>{{ item.language }}</span>{% endif %}
+                  {% if item.license and item.license != "" %}<span>{{ item.license }}</span>{% endif %}
+                </p>
+                <h3><a href="{{ item.repo_url | default: item.external_url }}" target="_blank" rel="noreferrer">{{ item.title }} ↗</a></h3>
+                <p>{{ item.summary }}</p>
+              </article>
+            {% endfor %}
+          </div>
         </div>
-      </div>
-      <div class="resource-group">
-        <div class="resource-group__heading"><span>02</span><h2>Curated resources</h2></div>
-        <div class="resource-list">
-          {% for item in curated_items %}
-            <article class="resource-card reveal" data-filter-item data-filter="{{ item.type | downcase | slugify }}" data-search="{{ item.title }} {{ item.summary }} {{ item.language }} {{ item.topics | join: ' ' }}">
-              <p class="card-meta"><span>{{ item.type }}</span><span>{{ item.language }}</span></p>
-              <h3><a href="{{ item.external_url }}" target="_blank" rel="noreferrer">{{ item.title }} ↗</a></h3>
-              <p>{{ item.summary }}</p>
-            </article>
-          {% endfor %}
+      {% endif %}
+      {% if curated_items.size > 0 %}
+        <div class="resource-group">
+          <div class="resource-group__heading"><span>02</span><h2>Curated resources</h2></div>
+          <div class="resource-list">
+            {% for item in curated_items %}
+              <article class="resource-card reveal" data-filter-item data-filter="{{ item.type | downcase | slugify }}" data-search="{{ item.title }} {{ item.summary }} {{ item.language }} {{ item.license }} {{ item.topics | join: ' ' }}">
+                <p class="card-meta">
+                  <span>{{ item.type }}</span>
+                  {% if item.language and item.language != "" %}<span>{{ item.language }}</span>{% endif %}
+                  {% if item.license and item.license != "" %}<span>{{ item.license }}</span>{% endif %}
+                </p>
+                <h3><a href="{{ item.external_url }}" target="_blank" rel="noreferrer">{{ item.title }} ↗</a></h3>
+                <p>{{ item.summary }}</p>
+              </article>
+            {% endfor %}
+          </div>
         </div>
-      </div>
+      {% endif %}
     {% else %}
       {% include empty-state.html title="A public toolkit is taking shape" body="Original repositories, datasets, templates, and carefully annotated external references will live here. The page is ready to distinguish my work from curated material." %}
     {% endif %}

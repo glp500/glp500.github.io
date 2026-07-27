@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img">
+  <title>Cybernetics and artificial societies feedback diagram</title>
+  <rect width="1200" height="700" fill="#0b1113"/>
+  <g fill="#9db7be"><circle cx="265" cy="180" r="22"/><circle cx="175" cy="315" r="18"/><circle cx="330" cy="360" r="25"/><circle cx="240" cy="510" r="16"/><circle cx="830" cy="175" r="20"/><circle cx="980" cy="285" r="24"/><circle cx="795" cy="390" r="17"/><circle cx="940" cy="510" r="22"/></g>
+  <g stroke="#9db7be" stroke-width="3" fill="none"><path d="M265 180 175 315 330 360 240 510 175 315M830 175 980 285 795 390 940 510 980 285"/></g>
+  <ellipse cx="600" cy="345" rx="150" ry="105" fill="#f0fd71"/><text x="600" y="335" fill="#0b1113" font-family="Arial" font-size="27" text-anchor="middle">AGGREGATE</text><text x="600" y="375" fill="#0b1113" font-family="Georgia" font-size="21" text-anchor="middle">pattern</text>
+  <g stroke="#f4f1e7" stroke-width="6" fill="none"><path d="M355 275c70-130 155-160 245-150 100 10 180 80 200 145"/><path d="m780 235 20 35-40-4"/><path d="M845 470c-70 110-155 145-245 135-100-10-170-60-210-130"/><path d="m410 505-20-30 38-2"/></g>
+</svg>

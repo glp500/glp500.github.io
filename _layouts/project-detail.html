@@ -7,7 +7,7 @@ layout: default
     <div class="shell detail-hero__grid">
       <div class="detail-hero__index"><span>{{ page.status }}</span><a href="{{ '/projects/' | relative_url }}">Return to projects ↗</a></div>
       <div class="detail-hero__title reveal">
-        <p class="kicker">{{ page.role }} · {{ page.date | date: "%Y" }}</p>
+        <p class="kicker">{{ page.context | default: page.status }} · {% if page.dates_display %}{{ page.dates_display }}{% else %}{{ page.date | date: "%Y" }}{% endif %}</p>
         <h1>{{ page.title }}</h1>
         <p class="detail-hero__question">{{ page.summary }}</p>
       </div>
@@ -22,6 +22,12 @@ layout: default
   </header>
   <div class="detail-body shell">
     <aside>
+      <p class="kicker">Context</p>
+      <dl class="project-facts">
+        {% if page.role %}<div><dt>Role</dt><dd>{{ page.role }}</dd></div>{% endif %}
+        {% if page.dates_display %}<div><dt>Dates</dt><dd>{{ page.dates_display }}</dd></div>{% endif %}
+        {% if page.status %}<div><dt>Status</dt><dd>{{ page.status }}</dd></div>{% endif %}
+      </dl>
       <p class="kicker">Methods & technologies</p>
       <ul class="tag-list">{% for item in project_stack %}<li>{{ item }}</li>{% endfor %}</ul>
       {% if page.outcomes and page.outcomes.size > 0 %}
@@ -33,7 +39,57 @@ layout: default
         {% if page.repo_url and page.repo_url != "" %}<a href="{{ page.repo_url }}" target="_blank" rel="noreferrer">Repository ↗</a>{% endif %}
         {% if page.paper_url and page.paper_url != "" %}<a href="{{ page.paper_url }}" target="_blank" rel="noreferrer">Research output ↗</a>{% endif %}
       </div>
+      {% if page.research_programs and page.research_programs.size > 0 %}
+        <p class="kicker">Related research</p>
+        <div class="detail-links">
+          {% for program_slug in page.research_programs %}
+            {% assign program = site.research | where: "slug", program_slug | first %}
+            {% if program %}<a href="{{ program.url | relative_url }}">{{ program.title }} →</a>{% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if page.related_publication and page.related_publication != "" %}
+        {% assign related_publication = site.publications | where: "slug", page.related_publication | first %}
+        {% if related_publication %}
+          <p class="kicker">Related publication</p>
+          <div class="detail-links"><a href="{{ related_publication.url | relative_url }}">{{ related_publication.title }} →</a></div>
+        {% endif %}
+      {% endif %}
     </aside>
     <div class="prose">{{ content }}</div>
   </div>
+  {% if page.video_embed and page.video_embed != "" %}
+    <section class="project-media shell" aria-labelledby="project-video-title">
+      <div class="section-heading">
+        <div><p class="kicker">Demonstration</p><h2 id="project-video-title">{{ page.video_title | default: "Project video" }}</h2></div>
+        {% if page.video_caption %}<p>{{ page.video_caption }}</p>{% endif %}
+      </div>
+      <div class="video-frame">
+        <iframe src="{{ page.video_embed }}" title="{{ page.video_title | default: page.title }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+    </section>
+  {% endif %}
+  {% if page.visuals and page.visuals.size > 0 %}
+    <section class="project-media shell" aria-labelledby="project-gallery-title">
+      <div class="section-heading">
+        <div><p class="kicker">Evidence & systems</p><h2 id="project-gallery-title">Project gallery</h2></div>
+        <p>Figures are sourced from repository outputs or clearly labelled explanatory diagrams.</p>
+      </div>
+      <div class="project-gallery">
+        {% for visual in page.visuals %}
+          <figure class="project-gallery__item project-gallery__item--{{ visual.type | default: 'image' }}">
+            {% if visual.src contains '://' %}
+              <img src="{{ visual.src }}" alt="{{ visual.alt | default: '' }}" loading="lazy">
+            {% else %}
+              <img src="{{ visual.src | relative_url }}" alt="{{ visual.alt | default: '' }}" loading="lazy">
+            {% endif %}
+            <figcaption>
+              <span>{{ visual.caption }}</span>
+              {% if visual.source_url and visual.source_url != "" %}<a href="{{ visual.source_url }}" target="_blank" rel="noreferrer">{{ visual.source_label | default: "Source" }} ↗</a>{% endif %}
+            </figcaption>
+          </figure>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
 </article>

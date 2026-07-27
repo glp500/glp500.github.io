@@ -1,0 +1,27 @@
+{% assign project_stack = include.project.stack | default: include.project.tech %}
+<article
+  class="project-ledger__item reveal"
+  data-filter-item
+  data-filter="{{ include.project.context | default: 'project' | downcase | slugify }}"
+  data-search="{{ include.project.title }} {{ include.project.summary }} {{ include.project.role }} {{ include.project.context }} {{ include.project.dates_display }} {{ project_stack | join: ' ' }} {{ include.project.topics | join: ' ' }}"
+>
+  <a class="project-ledger__index" href="{{ include.project.url | relative_url }}" aria-label="View {{ include.project.title }}">
+    <span>{{ include.index | prepend: '0' | slice: -2, 2 }}</span>
+  </a>
+  <div class="project-ledger__main">
+    <p class="card-meta">
+      <span>{{ include.project.context | default: include.project.status }}</span>
+      <span>{% if include.project.dates_display %}{{ include.project.dates_display }}{% else %}{{ include.project.date | date: "%Y" }}{% endif %}</span>
+    </p>
+    <h3><a href="{{ include.project.url | relative_url }}">{{ include.project.title }}</a></h3>
+    <p>{{ include.project.summary }}</p>
+  </div>
+  <div class="project-ledger__aside">
+    {% if project_stack and project_stack.size > 0 %}
+      <ul class="tag-list" aria-label="Methods and technologies">
+        {% for tag in project_stack limit: 3 %}<li>{{ tag }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    <a class="arrow-link" href="{{ include.project.url | relative_url }}">Open →</a>
+  </div>
+</article>

@@ -9,9 +9,10 @@ summary: "An interdisciplinary AI and NLP study combining language-model fine-tu
 abstract: "This publication presents a reproducible framework for fine-tuning and evaluating large language models for Early Modern Dutch translation. The work compares model variants using preference-based and parameter-efficient methods, embedding-based evaluation, and domain-expert review."
 doi: "10.1017/chr.2026.10022"
 pdf_url: "https://doi.org/10.1017/chr.2026.10022"
-code_url: ""
+code_url: "https://github.com/glp500/EMDutch-LLM-Finetune"
 slides_url: ""
-related_project: ""
+related_project: "Early Modern Dutch LLM Fine-Tuning"
+related_project_url: "/projects/early-modern-dutch-llm-finetuning/"
 topics:
   - Natural language processing
   - Computational humanities

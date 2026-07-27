@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img">
+  <title>Pumped hydroelectric energy arbitrage system</title>
+  <rect width="1200" height="700" fill="#f4f1e7"/>
+  <path d="M0 510h1200v190H0z" fill="#9db7be"/><path d="M0 510 285 250l260 260z" fill="#0b1113"/>
+  <path d="M90 455h300v55H90z" fill="#9db7be"/><rect x="475" y="400" width="120" height="110" fill="#f0fd71" stroke="#0b1113" stroke-width="3"/>
+  <path d="M380 455c110 0 75-210 235-210" fill="none" stroke="#9db7be" stroke-width="20"/><path d="M615 245c-165 0-125 210-235 210" fill="none" stroke="#f0fd71" stroke-width="9"/>
+  <g fill="#0b1113" font-family="Arial"><text x="90" y="215" font-size="25">UPPER RESERVOIR</text><text x="465" y="380" font-size="24">PUMP / TURBINE</text><text x="760" y="180" font-size="25">ELECTRICITY PRICE</text></g>
+  <polyline points="760,320 820,270 880,330 940,190 1000,245 1080,150" fill="none" stroke="#0b1113" stroke-width="7"/>
+  <g font-family="Arial" font-size="18"><text x="650" y="250">PUMP WHEN BUYING</text><text x="650" y="465">GENERATE WHEN SELLING</text></g>
+  <text x="760" y="600" fill="#0b1113" font-family="Georgia" font-size="28">state: volume · price · time</text>
+</svg>
