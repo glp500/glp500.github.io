@@ -11,13 +11,15 @@ const BASE = "/assets/js/vendor/wllama/";
 // Planning needs a couple of hundred tokens, not thousands. A smaller context
 // means a smaller KV cache and less memory traffic per token, which matters a
 // great deal when there is no GPU to hide it.
-const PLANNING_CTX = 2048;
+const PLANNING_CTX = 4096;
 
 let WllamaCtor = null;
 let instance = null;
 let loadedId = null;
 let constraintWorks = false;
 let constraintAffordable = false;
+let loadedCtx = PLANNING_CTX;
+let speed = null;
 
 async function getWllama() {
   if (!WllamaCtor) {
@@ -29,6 +31,19 @@ async function getWllama() {
 
 export function loadedModelId() {
   return loadedId;
+}
+
+/** The context window the loaded model was given. */
+export function contextWindow() {
+  return loadedCtx;
+}
+
+/**
+ * Measured speed of the loaded model on this machine: time to first token and
+ * decode rate, from the preflight. Null until a model has loaded.
+ */
+export function measuredSpeed() {
+  return speed;
 }
 
 /**
@@ -99,7 +114,15 @@ export async function loadModel(model, hardware, handlers = {}) {
   );
 
   loadedId = model.id;
+  loadedCtx = params.n_ctx;
   record("model.load.done", { model: model.id, ms: Math.round(performance.now() - began) });
+
+  // Preflight: measure this machine rather than assuming. One tiny generation
+  // tells us the real time-to-first-token and decode rate, which is what the
+  // deadline should be sized from and what the visitor deserves to be told.
+  onStage?.("Measuring speed");
+  speed = await measureSpeed();
+  record("model.speed", speed);
 
   constraintAffordable = Boolean(hardware.webgpu);
   if (constraintAffordable) {
@@ -153,6 +176,38 @@ async function probeConstraint() {
   }
 }
 
+/** One short generation, purely to time this machine. */
+async function measureSpeed() {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 30_000);
+  const began = performance.now();
+  let firstAt = 0;
+  let tokens = 0;
+  try {
+    for await (const piece of chatStream({
+      messages: [{ role: "user", content: "Count: one two three four five six seven eight." }],
+      maxTokens: 16,
+      signal: controller.signal,
+    })) {
+      if (piece && !firstAt) firstAt = performance.now();
+      if (piece) tokens += 1;
+    }
+  } catch {
+    /* a failed probe just means we have no measurement */
+  } finally {
+    clearTimeout(timer);
+  }
+  if (!tokens) {
+    return { ok: false, ttftMs: null, tokensPerSecond: 0 };
+  }
+  const decodeMs = performance.now() - firstAt;
+  return {
+    ok: true,
+    ttftMs: Math.round(firstAt - began),
+    tokensPerSecond: +(tokens > 1 ? (tokens - 1) / Math.max(decodeMs / 1000, 0.001) : 0).toFixed(2),
+  };
+}
+
 export async function unloadModel() {
   if (instance) {
     try {
@@ -165,6 +220,7 @@ export async function unloadModel() {
   loadedId = null;
   constraintWorks = false;
   constraintAffordable = false;
+  speed = null;
 }
 
 /**

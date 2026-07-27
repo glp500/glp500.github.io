@@ -10,6 +10,7 @@
 
 import { runGuarded } from "./harness.js";
 import { record } from "./diagnostics.js";
+import { buildPlanContext } from "./context.js";
 
 export const TASKS = {
   summary: "Describe the shape of the data and the distribution of its columns.",
@@ -49,17 +50,19 @@ export const PLAN_SCHEMA = {
  *
  * @returns {{plan: object, source: "model"|"fallback", reason: string}}
  */
-export async function planAnalysis(schema, { signal, onProgress } = {}) {
+export async function planAnalysis(schema, { signal, onProgress, profile, nCtx = 4096, limits = {} } = {}) {
   const columnNames = new Set(schema.columns.map((c) => c.name));
 
-  // Keep the prompt small: on CPU the prompt is evaluated token by token too,
-  // so a verbose schema costs as much as a verbose answer.
-  const brief = {
-    rows: schema.rows,
-    columns: schema.columns.map((c) => ({ name: c.name, type: c.type })),
-  };
-  const userMessage = JSON.stringify(brief);
-  record("plan.prompt", { chars: userMessage.length, columns: brief.columns.length });
+  // Select rather than dump. A wide file otherwise fills the context window
+  // with column names, which is slow to evaluate on CPU and a worse prompt.
+  const context = buildPlanContext(profile, { nCtx });
+  const userMessage = JSON.stringify(context.payload);
+  record("plan.prompt", {
+    chars: userMessage.length,
+    tokens: context.tokens,
+    shown: context.shown.length,
+    omitted: context.omitted,
+  });
 
   const result = await runGuarded({
     messages: [
@@ -69,6 +72,7 @@ export async function planAnalysis(schema, { signal, onProgress } = {}) {
     schema: PLAN_SCHEMA,
     signal,
     onProgress,
+    limits,
     // Semantic gate: schema-valid JSON can still name a column that is not
     // there. Reject with the specific reason so the repair turn is useful.
     validate: (parsed) => {

@@ -793,7 +793,9 @@
           ctx.strokeStyle = point.strength > 0 ? "#f0fd71" : "#ffffff";
           ctx.lineWidth = 1;
           ctx.beginPath();
-          ctx.arc(point.x, point.y, 18 + age * 90, 0, Math.PI * 2);
+          // age can go negative if the clock jumps (tab restored from the
+          // background), and a negative radius throws in Firefox.
+          ctx.arc(point.x, point.y, Math.max(0, 18 + age * 90), 0, Math.PI * 2);
           ctx.stroke();
         });
         if (this.pointer.down && this.flow.length > 1) {

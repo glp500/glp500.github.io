@@ -4,7 +4,14 @@
 // route pays for any of this.
 
 import { probeHardware, evaluateModel, recommendModel, formatBytes } from "./hardware.js";
-import { loadModel, unloadModel, loadedModelId, supportsConstraint } from "./runtime.js";
+import {
+  loadModel,
+  unloadModel,
+  loadedModelId,
+  supportsConstraint,
+  contextWindow,
+  measuredSpeed,
+} from "./runtime.js";
 import { ensureIsolation } from "./coi.js";
 import {
   record,
@@ -339,7 +346,12 @@ async function startLoad(root) {
         )} · ${formatBytes(rate)}/s · ${formatTime(remaining)} left`;
       },
     });
-    progress.textContent = `${state.selected.label} is running on this machine.`;
+    const speed = measuredSpeed();
+    progress.textContent = speed?.ok
+      ? `${state.selected.label} · ${speed.tokensPerSecond} tokens/s · ${(
+          speed.ttftMs / 1000
+        ).toFixed(1)}s to first token`
+      : `${state.selected.label} is loaded.`;
     markModelReady(root, true);
   } catch (error) {
     progress.innerHTML =
@@ -487,7 +499,23 @@ async function runPipeline(root) {
       const began = performance.now();
       status.textContent = "The model is choosing an analysis…";
 
+      // Size the budget from what this machine actually did in the preflight,
+      // rather than from a fixed guess that suits neither fast nor slow ones.
+      const speed = measuredSpeed();
+      const limits = speed?.ok
+        ? {
+            firstAttemptMs: Math.min(
+              150_000,
+              Math.max(20_000, Math.round(speed.ttftMs * 3 + (60 / Math.max(speed.tokensPerSecond, 0.2)) * 1000))
+            ),
+          }
+        : {};
+      record("analysis.budget", { ...limits, speed });
+
       const outcome = await planAnalysis(schema, {
+        profile: state.profile,
+        nCtx: contextWindow(),
+        limits,
         signal: state.analysisAbort.signal,
         onProgress: ({ attempt, tokens, thinking, rate, elapsedMs, phase }) => {
           const suffix = attempt > 1 ? ` · retry ${attempt - 1}` : "";
