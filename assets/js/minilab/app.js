@@ -64,16 +64,8 @@ function bindPanels(root) {
 function renderHardware(root, hw) {
   const target = $("[data-hardware]", root);
   const rows = [
-    ["Graphics", hw.webgpu ? hw.gpuName : "No WebGPU"],
-    ["Acceleration", hw.webgpu ? "WebGPU available" : "CPU only — much slower"],
-    ["Memory budget", formatBytes(hw.budgetBytes)],
-    ["CPU threads", hw.crossOriginIsolated ? hw.threads : `${hw.threads} (1 usable)`],
-    [
-      "Cache space",
-      hw.storageQuotaBytes
-        ? `${formatBytes(hw.storageQuotaBytes - (hw.storageUsedBytes || 0))} free`
-        : "Unknown",
-    ],
+    ["GPU", hw.webgpu ? hw.gpuName : "None — running on CPU"],
+    ["Room for", formatBytes(hw.budgetBytes)],
   ];
 
   target.innerHTML = `
@@ -109,10 +101,12 @@ function renderCatalogue(root) {
           <span class="ml-model__name">${escapeHtml(model.label)}${
             isRecommended ? ' <em class="ml-badge">Recommended</em>' : ""
           }</span>
-          <span class="ml-model__size">${formatBytes(model.size_bytes)} download</span>
-          <span class="ml-model__note">${escapeHtml(
-            verdict.ok ? verdict.warning || model.note || "" : verdict.reason
-          )}</span>
+          <span class="ml-model__size">${formatBytes(model.size_bytes)}</span>
+          ${
+            verdict.ok
+              ? ""
+              : `<span class="ml-model__note">${escapeHtml(verdict.reason)}</span>`
+          }
         </label>
       </li>`;
     })
@@ -131,6 +125,12 @@ function renderCatalogue(root) {
   });
 }
 
+function markModelReady(root, ready) {
+  const run = $("[data-run-analysis]", root);
+  if (!run) return;
+  run.textContent = ready ? "Analyse with the model" : "Analyse";
+}
+
 function updateLoadButton(root) {
   const button = $("[data-load-model]", root);
   if (!state.selected) {
@@ -139,9 +139,7 @@ function updateLoadButton(root) {
     return;
   }
   button.disabled = state.loading;
-  button.textContent = state.loading
-    ? "Loading…"
-    : `Load ${state.selected.label} (${formatBytes(state.selected.size_bytes)})`;
+  button.textContent = state.loading ? "Loading…" : `Load ${state.selected.label}`;
 }
 
 function bindModelControls(root) {
@@ -241,8 +239,8 @@ async function startLoad(root) {
         )} · ${formatBytes(rate)}/s · ${formatTime(remaining)} left`;
       },
     });
-    progress.textContent = `${state.selected.label} is loaded and running locally.`;
-    $("[data-needs-model]", root).hidden = false;
+    progress.textContent = `${state.selected.label} is running on this machine.`;
+    markModelReady(root, true);
   } catch (error) {
     progress.innerHTML =
       error?.name === "AbortError"
@@ -319,7 +317,9 @@ async function handleFile(root, file) {
       profile.columnCount
     } columns. Nothing was uploaded.`;
     renderProfile(root, profile);
+    $("[data-analysis-step]", root).hidden = false;
     $("[data-run-analysis]", root).disabled = false;
+    markModelReady(root, Boolean(loadedModelId()));
   } catch (error) {
     status.innerHTML = `<span class="ml-error">${escapeHtml(
       error instanceof IngestError ? error.message : `Could not read that file: ${error.message}`
@@ -331,7 +331,6 @@ function renderProfile(root, profile) {
   const target = $("[data-profile]", root);
   target.hidden = false;
   target.innerHTML = `
-    <h3>Columns</h3>
     <div class="ml-table-scroll">
       <table class="ml-table">
         <thead><tr><th>Column</th><th>Type</th><th>Missing</th><th>Unique</th><th>Range / values</th></tr></thead>
@@ -371,10 +370,10 @@ async function runPipeline(root) {
   let plan;
 
   if (loadedModelId()) {
-    status.textContent = "Asking the local model to choose an analysis…";
+    status.textContent = "The model is choosing an analysis…";
     plan = await planAnalysis(schema);
   } else {
-    status.textContent = "No model loaded — using the built-in default analysis.";
+    status.textContent = "No model loaded — using the default analysis.";
     plan = validatePlan(null, schema);
   }
 
@@ -384,7 +383,7 @@ async function runPipeline(root) {
   state.results = results;
 
   renderResults(root, plan, results);
-  status.textContent = "Done. Every figure below was computed from your file.";
+  status.textContent = "Computed from your file.";
   output.hidden = false;
   runButton.disabled = false;
 }

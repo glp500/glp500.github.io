@@ -33,7 +33,7 @@ export async function probeHardware() {
 
   if (!("gpu" in navigator)) {
     report.notes.push(
-      "WebGPU is unavailable in this browser. Models can still run on the CPU, but much more slowly."
+      "No WebGPU here, so models fall back to the CPU. Expect several seconds per reply."
     );
   } else {
     try {
@@ -42,7 +42,7 @@ export async function probeHardware() {
       });
       if (!adapter) {
         report.notes.push(
-          "This browser reports WebGPU but refused a GPU adapter, which usually means GPU access is disabled or blocklisted."
+          "WebGPU is present but no GPU was granted — usually disabled or blocklisted."
         );
       } else {
         report.webgpu = true;
@@ -64,7 +64,7 @@ export async function probeHardware() {
         } else {
           report.gpuName = "WebGPU device";
           report.notes.push(
-            "Your browser hides the GPU model name, so the estimate below uses buffer limits only."
+            "Your browser hides the GPU name, so the estimate uses buffer limits."
           );
         }
         report.maxBufferBytes = Math.min(
@@ -97,7 +97,7 @@ export async function probeHardware() {
 
   if (!report.crossOriginIsolated) {
     report.notes.push(
-      "Multi-threaded WebAssembly is unavailable on this page, so CPU work runs on a single thread. GPU offload is unaffected."
+      "CPU work runs single-threaded here. GPU offload is unaffected."
     );
   }
 
@@ -166,13 +166,8 @@ export function evaluateModel(model, report) {
     };
   }
 
-  if (!report.webgpu) {
-    return {
-      ok: true,
-      warning: "Will run on the CPU without WebGPU. Expect several seconds per reply.",
-    };
-  }
-
+  // Deliberately no per-model note about missing WebGPU: it would be the same
+  // sentence on every row. The hardware panel states it once.
   return { ok: true };
 }
 

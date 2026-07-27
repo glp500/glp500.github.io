@@ -2776,263 +2776,179 @@ a {
 /* ---------- Mini-Lab ---------- */
 
 .minilab {
-  padding: clamp(3rem, 6vw, 5rem) 0 clamp(4rem, 8vw, 7rem);
+  padding: clamp(2.5rem, 5vw, 4rem) 0 clamp(4rem, 8vw, 7rem);
   background: rgba(157, 183, 190, 0.91);
 }
 
-.minilab__intro {
-  max-width: 72ch;
-  margin-bottom: clamp(2.5rem, 5vw, 4rem);
-}
-
 .minilab__lead {
-  margin: 0 0 1.2rem;
+  max-width: 60ch;
+  margin: 0 0 1rem;
   font-family: var(--serif);
-  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  font-size: clamp(1.15rem, 1.9vw, 1.6rem);
   line-height: 1.4;
 }
 
 .minilab__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem 1.8rem;
-  margin-top: 1.6rem;
+  gap: 0.5rem 1.6rem;
+  margin: 0 0 clamp(2rem, 4vw, 3rem);
 }
 
 .minilab__layout {
   display: grid;
-  grid-template-columns: minmax(230px, 0.8fr) minmax(0, 2.6fr);
-  gap: clamp(2rem, 4vw, 3.5rem);
+  grid-template-columns: minmax(240px, 0.8fr) minmax(0, 2.4fr);
+  gap: clamp(1.8rem, 3.5vw, 3rem);
   align-items: start;
 }
+
+/* setup rail */
 
 .minilab__rail {
   position: sticky;
   top: 6rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 1.6rem;
 }
 
-.minilab__rail > button {
+.ml-apps {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding: 1rem;
+}
+
+.ml-apps button {
+  padding: 0.75rem 0.9rem;
   border: 1px solid var(--ink);
   background: transparent;
   color: inherit;
   cursor: pointer;
+  font-size: 0.82rem;
   text-align: left;
 }
 
-.minilab__rail > button strong {
-  font-size: 0.92rem;
+.ml-apps button + button {
+  border-top: 0;
 }
 
-.minilab__rail > button span {
-  font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.minilab__rail > button.is-active {
+.ml-apps button.is-active {
   background: var(--acid);
 }
 
-.minilab__hardware {
-  margin-top: 1.5rem;
-  padding-top: 1.2rem;
-  border-top: 1px solid var(--ink);
-}
-
-.minilab__hardware h2 {
-  margin: 0 0 0.8rem;
+.ml-setup h2 {
+  margin: 0 0 0.5rem;
   font-family: var(--mono);
-  font-size: 0.58rem;
+  font-size: 0.56rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.minilab__pane {
-  min-width: 0;
-}
+/* status lines share one quiet voice everywhere */
 
-.minilab__block {
-  padding: clamp(1.5rem, 3vw, 2.2rem);
-  margin-bottom: 1.5rem;
-  border: 1px solid var(--ink);
-  background: rgba(237, 236, 237, 0.42);
-}
-
-.minilab__block > h2 {
-  margin: 0 0 1.2rem;
-  font-size: clamp(1.3rem, 2.2vw, 1.9rem);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-}
-
-.minilab__block h3 {
-  margin: 2rem 0 0.8rem;
-  font-size: 1.05rem;
-  font-weight: 500;
-}
-
-.minilab__block h4 {
-  margin: 1.5rem 0 0.6rem;
+.ml-status {
+  display: block;
+  margin: 0.5rem 0 0;
   font-family: var(--mono);
   font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  line-height: 1.6;
 }
 
-/* facts, notes, lists */
-
-.ml-facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.9rem 1.5rem;
-  margin: 0;
-}
-
-.ml-facts dt {
-  font-family: var(--mono);
-  font-size: 0.54rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.75;
-}
-
-.ml-facts dd {
-  margin: 0.2rem 0 0;
-  font-size: 0.9rem;
-}
-
-.ml-notes,
-.ml-list {
-  margin: 1rem 0 0;
-  padding-left: 1.1rem;
-  font-size: 0.85rem;
-}
-
-.ml-notes li,
-.ml-list li {
-  margin-bottom: 0.5rem;
-}
-
-.ml-caveat {
-  margin-top: 0.8rem;
-  font-size: 0.8rem;
-  opacity: 0.8;
-}
-
-.ml-error {
-  padding: 0.1rem 0.3rem;
-  background: rgba(164, 89, 38, 0.16);
-  border-bottom: 2px solid #a45926;
-}
-
-/* model picker */
+/* models */
 
 .ml-models {
-  margin: 0;
+  margin: 0.6rem 0 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--line-dark);
 }
 
 .ml-model {
-  border-bottom: 1px solid var(--ink);
+  border-bottom: 1px solid var(--line-dark);
 }
 
 .ml-model label {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 0.3rem 0.9rem;
+  gap: 0.15rem 0.6rem;
   align-items: baseline;
-  padding: 0.9rem 0;
+  padding: 0.6rem 0;
   cursor: pointer;
+  font-size: 0.84rem;
 }
 
 .ml-model.is-blocked label {
   cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.ml-model__name {
-  font-weight: 500;
+  opacity: 0.55;
 }
 
 .ml-model__size {
   font-family: var(--mono);
-  font-size: 0.58rem;
-  text-transform: uppercase;
+  font-size: 0.55rem;
   white-space: nowrap;
 }
 
 .ml-model__note {
   grid-column: 2 / -1;
-  font-size: 0.8rem;
-  opacity: 0.85;
+  font-size: 0.72rem;
+  line-height: 1.45;
 }
 
 .ml-badge {
-  padding: 0.1rem 0.4rem;
+  margin-left: 0.3rem;
+  padding: 0.05rem 0.32rem;
   background: var(--acid);
   font-family: var(--mono);
-  font-size: 0.5rem;
+  font-size: 0.46rem;
   font-style: normal;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
+
+/* buttons */
 
 .ml-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
+  gap: 0.6rem;
   align-items: center;
-  margin: 1.2rem 0 0.8rem;
+  margin-top: 0.9rem;
 }
 
 .ml-actions button:not(.button),
 .ml-hf button {
-  padding: 0.5rem 0.9rem;
+  padding: 0.45rem 0.8rem;
   border: 1px solid var(--ink);
   background: transparent;
   color: inherit;
   cursor: pointer;
   font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.06em;
+  font-size: 0.55rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-.ml-actions button:hover:not(:disabled),
+.ml-actions button:not(.button):hover:not(:disabled),
 .ml-hf button:hover {
   background: var(--ink);
   color: var(--paper);
 }
 
-.ml-progress {
-  margin: 0.6rem 0 0;
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  line-height: 1.6;
+.ml-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
+/* progressive disclosure */
+
 .ml-more {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--line-dark);
+  margin-top: 1rem;
 }
 
 .ml-more summary {
   cursor: pointer;
   font-family: var(--mono);
-  font-size: 0.58rem;
+  font-size: 0.55rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -3040,48 +2956,57 @@ a {
 .ml-hf__row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
-  margin: 1rem 0;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
 }
 
 .ml-hf input {
-  flex: 1 1 260px;
+  flex: 1 1 140px;
   min-width: 0;
-  padding: 0.5rem 0.7rem;
+  padding: 0.45rem 0.6rem;
   border: 1px solid var(--ink);
   background: transparent;
   color: inherit;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .ml-hf-list {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
 }
 
 .ml-hf-list li {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1rem;
+  gap: 0.3rem 0.7rem;
   align-items: baseline;
-  padding: 0.4rem 0;
+  padding: 0.35rem 0;
   border-bottom: 1px solid var(--line-dark);
 }
 
-/* dropzone */
+/* the working pane */
+
+.minilab__pane {
+  min-width: 0;
+}
 
 .ml-dropzone {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.35rem;
   align-items: center;
-  padding: clamp(2rem, 5vw, 3.5rem) 1rem;
+  padding: clamp(2.5rem, 6vw, 4.5rem) 1rem;
   border: 2px dashed var(--ink);
   cursor: pointer;
   text-align: center;
   transition: background 200ms var(--ease);
+}
+
+.ml-dropzone strong {
+  font-size: 1.15rem;
+  font-weight: 500;
 }
 
 .ml-dropzone:hover,
@@ -3092,26 +3017,95 @@ a {
 
 .ml-dropzone span {
   font-family: var(--mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.04em;
+  font-size: 0.58rem;
+}
+
+.ml-step {
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+  border-top: 1px solid var(--ink);
+}
+
+.ml-step[hidden] {
+  display: none;
+}
+
+.ml-step h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.ml-step h4 {
+  margin: 1.2rem 0 0.5rem;
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* facts, notes, caveats */
+
+.ml-facts {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+}
+
+.ml-facts dt {
+  font-family: var(--mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.ml-facts dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+}
+
+.ml-notes,
+.ml-list {
+  margin: 0.8rem 0 0;
+  padding-left: 1rem;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.ml-notes li,
+.ml-list li {
+  margin-bottom: 0.4rem;
+}
+
+.ml-caveat {
+  margin-top: 0.7rem;
+  font-size: 0.76rem;
+  opacity: 0.8;
+}
+
+.ml-error {
+  padding: 0.1rem 0.3rem;
+  background: rgba(164, 89, 38, 0.16);
+  border-bottom: 2px solid #a45926;
 }
 
 /* tables */
 
 .ml-table-scroll {
   overflow-x: auto;
-  margin-top: 0.8rem;
 }
 
 .ml-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
 }
 
 .ml-table th,
 .ml-table td {
-  padding: 0.45rem 0.7rem;
+  padding: 0.4rem 0.65rem;
   border-bottom: 1px solid var(--line-dark);
   text-align: left;
   white-space: nowrap;
@@ -3120,7 +3114,7 @@ a {
 .ml-table thead th {
   border-bottom: 1px solid var(--ink);
   font-family: var(--mono);
-  font-size: 0.54rem;
+  font-size: 0.5rem;
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3128,14 +3122,14 @@ a {
 
 .ml-matrix td {
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   text-align: right;
 }
 
 /* results */
 
 .ml-plan {
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.3rem;
   font-size: 1rem;
 }
 
@@ -3146,23 +3140,23 @@ a {
 }
 
 .ml-corrections {
-  margin-bottom: 1.4rem;
-  font-size: 0.82rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.78rem;
 }
 
 .ml-corrections summary {
   cursor: pointer;
   font-family: var(--mono);
-  font-size: 0.56rem;
+  font-size: 0.54rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .ml-charts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin: 1.5rem 0;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.4rem;
+  margin: 1.4rem 0;
 }
 
 .ml-chart {
@@ -3177,22 +3171,27 @@ a {
 }
 
 .ml-chart figcaption {
-  margin-top: 0.5rem;
+  margin-top: 0.45rem;
   font-family: var(--mono);
-  font-size: 0.56rem;
+  font-size: 0.54rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
+.ml-code-block {
+  margin-top: 1.8rem;
+}
+
 .ml-code {
   overflow-x: auto;
-  max-height: 460px;
+  max-height: 420px;
+  margin-top: 0.8rem;
   padding: 1rem;
   border: 1px solid var(--ink);
   background: rgba(7, 8, 7, 0.92);
   color: #edeced;
   font-family: var(--mono);
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   line-height: 1.55;
 }
 
@@ -3207,20 +3206,18 @@ a {
 
   .minilab__rail {
     position: static;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 
-  .minilab__hardware {
-    grid-column: 1 / -1;
-    margin-top: 0.5rem;
+  .ml-apps {
+    flex-direction: row;
   }
 
-  .ml-model label {
-    grid-template-columns: auto minmax(0, 1fr);
+  .ml-apps button {
+    flex: 1;
   }
 
-  .ml-model__size {
-    grid-column: 2;
+  .ml-apps button + button {
+    border-top: 1px solid var(--ink);
+    border-left: 0;
   }
 }
