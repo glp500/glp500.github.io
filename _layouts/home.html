@@ -11,14 +11,47 @@ layout: default
 
 <section class="masthead" data-world-mode="home">
   <div class="masthead__orbit" aria-hidden="true"></div>
-  <div class="masthead__inner shell">
-    <p class="masthead__edition">Independent research portfolio · Amsterdam · 2026</p>
-    <h1>{{ profile.name }}</h1>
-    <p class="masthead__discipline">{{ profile.title }}</p>
-    <p class="masthead__intro">{{ profile.summary }}</p>
-    <a class="scroll-cue" href="#about">Enter the field <span aria-hidden="true">↓</span></a>
+  <div class="masthead__inner masthead__grid shell">
+    <div class="masthead__identity">
+      <p class="masthead__edition">Independent research portfolio · Amsterdam · 2026</p>
+      <h1><span>Gavin</span><span>Lip</span></h1>
+      <p class="masthead__discipline">{{ profile.title }}</p>
+    </div>
+    <div class="masthead__statement">
+      <p class="kicker">Intelligence · coordination · culture</p>
+      <p class="masthead__intro">{{ profile.summary }}</p>
+      <div class="masthead__actions">
+        <a class="button button--dark" href="{{ '/research/' | relative_url }}">Explore research →</a>
+        <a class="arrow-link" href="{{ '/projects/' | relative_url }}">View projects</a>
+        <a class="arrow-link" href="{{ '/experience/' | relative_url }}">Experience & CV</a>
+      </div>
+    </div>
+    <a class="scroll-cue" href="#portfolio-index">Portfolio index <span aria-hidden="true">↓</span></a>
   </div>
 </section>
+
+<nav class="home-directory section-rule" id="portfolio-index" aria-label="Portfolio sections" data-world-mode="home">
+  <div class="shell">
+    <div class="home-directory__heading">
+      <div class="section-index"><span>000</span><span>Start here</span></div>
+      <p>Six ways into the work. Each section has its own archive and agent formation.</p>
+    </div>
+    <ol class="home-directory__list">
+      {% for item in site.data.navigation %}
+        {% unless item.key == "home" %}
+          <li>
+            <a href="{{ item.url | relative_url }}" data-world-link="{{ item.world_mode }}">
+              <span class="home-directory__number">0{{ forloop.index0 }}</span>
+              <strong>{{ item.label }}</strong>
+              <em>{{ item.description }}</em>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </li>
+        {% endunless %}
+      {% endfor %}
+    </ol>
+  </div>
+</nav>
 
 <section class="home-about section-rule" id="about" data-world-mode="home">
   <div class="shell home-about__grid">
@@ -130,9 +163,9 @@ layout: default
       <a class="arrow-link" href="{{ '/media/' | relative_url }}">Open the shelves →</a>
     </div>
     <div class="shelf-preview">
-      <a href="{{ '/media/#read' | relative_url }}"><span>01</span><strong>Read</strong><em>Books, papers, long-form work</em></a>
-      <a href="{{ '/media/#watch' | relative_url }}"><span>02</span><strong>Watch</strong><em>Lectures, films, visual essays</em></a>
-      <a href="{{ '/media/#listen' | relative_url }}"><span>03</span><strong>Listen</strong><em>Sound, conversation, field recordings</em></a>
+      <a href="{{ '/media/?filter=read' | relative_url }}"><span>01</span><strong>Read</strong><em>Books, papers, long-form work</em></a>
+      <a href="{{ '/media/?filter=watch' | relative_url }}"><span>02</span><strong>Watch</strong><em>Lectures, films, visual essays</em></a>
+      <a href="{{ '/media/?filter=listen' | relative_url }}"><span>03</span><strong>Listen</strong><em>Sound, conversation, field recordings</em></a>
     </div>
   </div>
 </section>

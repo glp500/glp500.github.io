@@ -6,6 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Libre+Caslon+Display&family=Manrope:ital,wght@0,400;0,500;0,600;1,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+{% assign asset_version = site.time | date: "%Y%m%d%H%M%S" %}
+<link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ asset_version }}">
 {% seo %}
 {% feed_meta %}

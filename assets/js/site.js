@@ -68,6 +68,14 @@
     const reset = root.querySelector("[data-filter-reset]");
     const empty = root.querySelector("[data-filter-empty]");
     let activeFilter = "all";
+    const requestedFilter = slug(new URLSearchParams(window.location.search).get("filter"));
+
+    if (requestedFilter && buttons.some((button) => button.dataset.filterValue === requestedFilter)) {
+      activeFilter = requestedFilter;
+      buttons.forEach((button) =>
+        button.classList.toggle("is-active", button.dataset.filterValue === activeFilter)
+      );
+    }
 
     const applyFilters = () => {
       const query = (search?.value || "").trim().toLowerCase();

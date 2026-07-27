@@ -2,6 +2,8 @@
 
 A custom Jekyll portfolio for research programs, projects, publications, field notes, media, open-source resources, and a web CV. The visual system is based on Gavin's Canva layouts and includes a persistent interactive multi-agent field.
 
+The canonical public homepage is **https://glp500.github.io/**. Do not append the repository name to the URL; `https://glp500.github.io/glp500.github.io/` is not the site root.
+
 ## Local preview
 
 ```bash
@@ -63,3 +65,5 @@ The workflow at `.github/workflows/pages.yml` builds and deploys the site.
 4. Open the deployment URL shown by the completed workflow.
 
 No database, CMS, or paid hosting is required.
+
+The CSS and JavaScript URLs receive a unique build timestamp so a newly deployed visual system is not confused with an older cached theme. If GitHub reports a successful deployment but a browser still shows older HTML, open the canonical URL in a private window or hard-refresh once with `Ctrl+Shift+R`.
