@@ -18,18 +18,24 @@ import { chatStream, supportsConstraint } from "./runtime.js";
 import { record, recordError } from "./diagnostics.js";
 
 export const DEFAULTS = {
-  totalBudgetMs: 90_000,
-  firstAttemptMs: 60_000,
+  // Generous enough for prompt evaluation on a CPU-only machine, which is
+  // front-loaded and can take tens of seconds before the first token appears.
+  // The decode-rate guard below is what protects against hopeless cases, so
+  // this ceiling does not need to be tight.
+  totalBudgetMs: 110_000,
+  firstAttemptMs: 80_000,
   repairAttemptMs: 25_000,
-  maxTokens: 220,
-  repairMaxTokens: 160,
+  // Sized for the tiny plan object above, not for prose.
+  maxTokens: 96,
+  repairMaxTokens: 72,
   // Below this rate a generation cannot plausibly finish in budget, so we stop
   // rather than let the visitor watch a counter crawl.
   minTokensPerSecond: 0.4,
   // Don't start an attempt that has no realistic chance of producing anything.
   minAttemptMs: 2_000,
-  // Don't judge the rate until enough tokens have arrived to measure it.
-  rateGraceTokens: 12,
+  // Judge the rate as soon as there is anything to measure. Learning that a
+  // machine is too slow should cost seconds, not the whole deadline.
+  rateGraceTokens: 4,
 };
 
 export class HarnessAbort extends Error {
@@ -114,6 +120,14 @@ export async function runGuarded({
       attempts.push({ attempt, outcome });
       if (!(error instanceof HarnessAbort)) recordError("harness.generate", error);
       else record("harness.abandoned", { attempt, why: error.message });
+
+      // A deadline or a too-slow verdict is a statement about the machine, not
+      // about the reply. Retrying measures the same machine again and spends
+      // the rest of the budget to reach the same conclusion.
+      if (outcome === "deadline" || outcome === "too-slow") {
+        return { ok: false, value: null, attempts, reason: outcome };
+      }
+
       conversation = withRepair(messages, raw, "The reply did not arrive in time.");
       continue;
     }
@@ -186,7 +200,24 @@ async function generateBounded({
 
   const began = performance.now();
   let tokens = 0;
+  let thinking = 0;
   let text = "";
+  let complete = false;
+  let firstTokenAt = 0;
+
+  // A model that ignores enable_thinking emits tokens we never see as content.
+  // Surface them as progress so the page does not look frozen, and so the
+  // "produced literally nothing" case stays distinguishable.
+  const noteThinking = () => {
+    thinking += 1;
+    onProgress?.({
+      tokens,
+      thinking,
+      rate: thinking / Math.max((performance.now() - began) / 1000, 0.001),
+      elapsedMs: performance.now() - began,
+      phase: "thinking",
+    });
+  };
 
   // The iterator is driven by hand rather than with `for await`.
   //
@@ -213,21 +244,51 @@ async function generateBounded({
 
   try {
     for (;;) {
-      const step = await Promise.race([iterator.next(), aborted]);
+      // Attach a no-op catch: when the race is lost to an abort, this promise
+      // would otherwise reject unobserved and surface as a page error.
+      const pending = iterator.next();
+      pending.catch(() => {});
+
+      const step = await Promise.race([pending, aborted]);
       if (step.done) break;
 
       text += step.value ?? "";
       tokens += 1;
+      if (!firstTokenAt) firstTokenAt = performance.now();
+
+      // Stop the moment a complete JSON object has arrived.
+      //
+      // Small models frequently emit the answer and then keep the stream open
+      // without ever sending an end-of-stream. Measured on Qwen3.5-0.8B: the
+      // full 20-character answer arrived in about three seconds, then the
+      // stream idled until the 60-second deadline killed it and the whole
+      // reply was thrown away. Parsing as we go turns that into an immediate
+      // success — it is the difference between working and timing out.
+      if (text.includes("}")) {
+        const early = extractJSON(text);
+        if (early) {
+          reason = null;
+          complete = true;
+          controller.abort();
+          break;
+        }
+      }
 
       const elapsedMs = performance.now() - began;
-      const rate = tokens / Math.max(elapsedMs / 1000, 0.001);
-      onProgress?.({ tokens, rate, elapsedMs, phase: "generating" });
+      // Measure decoding from the first token, not from the request. On CPU
+      // the prompt is evaluated before anything is emitted, and folding that
+      // wait into the rate makes a perfectly healthy machine look stalled.
+      const decodeMs = performance.now() - firstTokenAt;
+      const rate = tokens > 1 ? (tokens - 1) / Math.max(decodeMs / 1000, 0.001) : 0;
+      onProgress?.({ tokens, rate, elapsedMs, ttftMs: firstTokenAt - began, phase: "generating" });
 
       // Abandon early if the measured rate cannot reach the token budget in
       // the time left. Waiting out the full deadline helps nobody.
-      if (tokens >= graceTokens) {
-        const projectedMs = ((maxTokens - tokens) / Math.max(rate, 0.0001)) * 1000;
-        if (rate < minRate || elapsedMs + projectedMs > deadlineMs * 1.5) {
+      if (tokens >= graceTokens && thinking === 0 && rate > 0) {
+        // Assume a plan needs roughly 40 tokens, not the full ceiling; the
+        // ceiling is a safety limit, not an expectation.
+        const projectedMs = ((40 - tokens) / rate) * 1000;
+        if (rate < minRate || elapsedMs + projectedMs > deadlineMs) {
           reason = "too-slow";
           controller.abort();
           break;
@@ -236,7 +297,7 @@ async function generateBounded({
     }
   } catch (error) {
     if (!(error instanceof HarnessAbort) && !controller.signal.aborted) throw error;
-    if (!reason) reason = "aborted";
+    if (!reason && !complete) reason = "aborted";
   } finally {
     clearTimeout(timer);
     signal?.removeEventListener("abort", onExternalAbort);
@@ -244,6 +305,17 @@ async function generateBounded({
     iterator.return?.().catch(() => {});
   }
 
+  // Always record what actually arrived. Without this, a timeout tells you the
+  // generation was slow but not whether it was slow, silent, or thinking.
+  record("harness.stream", {
+    tokens,
+    thinking,
+    chars: text.length,
+    ttftMs: firstTokenAt ? Math.round(firstTokenAt - began) : null,
+    ms: Math.round(performance.now() - began),
+    why: complete ? "early-complete" : reason || "complete",
+  });
+  if (complete) return text;
   if (reason === "cancelled") throw new HarnessAbort("cancelled");
   if (reason) {
     // A partial reply can still parse; give it the chance before giving up.

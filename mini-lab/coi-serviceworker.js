@@ -28,13 +28,28 @@ self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim(
 self.addEventListener("fetch", (event) => {
   const request = event.request;
 
-  // Range requests and cache-only lookups must pass through untouched.
-  if (request.cache === "only-if-cached" && request.mode !== "same-origin") return;
+  // Only the document itself needs these headers — COOP and COEP are
+  // document-level, and isolation follows from the navigation response.
+  //
+  // Everything else is deliberately left alone. Re-wrapping a subresource
+  // response through the worker breaks large streamed cross-origin downloads
+  // in Firefox ("A ServiceWorker intercepted the request and encountered an
+  // unexpected error"), which surfaced as a corrupt model and llama.cpp
+  // reporting "Error in input stream". The multi-hundred-megabyte model fetch
+  // must reach the network untouched.
+  if (request.mode !== "navigate") return;
+
+  let sameOrigin = false;
+  try {
+    sameOrigin = new URL(request.url).origin === self.location.origin;
+  } catch {
+    return;
+  }
+  if (!sameOrigin) return;
 
   event.respondWith(
     fetch(request)
       .then((response) => {
-        // Opaque responses have no readable body or headers to rewrite.
         if (response.status === 0 || response.type === "opaque") return response;
 
         const headers = new Headers(response.headers);

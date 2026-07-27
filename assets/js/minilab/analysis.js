@@ -18,44 +18,28 @@ export const TASKS = {
   regression: "Predict a numeric target from the other columns.",
 };
 
-const PLAN_SYSTEM = `You choose an analysis for a tabular dataset.
-You are given only the schema and summary statistics, never the rows.
-Reply with a single JSON object and nothing else:
+const PLAN_SYSTEM = `Pick one analysis for this table. Reply with only JSON:
+{"task":"summary|correlation|classification|regression","target":"<column or null>","rationale":"<12 words>"}
+target is null for summary and correlation, categorical for classification, numeric for regression.`;
 
-{"task":"summary|correlation|classification|regression",
- "target":"<column name or null>",
- "features":["<column name>", ...],
- "charts":[{"kind":"histogram|bar|scatter","x":"<column>","y":"<column or null>"}],
- "rationale":"<one sentence>"}
-
-Rules:
-- "target" must be null for summary and correlation.
-- classification needs a categorical or binary target; regression needs a numeric target.
-- Only use column names exactly as given.
-- Choose at most three charts.`;
-
-/** JSON schema for the structural gate. Also sent as a decode constraint. */
+/**
+ * Schema for the structural gate, also sent as a decode constraint.
+ *
+ * Deliberately tiny. On a CPU-only machine the model runs at a few tokens per
+ * second, so every field it must emit costs real seconds. The genuinely
+ * model-shaped decision is *which analysis* and *on which column*; feature
+ * lists and chart choices are derived far more reliably from the column types
+ * we already computed. Asking for less is what makes this finish.
+ */
 export const PLAN_SCHEMA = {
   type: "object",
   properties: {
     task: { type: "string", enum: ["summary", "correlation", "classification", "regression"] },
     target: { type: ["string", "null"] },
-    features: { type: "array", items: { type: "string" } },
-    charts: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          kind: { type: "string", enum: ["histogram", "bar", "scatter"] },
-          x: { type: "string" },
-          y: { type: ["string", "null"] },
-        },
-        required: ["kind", "x"],
-      },
-    },
-    rationale: { type: "string" },
+    rationale: { type: "string", maxLength: 140 },
   },
   required: ["task"],
+  additionalProperties: false,
 };
 
 /**
@@ -68,10 +52,19 @@ export const PLAN_SCHEMA = {
 export async function planAnalysis(schema, { signal, onProgress } = {}) {
   const columnNames = new Set(schema.columns.map((c) => c.name));
 
+  // Keep the prompt small: on CPU the prompt is evaluated token by token too,
+  // so a verbose schema costs as much as a verbose answer.
+  const brief = {
+    rows: schema.rows,
+    columns: schema.columns.map((c) => ({ name: c.name, type: c.type })),
+  };
+  const userMessage = JSON.stringify(brief);
+  record("plan.prompt", { chars: userMessage.length, columns: brief.columns.length });
+
   const result = await runGuarded({
     messages: [
       { role: "system", content: PLAN_SYSTEM },
-      { role: "user", content: JSON.stringify(schema) },
+      { role: "user", content: userMessage },
     ],
     schema: PLAN_SCHEMA,
     signal,
@@ -90,10 +83,6 @@ export async function planAnalysis(schema, { signal, onProgress } = {}) {
       }
       if (parsed.target && !columnNames.has(parsed.target)) {
         return { ok: false, error: `Column "${parsed.target}" does not exist in this file.` };
-      }
-      const badChart = (parsed.charts || []).find((c) => c?.x && !columnNames.has(c.x));
-      if (badChart) {
-        return { ok: false, error: `Chart column "${badChart.x}" does not exist in this file.` };
       }
       return { ok: true, value: parsed };
     },

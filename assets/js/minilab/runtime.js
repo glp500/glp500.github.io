@@ -17,6 +17,7 @@ let WllamaCtor = null;
 let instance = null;
 let loadedId = null;
 let constraintWorks = false;
+let constraintAffordable = false;
 
 async function getWllama() {
   if (!WllamaCtor) {
@@ -30,9 +31,18 @@ export function loadedModelId() {
   return loadedId;
 }
 
-/** Whether this build honoured a JSON constraint when we probed it. */
+/**
+ * Whether to constrain decoding to a JSON schema.
+ *
+ * Supported is not the same as worth it. llama.cpp compiles the schema into a
+ * grammar and evaluates it at every token; measured on a CPU-only machine that
+ * cost roughly 15x per token (0.15 tok/s against 2.5 tok/s for a trivial
+ * schema), which is the difference between answering and timing out. The
+ * validator in analysis.js is the real guarantee either way, so the constraint
+ * is used only where the GPU can absorb its cost.
+ */
 export function supportsConstraint() {
-  return constraintWorks;
+  return constraintWorks && constraintAffordable;
 }
 
 /**
@@ -91,9 +101,18 @@ export async function loadModel(model, hardware, handlers = {}) {
   loadedId = model.id;
   record("model.load.done", { model: model.id, ms: Math.round(performance.now() - began) });
 
-  onStage?.("Checking output constraints");
-  constraintWorks = await probeConstraint();
-  record("model.constraint", { supported: constraintWorks });
+  constraintAffordable = Boolean(hardware.webgpu);
+  if (constraintAffordable) {
+    onStage?.("Checking output constraints");
+    constraintWorks = await probeConstraint();
+  } else {
+    constraintWorks = false;
+  }
+  record("model.constraint", {
+    supported: constraintWorks,
+    used: supportsConstraint(),
+    why: constraintAffordable ? "gpu present" : "skipped: too slow without a GPU",
+  });
 
   onStage?.("Ready");
   return instance;
@@ -145,6 +164,7 @@ export async function unloadModel() {
   instance = null;
   loadedId = null;
   constraintWorks = false;
+  constraintAffordable = false;
 }
 
 /**
@@ -159,6 +179,7 @@ export async function* chatStream({
   temperature = 0.1,
   schema = null,
   signal,
+  onThinking,
 } = {}) {
   if (!instance) throw new Error("No model is loaded.");
 
@@ -168,6 +189,16 @@ export async function* chatStream({
     max_tokens: maxTokens,
     temperature,
     abortSignal: signal,
+    // Qwen3.x and other hybrid-reasoning models spend their whole token
+    // budget on hidden thinking and emit no delta.content at all. Measured on
+    // Qwen3.5-0.8B: 60 tokens of thinking and zero content in 43s, versus
+    // 5 tokens and a correct answer in 5.8s with thinking off. A larger budget
+    // only buys more thinking. The Mini-Lab wants a small JSON plan, not a
+    // chain of thought, so thinking is disabled.
+    chat_template_kwargs: { enable_thinking: false },
+    // Reuse the evaluated system prompt across attempts. On CPU the prompt is
+    // the dominant cost, so re-evaluating it for a repair turn is pure waste.
+    cache_prompt: true,
   };
 
   // Forwarded verbatim to llama.cpp. Harmless if this build ignores it.
@@ -181,8 +212,16 @@ export async function* chatStream({
   const stream = await instance.createChatCompletion(options);
   for await (const chunk of stream) {
     if (signal?.aborted) return;
-    const piece = chunk?.choices?.[0]?.delta?.content || "";
-    if (piece) yield piece;
+    const delta = chunk?.choices?.[0]?.delta || {};
+    const piece = delta.content || "";
+    if (piece) {
+      yield piece;
+    } else if (Object.keys(delta).some((k) => k !== "role" && delta[k])) {
+      // A model that ignores enable_thinking still burns tokens here. Report
+      // it so progress does not read as a frozen page, and so the harness can
+      // tell "thinking" apart from "produced nothing at all".
+      onThinking?.();
+    }
   }
 }
 

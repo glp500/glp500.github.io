@@ -489,11 +489,13 @@ async function runPipeline(root) {
 
       const outcome = await planAnalysis(schema, {
         signal: state.analysisAbort.signal,
-        onProgress: ({ attempt, tokens, rate, elapsedMs }) => {
+        onProgress: ({ attempt, tokens, thinking, rate, elapsedMs, phase }) => {
           const suffix = attempt > 1 ? ` · retry ${attempt - 1}` : "";
-          status.textContent = `Thinking — ${tokens} tokens · ${rate.toFixed(
-            1
-          )}/s · ${Math.round(elapsedMs / 1000)}s${suffix}`;
+          const seconds = Math.round(elapsedMs / 1000);
+          status.textContent =
+            phase === "thinking"
+              ? `Reasoning — ${thinking} tokens · ${seconds}s${suffix}`
+              : `Writing — ${tokens} tokens · ${rate.toFixed(1)}/s · ${seconds}s${suffix}`;
         },
       });
 
