@@ -73,11 +73,31 @@ When refreshing a project from GitHub:
 
 ## Mini-Lab
 
-`/mini-lab/` runs a small language model on the visitor's own GPU via
-[wllama](https://github.com/ngxson/wllama) (WebAssembly bindings for
-[llama.cpp](https://github.com/ggml-org/llama.cpp) with WebGPU offload) and
-applies it to a file that never leaves their browser. There is no server and no
-API key.
+`/mini-lab/` runs a small language model on the visitor's own machine and applies
+it to a file that never leaves their browser. There is no server and no API key.
+
+Two backends sit behind `minilab/runtime.js`, and nothing above it knows which is
+in use:
+
+- **wllama** — [WebAssembly bindings](https://github.com/ngxson/wllama) for
+  [llama.cpp](https://github.com/ggml-org/llama.cpp), GGUF weights, WebGPU when
+  the browser has it and CPU threads when it does not. The default, and the only
+  backend that runs without a GPU.
+- **web-llm** — [MLC's WebGPU engine](https://github.com/mlc-ai/web-llm),
+  MLC-compiled weights. Selected only when `navigator.gpu` exists; its 6 MB
+  bundle is not even fetched otherwise.
+
+Note that Firefox has not shipped WebGPU on Linux as of 2026, so GPU inference
+there means Chromium or Chrome. The hardware panel reports what actually loaded
+rather than what the adapter probe implied.
+
+Charts are [D3](https://d3js.org) drawn from a plain spec object; the same spec
+generates the [manim](https://www.manim.community/) Scenes behind "Take the
+code", so the exported figures reproduce what is on screen. `manim` needs
+ffmpeg, cairo and LaTeX installed, which the generated `requirements.txt` says.
+
+Run the checks with `node --test "test/*.test.js"` — chart specs, manim codegen
+(via `python3 -m py_compile`), and backend selection.
 
 ### The trust boundary
 

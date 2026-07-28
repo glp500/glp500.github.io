@@ -1,9 +1,13 @@
 // Generates the Python the visitor can take away.
 //
-// Real, runnable pandas/scikit-learn/matplotlib code assembled from the same
-// plan and the same chart specs the browser rendered. Because the control panel
-// edits those specs, the exported figures reproduce what is on screen —
-// palette, scale, labels, ordering and all — rather than approximating it.
+// Real, runnable pandas/scikit-learn/manim code assembled from the same plan and
+// the same chart specs the browser rendered. Because the control panel edits
+// those specs, the exported figures reproduce what is on screen — palette,
+// scale, labels, ordering and all — rather than approximating it.
+//
+// The figures are manim Scenes rather than matplotlib calls. That is a heavier
+// dependency than it looks: manim needs ffmpeg, cairo and LaTeX on the system,
+// not just a pip install, so buildRequirements() says so out loud.
 
 import { theme } from "./palette.js";
 
@@ -17,11 +21,15 @@ export function buildPython(plan, profile, fileName) {
     "computed, not generated. This script reproduces that computation.",
     "",
     `Task: ${plan.task}${plan.target ? ` — target column "${plan.target}"` : ""}`,
+    "",
+    "Figures are manim Scenes. Render one with:",
+    "    manim -pql analysis.py Chart1",
+    "Needs ffmpeg, cairo and LaTeX installed, not just the pip packages.",
     '"""',
     "",
-    "import pandas as pd",
     "import numpy as np",
-    "import matplotlib.pyplot as plt",
+    "import pandas as pd",
+    "from manim import *",
   ];
 
   if (plan.task === "classification") {
@@ -71,16 +79,19 @@ export function buildPython(plan, profile, fileName) {
 
   const specs = plan.charts || [];
   if (specs.length) {
-    lines.push(...matplotlibStyle(specs[0].mode || "light"));
+    lines.push(...manimPreamble(specs[0].mode || "light"));
     specs.forEach((spec, i) => {
-      lines.push(...matplotlibChart(spec, i + 1));
+      lines.push(...manimScene(spec, i + 1));
     });
   }
 
-
+  // The model block lives in a function rather than at module level: manim
+  // imports this file to find a Scene, and retraining a random forest on every
+  // frame render is not what anyone asked for.
+  const model = [];
   if (plan.task === "classification" || plan.task === "regression") {
     const isClf = plan.task === "classification";
-    lines.push(
+    model.push(
       "# --- Model ---------------------------------------------------------------",
       "# Non-numeric predictors are ordinal-encoded so a tree model can use them.",
       `features = ${py(plan.features)}`,
@@ -109,13 +120,13 @@ export function buildPython(plan, profile, fileName) {
     );
 
     if (isClf) {
-      lines.push(
+      model.push(
         "print(classification_report(y_test, pred))",
         "# Compare against always predicting the most common class.",
         "print('majority baseline:', y.value_counts(normalize=True).max())"
       );
     } else {
-      lines.push(
+      model.push(
         "print('MAE:', mean_absolute_error(y_test, pred))",
         "print('R2 :', r2_score(y_test, pred))",
         "# Compare against always predicting the mean.",
@@ -123,12 +134,22 @@ export function buildPython(plan, profile, fileName) {
       );
     }
 
-    lines.push(
+    model.push(
       "",
       "print(cross_val_score(model, X, y, cv=5))",
       "",
       "importance = pd.Series(model.feature_importances_, index=features)",
       "print(importance.sort_values(ascending=False))"
+    );
+
+    lines.push(
+      "",
+      "def model_report():",
+      ...model.map((l) => (l ? `    ${l}` : "")),
+      "",
+      "",
+      'if __name__ == "__main__":',
+      "    model_report()"
     );
   }
 
@@ -136,121 +157,221 @@ export function buildPython(plan, profile, fileName) {
 }
 
 export function buildRequirements(plan) {
-  const reqs = ["pandas>=2.0", "numpy>=1.24", "matplotlib>=3.7"];
+  const reqs = ["pandas>=2.0", "numpy>=1.24", "manim>=0.18"];
   if (plan.task === "classification" || plan.task === "regression") {
     reqs.push("scikit-learn>=1.3");
   }
   if (plan.fileName && /\.(xlsx|xls)$/i.test(plan.fileName)) reqs.push("openpyxl>=3.1");
-  return reqs.join("\n");
+  return [
+    "# manim also needs system packages, not just these:",
+    "#   ffmpeg, cairo, pango and a LaTeX distribution.",
+    "#   Fedora: sudo dnf install ffmpeg cairo-devel pango-devel texlive-scheme-medium",
+    "",
+    ...reqs,
+  ].join("\n");
 }
 
 function py(value) {
   return JSON.stringify(value);
 }
 
-
 // ---------------------------------------------------------------------------
-// Chart code, generated from the same spec the SVG renderer drew from
+// Figures, generated from the same spec the on-screen renderer drew from
 // ---------------------------------------------------------------------------
 
-/** rcParams that reproduce the on-screen theme. */
-function matplotlibStyle(mode) {
+/** Palette and the few helpers every Scene shares. */
+function manimPreamble(mode) {
   const th = theme(mode);
   return [
-    "# --- Figure style ------------------------------------------------------",
-    "# Mirrors the Mini-Lab's on-screen theme. The palette is validated for",
-    "# colour-vision deficiency and contrast; changing the hexes may break that.",
-    `CATEGORICAL = ${py(th.categorical)}`,
+    "# --- Figures -------------------------------------------------------------",
+    "# The palette is validated for colour-vision deficiency and contrast against",
+    "# the Mini-Lab's surface; changing these hexes may break that.",
     `SURFACE = ${py(th.surface)}`,
-    "plt.rcParams.update({",
-    `    "figure.facecolor": SURFACE,`,
-    `    "axes.facecolor": SURFACE,`,
-    `    "axes.edgecolor": ${py(th.grid)},`,
-    `    "axes.labelcolor": ${py(th.text.secondary)},`,
-    `    "text.color": ${py(th.text.primary)},`,
-    `    "xtick.color": ${py(th.text.secondary)},`,
-    `    "ytick.color": ${py(th.text.secondary)},`,
-    `    "grid.color": ${py(th.grid)},`,
-    '    "grid.linewidth": 0.8,',
-    '    "axes.spines.top": False,',
-    '    "axes.spines.right": False,',
-    '    "font.size": 10,',
-    "})",
+    `TEXT = ${py(th.text.primary)}`,
+    `MUTED = ${py(th.text.muted)}`,
+    `GRID = ${py(th.grid)}`,
+    `CATEGORICAL = ${py(th.categorical)}`,
+    `DIVERGING = (${py(th.diverging.low)}, ${py(th.diverging.mid)}, ${py(th.diverging.high)})`,
+    "",
+    "",
+    "def axis_range(series):",
+    '    """Padded [min, max, step] for a manim Axes."""',
+    "    lo, hi = float(series.min()), float(series.max())",
+    "    if lo == hi:",
+    "        hi = lo + 1",
+    "    return [lo, hi, (hi - lo) / 5]",
+    "",
+    "",
+    "def category_counts(series, limit, ascending=False, by_label=False):",
+    "    counts = series.dropna().astype(str).value_counts()",
+    "    counts = counts.sort_index() if by_label else counts.sort_values(ascending=ascending)",
+    "    return counts.head(limit)",
+    "",
+    "",
+    "def diverging(v):",
+    '    """Two hues through a neutral middle. Zero must read as nothing."""',
+    "    low, mid, high = DIVERGING",
+    "    t = 0.0 if v != v else max(-1.0, min(1.0, float(v)))",
+    "    end = low if t < 0 else high",
+    "    return interpolate_color(ManimColor(mid), ManimColor(end), abs(t))",
+    "",
+    "",
+    "def heading(scene, text):",
+    "    if text:",
+    "        scene.add(Text(text, font_size=28, color=TEXT).to_edge(UP))",
     "",
   ];
 }
 
-/** One chart, honouring type, scale, ordering, labels and layout. */
-function matplotlibChart(spec, n) {
-  const th = theme(spec.mode || "light");
-  const out = [
-    `# --- Chart ${n}: ${spec.type} -------------------------------------------`,
-    `fig, ax = plt.subplots(figsize=(8, ${((spec.height || 320) / 60).toFixed(1)}))`,
-  ];
+/** One Scene per chart, honouring type, scale, ordering, labels and colour. */
+function manimScene(spec, n) {
+  const name = `Chart${n}`;
+  const body = [];
+  const title = spec.title || `${spec.type} of ${spec.x}`;
 
-  if (spec.type === "histogram") {
-    out.push(
-      `ax.hist(df[${py(spec.x)}].dropna(), bins=${spec.bins || 20}, color=CATEGORICAL[0], edgecolor=SURFACE, linewidth=1.2)`,
-      `ax.set_ylabel(${py(spec.yLabel || "Rows")})`
+  if (spec.type === "bar") {
+    body.push(
+      `counts = category_counts(df[${py(spec.x)}], ${spec.maxCategories || 12}, ascending=${
+        spec.sort === "value-asc" ? "True" : "False"
+      }, by_label=${spec.sort === "label" ? "True" : "False"})`,
+      "chart = BarChart(",
+      "    list(counts.values),",
+      "    bar_names=[str(i) for i in counts.index],",
+      spec.palette === "categorical"
+        ? "    bar_colors=[CATEGORICAL[i % len(CATEGORICAL)] for i in range(len(counts))],"
+        : "    bar_colors=[CATEGORICAL[0]] * len(counts),",
+      "    x_length=10,",
+      "    y_length=5.5,",
+      `    y_axis_config={"color": GRID, "font_size": 18},`,
+      `    x_axis_config={"color": GRID, "font_size": 18},`,
+      ")",
+      `heading(self, ${py(title)})`,
+      "self.play(Create(chart), run_time=1.5)"
     );
-  } else if (spec.type === "bar") {
-    const asc = spec.sort === "value-asc";
-    out.push(
-      `counts = df[${py(spec.x)}].value_counts()${
-        spec.sort === "label" ? ".sort_index()" : `.sort_values(ascending=${asc ? "True" : "False"})`
-      }.head(${spec.maxCategories || 12})`,
-      `bars = ax.bar(counts.index.astype(str), counts.values, color=CATEGORICAL[0], edgecolor=SURFACE, linewidth=1.2)`,
-      `ax.set_ylabel(${py(spec.yLabel || "Rows")})`,
-      "plt.setp(ax.get_xticklabels(), rotation=35, ha='right')"
+    if (spec.valueLabels) {
+      body.push("self.play(Write(chart.get_bar_labels(color=TEXT, font_size=20)))");
+    }
+  } else if (spec.type === "histogram") {
+    body.push(
+      `values, edges = np.histogram(df[${py(spec.x)}].dropna(), bins=${spec.bins || 20})`,
+      "chart = BarChart(",
+      "    list(values),",
+      '    bar_names=[f"{e:.3g}" for e in edges[:-1]],',
+      "    bar_colors=[CATEGORICAL[0]] * len(values),",
+      "    x_length=10,",
+      "    y_length=5.5,",
+      `    y_axis_config={"color": GRID, "font_size": 18},`,
+      `    x_axis_config={"color": GRID, "font_size": 14},`,
+      ")",
+      `heading(self, ${py(title)})`,
+      "self.play(Create(chart), run_time=1.5)"
     );
-    if (spec.valueLabels) out.push("ax.bar_label(bars, padding=3, fontsize=9)");
-  } else if (spec.type === "scatter") {
-    if (spec.colorBy) {
-      out.push(
-        `for i, (name, grp) in enumerate(df.groupby(${py(spec.colorBy)})):`,
-        `    if i >= 3:  # scatter caps at three colours for colourblind safety`,
-        "        break",
-        `    ax.scatter(grp[${py(spec.x)}], grp[${py(spec.y)}], s=28, alpha=0.85,`,
-        "               color=CATEGORICAL[i], edgecolors=SURFACE, linewidths=1.5, label=str(name))",
-        "ax.legend(frameon=False)"
+  } else if (spec.type === "scatter" || spec.type === "line") {
+    const cols = [spec.x, spec.y, ...(spec.colorBy ? [spec.colorBy] : [])];
+    body.push(
+      `data = df[${py(cols)}].dropna()`,
+      "ax = Axes(",
+      `    x_range=axis_range(data[${py(spec.x)}]),`,
+      `    y_range=axis_range(data[${py(spec.y)}]),`,
+      "    x_length=10,",
+      "    y_length=5.5,",
+      `    axis_config={"color": GRID, "include_numbers": True, "font_size": 16},`,
+      ...(spec.scaleY === "log" ? ['    y_axis_config={"scaling": LogBase(10)},'] : []),
+      ")",
+      "labels = ax.get_axis_labels(",
+      `    Text(${py(spec.xLabel || spec.x)}, font_size=22, color=MUTED),`,
+      `    Text(${py(spec.yLabel || spec.y)}, font_size=22, color=MUTED),`,
+      ")",
+      `heading(self, ${py(title)})`,
+      "self.play(Create(ax), Write(labels))"
+    );
+
+    if (spec.type === "line") {
+      body.push(
+        `ordered = data.sort_values(${py(spec.x)})`,
+        "graph = ax.plot_line_graph(",
+        `    x_values=ordered[${py(spec.x)}].tolist(),`,
+        `    y_values=ordered[${py(spec.y)}].tolist(),`,
+        "    line_color=ManimColor(CATEGORICAL[0]),",
+        "    add_vertex_dots=False,",
+        "    stroke_width=4,",
+        ")",
+        "self.play(Create(graph), run_time=2)"
+      );
+    } else if (spec.colorBy) {
+      body.push(
+        "# Scatter is an all-pairs form, so it caps at three colours: past that,",
+        "# two hues can land side by side and stop being distinguishable.",
+        `groups = list(data[${py(spec.colorBy)}].astype(str).value_counts().index[:3])`,
+        "dots = VGroup()",
+        "for i, name in enumerate(groups):",
+        `    sub = data[data[${py(spec.colorBy)}].astype(str) == name]`,
+        "    dots.add(",
+        "        *[",
+        "            Dot(ax.c2p(x, y), radius=0.045, color=ManimColor(CATEGORICAL[i]))",
+        `            for x, y in sub[[${py(spec.x)}, ${py(spec.y)}]].values`,
+        "        ]",
+        "    )",
+        "self.play(FadeIn(dots, lag_ratio=0.01), run_time=2)"
       );
     } else {
-      out.push(
-        `ax.scatter(df[${py(spec.x)}], df[${py(spec.y)}], s=28, alpha=0.85,`,
-        "           color=CATEGORICAL[0], edgecolors=SURFACE, linewidths=1.5)"
+      body.push(
+        "dots = VGroup(",
+        "    *[",
+        "        Dot(ax.c2p(x, y), radius=0.045, color=ManimColor(CATEGORICAL[0]))",
+        `        for x, y in data[[${py(spec.x)}, ${py(spec.y)}]].values`,
+        "    ]",
+        ")",
+        "self.play(FadeIn(dots, lag_ratio=0.01), run_time=2)"
       );
     }
-    out.push(`ax.set_ylabel(${py(spec.yLabel || spec.y)})`);
-  } else if (spec.type === "line") {
-    out.push(
-      `ordered = df[[${py(spec.x)}, ${py(spec.y)}]].dropna().sort_values(${py(spec.x)})`,
-      `ax.plot(ordered[${py(spec.x)}], ordered[${py(spec.y)}], linewidth=2, solid_joinstyle='round', color=CATEGORICAL[0])`,
-      `ax.set_ylabel(${py(spec.yLabel || spec.y)})`
-    );
   } else if (spec.type === "heatmap") {
-    out.push(
-      "numeric = df.select_dtypes('number')",
-      "corr = numeric.corr(method='pearson')",
+    body.push(
       "# Correlation is polarity data: a diverging map centred on zero, never a",
       "# sequential ramp and never a rainbow.",
-      "im = ax.imshow(corr, cmap='RdBu_r', vmin=-1, vmax=1)",
-      "ax.set_xticks(range(len(corr.columns)), corr.columns, rotation=45, ha='right')",
-      "ax.set_yticks(range(len(corr.columns)), corr.columns)",
-      "fig.colorbar(im, ax=ax, shrink=0.8, label='Pearson r')"
+      'corr = df.select_dtypes("number").corr(method="pearson")',
+      "names = list(corr.columns)[:14]",
+      "corr = corr.loc[names, names]",
+      "cell = 0.6",
+      "grid = VGroup()",
+      "for r, row_name in enumerate(names):",
+      "    for c, col_name in enumerate(names):",
+      "        square = Square(",
+      "            side_length=cell,",
+      "            fill_opacity=1,",
+      "            stroke_width=0.5,",
+      "            stroke_color=ManimColor(GRID),",
+      "        )",
+      "        square.set_fill(diverging(corr.iloc[r, c]))",
+      "        square.move_to([c * cell, -r * cell, 0])",
+      "        grid.add(square)",
+      "row_labels = VGroup(",
+      "    *[",
+      "        Text(name[:18], font_size=14, color=MUTED).next_to(",
+      "            grid[i * len(names)], LEFT, buff=0.15",
+      "        )",
+      "        for i, name in enumerate(names)",
+      "    ]",
+      ")",
+      "figure = VGroup(grid, row_labels).move_to(ORIGIN).scale_to_fit_height(5.5)",
+      `heading(self, ${py(title)})`,
+      "self.play(FadeIn(figure, lag_ratio=0.005), run_time=2)"
     );
   }
 
-  if (spec.type !== "heatmap") {
-    out.push(`ax.set_xlabel(${py(spec.xLabel || spec.x)})`);
-    if (spec.scaleY === "log") out.push("ax.set_yscale('log')");
-    if (spec.grid === "none") out.push("ax.grid(False)");
-    else out.push(`ax.grid(True, axis=${spec.grid === "both" ? "'both'" : "'y'"}, linewidth=0.8)`);
-    out.push("ax.set_axisbelow(True)");
-  }
+  body.push("self.wait(2)");
 
-  if (spec.title) out.push(`ax.set_title(${py(spec.title)}, loc='left', fontsize=12)`);
-  if (spec.caption) out.push(`fig.text(0.01, -0.02, ${py(spec.caption)}, fontsize=9, color=${py(th.text.muted)})`);
-
-  out.push("fig.tight_layout()", "plt.show()", "");
-  return out;
+  return [
+    "",
+    "",
+    `class ${name}(Scene):`,
+    `    """${title.replace(/"/g, "'")} — render: manim -pql analysis.py ${name}"""`,
+    "",
+    "    def construct(self):",
+    "        self.camera.background_color = SURFACE",
+    ...body.map((l) => (l ? `        ${l}` : "")),
+  ];
 }
+
+
+

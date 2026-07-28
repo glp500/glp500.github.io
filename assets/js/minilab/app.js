@@ -8,9 +8,10 @@ import {
   loadModel,
   unloadModel,
   loadedModelId,
-  supportsConstraint,
   contextWindow,
   measuredSpeed,
+  backendInfo,
+  gpuCatalogue,
 } from "./runtime.js";
 import { ensureIsolation } from "./coi.js";
 import {
@@ -27,8 +28,8 @@ import { searchRepos, resolveRepo } from "./hf.js";
 import { readTable, profileTable, schemaForModel, IngestError } from "./ingest.js";
 import { planAnalysis, validatePlan, runAnalysis } from "./analysis.js";
 import { renderChart, normaliseSpec } from "./charts.js";
-import { renderControls, readControl, reconcileSpec } from "./controls.js";
-import { buildQuestions, answersToConstraints, fallbackQuestions } from "./questions.js";
+import { renderControls, readControl, reconcileSpec, escapeAttr as escapeHtml } from "./controls.js";
+import { buildQuestions, answersToConstraints } from "./questions.js";
 import { buildPython, buildRequirements } from "./export.js";
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -46,8 +47,6 @@ const state = {
   abort: null,
   analysing: false,
   questions: null,
-  questionSource: null,
-  answers: null,
   specs: [],
   analysisAbort: null,
   isolation: null,
@@ -91,6 +90,15 @@ export async function init(root) {
   });
   record("hardware", { webgpu: hw.webgpu, threads: hw.threads, tier: hw.tier });
 
+  // The MLC models are only reachable on a machine with WebGPU, and asking for
+  // them is what pulls in the web-llm bundle — so a browser without a GPU never
+  // downloads it.
+  const gpuModels = await gpuCatalogue(hw);
+  if (gpuModels.length) {
+    state.catalogue = [...state.catalogue, ...gpuModels];
+    record("catalogue", { gguf: state.catalogue.length - gpuModels.length, mlc: gpuModels.length });
+  }
+
   renderHardware(root, hw);
   renderCatalogue(root);
   bindModelControls(root);
@@ -120,8 +128,19 @@ function bindPanels(root) {
 function renderHardware(root, hw) {
   const target = $("[data-hardware]", root);
   const iso = state.isolation || {};
+  // Once something is loaded the runtime knows what actually happened, which is
+  // not always what the adapter probe implied: a browser can expose WebGPU and
+  // still end up decoding on the CPU. Report the load, fall back to the probe.
+  const loaded = backendInfo();
   const rows = [
-    ["GPU", hw.webgpu ? hw.gpuName : "None — running on CPU"],
+    [
+      "Inference",
+      loaded
+        ? `${loaded.gpu ? "GPU" : "CPU"} · ${loaded.device} · ${loaded.engine}`
+        : hw.webgpu
+        ? `${hw.gpuName} (not loaded yet)`
+        : "None — will run on CPU",
+    ],
     ["Threads", hw.crossOriginIsolated ? `${hw.threads}` : "1"],
     ["Room for", formatBytes(hw.budgetBytes)],
   ];
@@ -152,7 +171,7 @@ function browserAdvice(hw) {
   if (isFirefox) {
     advice.push(
       isLinux
-        ? 'Firefox on Linux ships WebGPU disabled. Try <code>dom.webgpu.enabled</code> in <code>about:config</code>; Chrome will be faster today.'
+        ? 'Firefox has not shipped WebGPU on Linux — it is on the 2026 roadmap, and <code>dom.webgpu.enabled</code> in <code>about:config</code> is incomplete there. <strong>Chromium or Chrome runs this on the GPU today.</strong>'
         : 'Firefox needs <code>dom.webgpu.enabled</code> in <code>about:config</code> for GPU inference.'
     );
   } else if (/safari/i.test(ua) && !/chrome|chromium/i.test(ua)) {
@@ -360,6 +379,8 @@ async function startLoad(root) {
         ).toFixed(1)}s to first token`
       : `${state.selected.label} is loaded.`;
     markModelReady(root, true);
+    // The Inference row was a guess until now; repaint it with what loaded.
+    renderHardware(root, state.hardware);
   } catch (error) {
     progress.innerHTML =
       error?.name === "AbortError"
@@ -441,7 +462,7 @@ async function handleFile(root, file) {
       profile.columnCount
     } columns. Nothing was uploaded.${truncNote}`;
     renderProfile(root, profile);
-    await presentQuestions(root);
+    presentQuestions(root);
     $("[data-analysis-step]", root).hidden = false;
     $("[data-run-analysis]", root).disabled = false;
     markModelReady(root, Boolean(loadedModelId()));
@@ -647,7 +668,9 @@ function renderChartsAndControls(root) {
 
   target.innerHTML = state.specs
     .map(
-      (spec, i) => `<div class="viz-block" data-block="${spec.id}">
+      (spec, i) => `<div class="viz-tile" data-block="${spec.id}">
+        <button type="button" class="viz-tile__expand" data-expand="${spec.id}"
+          aria-label="Expand this chart" title="Expand">⤢</button>
         <div data-viz-figure></div>
         ${renderControls(spec, state.profile, i)}
         <div data-viz-table></div>
@@ -669,8 +692,7 @@ function renderChartsAndControls(root) {
 function paintChart(root, spec) {
   const block = $(`[data-block="${spec.id}"]`, root);
   if (!block) return;
-  const { svg, table, warning } = renderChart(spec, state.table);
-  $("[data-viz-figure]", block).innerHTML = svg;
+  const { table, warning } = renderChart(spec, state.table, $("[data-viz-figure]", block));
   $("[data-viz-table]", block).innerHTML = tableView(table, warning);
 }
 
@@ -735,6 +757,23 @@ function bindChartControls(root) {
       const status = $("[data-analysis-status]", root);
       if (status) status.textContent = notes.join(" ");
     }
+  });
+
+  // Promote one tile to the full width of the grid. The SVG is drawn to a
+  // viewBox, so CSS does the scaling and no repaint is needed.
+  charts.addEventListener("click", (event) => {
+    const id = event.target.closest?.("[data-expand]")?.dataset.expand;
+    if (!id) return;
+    const tile = $(`[data-block="${id}"]`, root);
+    const expanding = !tile.classList.contains("is-expanded");
+    // One at a time, so the grid never collapses to a single column of giants.
+    $$(".viz-tile.is-expanded", root).forEach((t) => t.classList.remove("is-expanded"));
+    tile.classList.toggle("is-expanded", expanding);
+    event.target.closest("[data-expand]").setAttribute(
+      "aria-label",
+      expanding ? "Shrink this chart" : "Expand this chart"
+    );
+    record("chart.expand", { id, expanded: expanding });
   });
 }
 
@@ -803,13 +842,6 @@ function formatTime(seconds) {
   return `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`;
 }
 
-function escapeHtml(s) {
-  return String(s ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
 
 
 // ---------------------------------------------------------------------------
@@ -819,48 +851,18 @@ function escapeHtml(s) {
 /**
  * Ask three multiple-choice questions plus a free-text field before analysing.
  *
- * The model writes them when it can; otherwise the deterministic set is used.
- * Either way the answers become hard constraints on the plan, which is what
- * stops every file being answered with "descriptive summary".
+ * Built from the column profile, not written by the model — see questions.js for
+ * why. The answers become hard constraints on the plan, which is what stops
+ * every file being answered with "descriptive summary".
  */
-async function presentQuestions(root) {
+function presentQuestions(root) {
   const step = $("[data-questions-step]", root);
   const status = $("[data-questions-status]", root);
   step.hidden = false;
 
-  let questions = fallbackQuestions(state.profile);
-  let source = "fallback";
-
-  if (loadedModelId()) {
-    status.textContent = "Writing questions about your data…";
-    const controller = new AbortController();
-    state.questionAbort = controller;
-    try {
-      const outcome = await buildQuestions(state.profile, {
-        signal: controller.signal,
-        nCtx: contextWindow(),
-        onProgress: ({ tokens, rate, phase }) => {
-          status.textContent =
-            phase === "thinking"
-              ? "Reasoning…"
-              : `Writing questions — ${tokens} tokens · ${rate.toFixed(1)}/s`;
-        },
-      });
-      questions = outcome.questions;
-      source = outcome.source;
-    } catch (error) {
-      recordError("questions", error);
-    } finally {
-      state.questionAbort = null;
-    }
-  }
-
+  const questions = buildQuestions(state.profile);
   state.questions = questions;
-  state.questionSource = source;
-  status.textContent =
-    source === "model"
-      ? "Written by the model from your columns."
-      : "Standard questions — the model did not write a set in time.";
+  status.textContent = "Your answers decide the analysis, not the model's guess.";
 
   $("[data-questions]", root).innerHTML = questions
     .map(

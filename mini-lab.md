@@ -102,6 +102,7 @@ description: Small language models running locally in your browser over WebGPU, 
 
               <details class="ml-more ml-code-block">
                 <summary>Take the code</summary>
+                <p class="ml-caveat">pandas for the analysis, manim for the figures. Render one with <code>manim -pql analysis.py Chart1</code>.</p>
                 <div class="ml-actions">
                   <button type="button" data-copy-code>Copy</button>
                 </div>

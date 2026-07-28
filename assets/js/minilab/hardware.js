@@ -9,7 +9,7 @@ const GB = 1024 ** 3;
 // A model needs materially more memory than its file size once the KV cache,
 // compute buffers and runtime overhead are counted. Measured in practice at
 // roughly 1.5-1.8x for Q4 GGUF at small context sizes.
-const RUNTIME_OVERHEAD = 1.7;
+export const RUNTIME_OVERHEAD = 1.7;
 
 // Browsers cap a single ArrayBuffer at 2 GB, which caps one GGUF file.
 export const MAX_FILE_BYTES = 2 * GB;
@@ -147,7 +147,9 @@ export function evaluateModel(model, report) {
   if (model.blocked_reason) {
     return { ok: false, reason: model.blocked_reason.trim() };
   }
-  if (model.size_bytes > MAX_FILE_BYTES) {
+  // The 2 GB ceiling is a single-file limit, so it only binds on GGUF. MLC
+  // weights arrive as many shards and are not subject to it.
+  if (model.backend !== "webllm" && model.size_bytes > MAX_FILE_BYTES) {
     return {
       ok: false,
       reason: `${formatBytes(model.size_bytes)} exceeds the ${formatBytes(

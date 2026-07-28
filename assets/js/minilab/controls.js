@@ -1,7 +1,7 @@
 // The chart control panel.
 //
 // Every control edits one field of a chart spec. The spec is the single source
-// of truth — the SVG renderer draws from it and export.js generates matplotlib
+// of truth — the D3 renderer draws from it and export.js generates manim
 // from it — which is what makes "take the code" reproduce what is on screen
 // rather than approximate it.
 //
@@ -11,11 +11,12 @@
 
 import { PALETTES } from "./palette.js";
 
+// What each type requires is enforced by reconcileSpec below, not declared here.
 const TYPES = [
-  { id: "histogram", label: "Histogram", needs: ["x"] },
-  { id: "bar", label: "Bar", needs: ["x"] },
-  { id: "scatter", label: "Scatter", needs: ["x", "y"] },
-  { id: "line", label: "Line", needs: ["x", "y"] },
+  { id: "histogram", label: "Histogram" },
+  { id: "bar", label: "Bar" },
+  { id: "scatter", label: "Scatter" },
+  { id: "line", label: "Line" },
 ];
 
 /**
@@ -152,10 +153,11 @@ function checkbox(id, label, field, checked) {
     <input id="${id}" type="checkbox" data-field="${field}"${checked ? " checked" : ""}><span>${label}</span></label>`;
 }
 
-function escapeText(s) {
+/** The one HTML escaper in the Mini-Lab; app.js imports it rather than owning a second. */
+export function escapeText(s) {
   return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function escapeAttr(s) {
+export function escapeAttr(s) {
   return escapeText(s).replace(/"/g, "&quot;");
 }

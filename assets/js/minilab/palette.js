@@ -47,9 +47,9 @@ export const DIVERGING = {
 export const ALL_PAIRS_SERIES_CAP = 3;
 
 export const PALETTES = [
-  { id: "categorical", label: "Categorical", note: "Distinct series" },
-  { id: "sequential", label: "Sequential", note: "One hue, more is darker" },
-  { id: "diverging", label: "Diverging", note: "Above and below a midpoint" },
+  { id: "categorical", label: "Categorical" },
+  { id: "sequential", label: "Sequential" },
+  { id: "diverging", label: "Diverging" },
 ];
 
 export function seriesColor(index, mode = "light") {

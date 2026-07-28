@@ -3295,14 +3295,48 @@ a {
 
 /* ---------- Mini-Lab: charts ---------- */
 
-.viz-block {
-  padding-bottom: 1.6rem;
-  margin-bottom: 1.6rem;
-  border-bottom: 1px solid var(--line-dark);
+/* Tiles. auto-fit collapses to one column on a phone and gives two or three
+   across on a desktop, with no breakpoints to maintain. */
+.ml-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1.6rem;
+  align-items: start;
 }
 
-.viz-block:last-child {
-  border-bottom: 0;
+.viz-tile {
+  position: relative;
+  min-width: 0; /* grid items default to min-content; without this the SVG cannot shrink */
+  padding: 1rem;
+  border: 1px solid var(--line-dark);
+}
+
+/* Promoted tile: spans every column, so the detail is worth the click. */
+.viz-tile.is-expanded {
+  grid-column: 1 / -1;
+}
+
+.viz-tile__expand {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--line-dark);
+  background: transparent;
+  color: inherit;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.viz-tile__expand:hover,
+.viz-tile__expand:focus-visible {
+  background: var(--line-dark);
+}
+
+.viz-tile.is-expanded .viz-tile__expand {
+  transform: rotate(180deg);
 }
 
 .viz {

@@ -4,7 +4,7 @@
 // file with a real byte size before it is offered, because the picker's whole
 // job is to never suggest something that cannot load.
 
-import { MAX_FILE_BYTES } from "./hardware.js";
+import { MAX_FILE_BYTES, RUNTIME_OVERHEAD } from "./hardware.js";
 
 const API = "https://huggingface.co/api";
 
@@ -55,7 +55,9 @@ export async function listModelFiles(repo, { signal } = {}) {
 /** Pick the best file in a repo that fits both the file cap and the budget. */
 export function chooseFile(files, budgetBytes) {
   const loadable = files.filter(
-    (f) => f.size_bytes <= MAX_FILE_BYTES && (!budgetBytes || f.size_bytes * 1.7 <= budgetBytes)
+    (f) =>
+      f.size_bytes <= MAX_FILE_BYTES &&
+      (!budgetBytes || f.size_bytes * RUNTIME_OVERHEAD <= budgetBytes)
   );
   if (!loadable.length) return null;
 
