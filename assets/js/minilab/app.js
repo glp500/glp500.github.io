@@ -12,6 +12,7 @@ import {
   measuredSpeed,
   backendInfo,
   gpuCatalogue,
+  constraintReport,
 } from "./runtime.js";
 import { ensureIsolation } from "./coi.js";
 import {
@@ -70,7 +71,7 @@ export async function init(root) {
     onReload: () => {
       const target = $("[data-hardware]", root);
       if (target) {
-        target.innerHTML = '<p class="ml-status">Enabling multi-threading — reloading once…</p>';
+        target.innerHTML = '<p class="ml-status">Turning on multi-threading. The page reloads once.</p>';
       }
     },
   });
@@ -139,11 +140,26 @@ function renderHardware(root, hw) {
         ? `${loaded.gpu ? "GPU" : "CPU"} · ${loaded.device} · ${loaded.engine}`
         : hw.webgpu
         ? `${hw.gpuName} (not loaded yet)`
-        : "None — will run on CPU",
+        : "No GPU. This will run on the CPU.",
     ],
     ["Threads", hw.crossOriginIsolated ? `${hw.threads}` : "1"],
     ["Room for", formatBytes(hw.budgetBytes)],
   ];
+
+  // Whether decoding is pinned to the schema is the single biggest factor in
+  // whether a small model returns a usable plan, so it is stated rather than
+  // buried in diagnostics.
+  const c = constraintReport();
+  if (loaded && c.supported) {
+    rows.push([
+      "Output",
+      c.used
+        ? `Pinned to the schema, ${c.grammarTps} tok/s`
+        : `Free text, ${c.grammarTps} tok/s pinned is too slow here`,
+    ]);
+  } else if (loaded) {
+    rows.push(["Output", "Free text. This build did not pin decoding to the schema."]);
+  }
 
   const notes = [...hw.notes];
   if (!hw.crossOriginIsolated && iso.detail) notes.push(iso.detail);
@@ -171,7 +187,7 @@ function browserAdvice(hw) {
   if (isFirefox) {
     advice.push(
       isLinux
-        ? 'Firefox has not shipped WebGPU on Linux — it is on the 2026 roadmap, and <code>dom.webgpu.enabled</code> in <code>about:config</code> is incomplete there. <strong>Chromium or Chrome runs this on the GPU today.</strong>'
+        ? 'Firefox has not shipped WebGPU on Linux yet. It is on the 2026 roadmap, and <code>dom.webgpu.enabled</code> in <code>about:config</code> is incomplete there. <strong>Chromium or Chrome will run this on the GPU today.</strong>'
         : 'Firefox needs <code>dom.webgpu.enabled</code> in <code>about:config</code> for GPU inference.'
     );
   } else if (/safari/i.test(ua) && !/chrome|chromium/i.test(ua)) {
@@ -180,7 +196,7 @@ function browserAdvice(hw) {
     advice.push("A browser with WebGPU (Chrome or Edge) will be substantially faster.");
   }
 
-  advice.push("Without a GPU, start with the smallest model — it is the difference between seconds and minutes.");
+  advice.push("Without a GPU, start with the smallest model. That is the difference between waiting seconds and waiting minutes.");
   return advice;
 }
 
@@ -332,7 +348,7 @@ async function useRepo(root, repo) {
     const model = await resolveRepo(repo, state.hardware.budgetBytes);
     state.custom = [...(state.custom || []), model];
     state.selected = model;
-    status.innerHTML = `Selected <strong>${escapeHtml(model.label)}</strong> — ${escapeHtml(
+    status.innerHTML = `Selected <strong>${escapeHtml(model.label)}</strong>. ${escapeHtml(
       model.file
     )} (${formatBytes(model.size_bytes)}).`;
     $$('input[name="minilab-model"]', root).forEach((i) => {
@@ -458,7 +474,7 @@ async function handleFile(root, file) {
     const truncNote = table.truncated
       ? ` Only the first ${profile.rowCount.toLocaleString()} rows were read.`
       : "";
-    status.innerHTML = `<strong>${escapeHtml(file.name)}</strong> — ${profile.rowCount.toLocaleString()} rows × ${
+    status.innerHTML = `<strong>${escapeHtml(file.name)}</strong>, ${profile.rowCount.toLocaleString()} rows × ${
       profile.columnCount
     } columns. Nothing was uploaded.${truncNote}`;
     renderProfile(root, profile);
@@ -558,8 +574,8 @@ async function runPipeline(root) {
           const seconds = Math.round(elapsedMs / 1000);
           status.textContent =
             phase === "thinking"
-              ? `Reasoning — ${thinking} tokens · ${seconds}s${suffix}`
-              : `Writing — ${tokens} tokens · ${rate.toFixed(1)}/s · ${seconds}s${suffix}`;
+              ? `Reasoning · ${thinking} tokens · ${seconds}s${suffix}`
+              : `Writing · ${tokens} tokens · ${rate.toFixed(1)}/s · ${seconds}s${suffix}`;
         },
       });
 
@@ -612,7 +628,8 @@ const FALLBACK_NOTES = {
   deadline: "The model ran out of time, so the default analysis was used.",
   "too-slow": "This machine is too slow for the model to plan in time, so the default was used.",
   "no-budget": "The time budget ran out, so the default analysis was used.",
-  unparseable: "The model did not return usable JSON, so the default analysis was used.",
+  unparseable:
+    "The model answered in prose rather than JSON, so the default analysis was used. Pinning decoding to the schema fixes this where the machine is fast enough for it.",
   invalid: "The model's plan did not match your columns, so the default analysis was used.",
 };
 
@@ -640,7 +657,7 @@ function renderResults(root, plan, results) {
 
   $("[data-plan]", root).innerHTML = `
     <p class="ml-plan"><strong>${escapeHtml(labelForTask(plan.task))}</strong>${
-      plan.target ? ` — target <code>${escapeHtml(plan.target)}</code>` : ""
+      plan.target ? `, target <code>${escapeHtml(plan.target)}</code>` : ""
     }</p>
     ${plan.rationale ? `<p class="ml-rationale">${escapeHtml(plan.rationale)}</p>` : ""}
     ${
@@ -862,7 +879,7 @@ function presentQuestions(root) {
 
   const questions = buildQuestions(state.profile);
   state.questions = questions;
-  status.textContent = "Your answers decide the analysis, not the model's guess.";
+  status.textContent = "Your answers decide which analysis runs.";
 
   $("[data-questions]", root).innerHTML = questions
     .map(

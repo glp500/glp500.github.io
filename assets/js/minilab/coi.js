@@ -57,7 +57,7 @@ export async function ensureIsolation({ onReload } = {}) {
       return {
         isolated: false,
         state: "reloading",
-        detail: "Enabling multi-threading — reloading once.",
+        detail: "Turning on multi-threading. The page reloads once.",
       };
     }
 

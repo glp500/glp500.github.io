@@ -1,6 +1,6 @@
 # Vendored dependency
 
-[D3](https://d3js.org) v7.9.0 — the chart primitives behind `minilab/charts.js`
+[D3](https://d3js.org) v7.9.0, the chart primitives behind `minilab/charts.js`
 (scales, axes, binning, shapes, colour interpolation). Licensed ISC.
 
 Vendored rather than loaded from a CDN, same reasoning as `../wllama/`: the

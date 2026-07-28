@@ -11,10 +11,12 @@
 //      than burning the whole clock.
 //   4. Output passes a structural gate (JSON) and then a semantic gate
 //      (validated against the real schema, in analysis.js).
-//   5. At most two attempts: one turn, then one repair with the specific error.
+//   5. Two attempts with a grammar, three without. Unconstrained decoding is
+//      where small models wander into prose, so that is where the extra repair
+//      turn earns its cost.
 //   6. Every path ends somewhere usable. The caller always gets a result.
 
-import { chatStream, supportsConstraint } from "./runtime.js";
+import { chatStream, supportsConstraint, PLAN_TOKENS } from "./runtime.js";
 import { record, recordError } from "./diagnostics.js";
 
 export const DEFAULTS = {
@@ -78,7 +80,13 @@ export async function runGuarded({
 
   let conversation = messages;
 
-  for (let attempt = 1; attempt <= 2; attempt += 1) {
+  // Without a grammar the model is free to answer in prose, and one repair is
+  // often not enough to pull it back. With a grammar the reply is JSON by
+  // construction, so a third turn would only burn clock.
+  const constrained = supportsConstraint();
+  const maxAttempts = constrained ? 2 : 3;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const isRepair = attempt > 1;
     const allowance = Math.min(
       isRepair ? cfg.repairAttemptMs : cfg.firstAttemptMs,
@@ -137,10 +145,13 @@ export async function runGuarded({
     if (!parsed) {
       attempts.push({ attempt, outcome: "unparseable", chars: raw.length });
       record("harness.unparseable", { attempt, chars: raw.length });
+      // Show the shape rather than describing it. llama.cpp's own guidance is
+      // that a schema constrains output without being visible to the model, so
+      // when the grammar is off the prompt is the only place the shape exists.
       conversation = withRepair(
         messages,
         raw,
-        "That was not valid JSON. Reply with the JSON object only, no prose and no code fences."
+        `That was not valid JSON. Reply with exactly this shape and nothing else: ${skeleton(schema)}`
       );
       continue;
     }
@@ -287,7 +298,7 @@ async function generateBounded({
       if (tokens >= graceTokens && thinking === 0 && rate > 0) {
         // Assume a plan needs roughly 40 tokens, not the full ceiling; the
         // ceiling is a safety limit, not an expectation.
-        const projectedMs = ((40 - tokens) / rate) * 1000;
+        const projectedMs = ((PLAN_TOKENS - tokens) / rate) * 1000;
         if (rate < minRate || elapsedMs + projectedMs > deadlineMs) {
           reason = "too-slow";
           controller.abort();
@@ -323,6 +334,27 @@ async function generateBounded({
     throw new HarnessAbort(reason);
   }
   return text;
+}
+
+/**
+ * A literal example of the object a schema describes.
+ *
+ * `{"task":"summary|correlation|classification|regression","target":null,"rationale":"..."}`
+ * lands with a small model in a way that a sentence about JSON does not.
+ */
+export function skeleton(schema) {
+  const props = schema?.properties;
+  if (!props) return "{}";
+  const parts = Object.entries(props).map(([key, def]) => {
+    const types = [].concat(def.type ?? "string");
+    if (def.enum) return `${JSON.stringify(key)}:${JSON.stringify(def.enum.join("|"))}`;
+    if (types.includes("null")) return `${JSON.stringify(key)}:null`;
+    if (types.includes("number") || types.includes("integer")) return `${JSON.stringify(key)}:0`;
+    if (types.includes("boolean")) return `${JSON.stringify(key)}:true`;
+    if (types.includes("array")) return `${JSON.stringify(key)}:[]`;
+    return `${JSON.stringify(key)}:"..."`;
+  });
+  return `{${parts.join(",")}}`;
 }
 
 /** First balanced JSON object in a reply. Tolerates fences and preamble. */

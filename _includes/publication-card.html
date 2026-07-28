@@ -1,7 +1,5 @@
 <article
   class="publication-entry reveal"
-  data-filter-item
-  data-filter="{{ include.publication.status | default: 'published' | downcase | slugify }}"
   data-search="{{ include.publication.title }} {{ include.publication.authors }} {{ include.publication.venue }} {{ include.publication.year }} {{ include.publication.topics | join: ' ' }}"
 >
   <div class="publication-entry__year">{{ include.publication.year }}</div>

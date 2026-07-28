@@ -1,11 +1,11 @@
 ---
 title: "Project title"
-summary: "One clear sentence describing what the project is and why it matters."
+summary: "One sentence saying what this is. Write it the way you would say it out loud."
 date: 2026-01-01
 status: "In development"
 role: "Your role"
 context: "Research"
-dates_display: "2026 — present"
+dates_display: "Since 2026"
 featured_rank: 99
 stack:
   - Method or technology

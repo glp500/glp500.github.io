@@ -22,18 +22,22 @@ const BACKENDS = [webllm, wllama]; // first match wins; wllama is the fallback
 // great deal when there is no GPU to hide it.
 const PLANNING_CTX = 4096;
 
-// Below this, constraining decoding to a grammar is the difference between
-// answering and timing out: llama.cpp evaluates the schema at every token, and
-// that measured roughly 15x per token on a CPU-only machine.
-const CONSTRAINT_MIN_TPS = 8;
+// A plan is about 40 tokens. Grammar is worth using whenever 40 tokens can
+// still be decoded well inside the harness's first attempt, so this is the
+// share of that attempt a constrained plan may consume before it stops being
+// worth the reliability it buys.
+// What a plan actually costs. Used for the grammar decision below and for
+// the harness's early-bail projection.
+export const PLAN_TOKENS = 40;
+const FIRST_ATTEMPT_MS = 80_000; // harness.js DEFAULTS.firstAttemptMs
+const CONSTRAINT_BUDGET_SHARE = 0.6;
 
 let backend = wllama;
 let loadedId = null;
 let loadedCtx = PLANNING_CTX;
 let info = null;
 let speed = null;
-let constraintWorks = false;
-let constraintAffordable = false;
+let constraint = { used: false, supported: false, plainTps: 0, grammarTps: 0, ratio: null, why: "not measured" };
 // Resolved promise chain that serialises generations onto the one context.
 let generationQueue = Promise.resolve();
 
@@ -76,13 +80,23 @@ export async function gpuCatalogue(hardware) {
 /**
  * Whether to constrain decoding to a JSON schema.
  *
- * Supported is not the same as worth it, and the deciding number is the machine's
- * measured decode rate rather than whether a GPU was detected — a WebGPU adapter
- * that ends up decoding on the CPU must not be charged the grammar's cost. The
- * validator in analysis.js is the real guarantee either way.
+ * A small model asked for JSON without a grammar answers in prose often enough
+ * that the harness spends both its attempts on repair and then falls back. So
+ * the question is not whether grammar is expensive, it is whether it is more
+ * expensive than being wrong, and that is a number about this machine.
+ *
+ * It is measured at load rather than assumed. The previous version refused
+ * grammar below 8 tok/s on the strength of a 15x figure measured before the
+ * context-contention bug was fixed, which is to say on a machine that was
+ * colliding with itself.
  */
 export function supportsConstraint() {
-  return constraintWorks && constraintAffordable;
+  return constraint.used;
+}
+
+/** The measurement behind that decision, for the diagnostics panel. */
+export function constraintReport() {
+  return constraint;
 }
 
 /**
@@ -126,20 +140,9 @@ export async function loadModel(model, hardware, handlers = {}) {
   speed = await measureSpeed();
   record("model.speed", speed);
 
-  constraintAffordable = Boolean(speed?.ok) && speed.tokensPerSecond >= CONSTRAINT_MIN_TPS;
-  if (constraintAffordable) {
-    onStage?.("Checking output constraints");
-    constraintWorks = await probeConstraint();
-  } else {
-    constraintWorks = false;
-  }
-  record("model.constraint", {
-    supported: constraintWorks,
-    used: supportsConstraint(),
-    why: constraintAffordable
-      ? `${speed.tokensPerSecond} tok/s is enough to pay for a grammar`
-      : `skipped: ${speed?.tokensPerSecond ?? 0} tok/s is below ${CONSTRAINT_MIN_TPS}`,
-  });
+  onStage?.("Checking output constraints");
+  constraint = await measureConstraint(speed);
+  record("model.constraint", constraint);
 
   // Only now is the model genuinely usable.
   //
@@ -155,37 +158,87 @@ export async function loadModel(model, hardware, handlers = {}) {
 }
 
 /**
- * Ask for one tiny constrained generation and see whether the build honours it.
- * Both backends accept a schema, but accepting it is not the same as binding to
- * it, so we measure instead of assuming.
+ * One constrained generation, which settles support and cost together.
+ *
+ * Accepting a schema is not the same as binding to it, so the reply has to be
+ * JSON and nothing else for support to count. The rate it decodes at is the
+ * grammar cost on this machine, which is the number the decision actually turns
+ * on. llama.cpp compiles the schema to a GBNF grammar and evaluates it at every
+ * token, so the cost is real; how large it is varies by machine and by schema,
+ * which is exactly why it is measured here instead of assumed.
+ *
+ * @param {{ok:boolean, tokensPerSecond:number}} plain the unconstrained baseline
  */
-async function probeConstraint() {
+export async function measureConstraint(plain, { streamFn = null } = {}) {
   const schema = {
     type: "object",
     properties: { ok: { type: "boolean" } },
     required: ["ok"],
     additionalProperties: false,
   };
+  const plainTps = plain?.ok ? plain.tokensPerSecond : 0;
+
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15_000);
+  const timer = setTimeout(() => controller.abort(), 20_000);
+  const began = performance.now();
+  let firstAt = 0;
+  let tokens = 0;
+  let text = "";
   try {
-    let text = "";
-    for await (const piece of chatStream({
-      messages: [{ role: "user", content: 'Reply with {"ok":true}' }],
-      maxTokens: 24,
-      schema,
-      signal: controller.signal,
-    })) {
+    const source = streamFn
+      ? streamFn({ schema })
+      : chatStream({
+          messages: [{ role: "user", content: 'Reply with {"ok":true}' }],
+          maxTokens: 24,
+          schema,
+          signal: controller.signal,
+        });
+    for await (const piece of source) {
+      if (piece && !firstAt) firstAt = performance.now();
+      if (piece) tokens += 1;
       text += piece;
     }
-    const trimmed = text.trim();
-    // If the constraint bound, the reply is JSON and nothing else.
-    return trimmed.startsWith("{") && JSON.parse(trimmed)?.ok !== undefined;
   } catch {
-    return false;
+    /* a failed probe means no measurement, which the decision below handles */
   } finally {
     clearTimeout(timer);
   }
+
+  const trimmed = text.trim();
+  let supported = false;
+  try {
+    supported = trimmed.startsWith("{") && JSON.parse(trimmed)?.ok !== undefined;
+  } catch {
+    supported = false;
+  }
+
+  const decodeMs = firstAt ? performance.now() - firstAt : 0;
+  const grammarTps =
+    tokens > 1 ? +((tokens - 1) / Math.max(decodeMs / 1000, 0.001)).toFixed(2) : 0;
+  // Two decimals, not one: a ratio can land below 0.05 on a fast machine, and
+  // rounding it to "0.0" throws away the only number that explains the verdict.
+  const ratio = grammarTps > 0 && plainTps > 0 ? +(plainTps / grammarTps).toFixed(2) : null;
+
+  if (!supported) {
+    return { used: false, supported: false, plainTps, grammarTps, ratio, why: "the build did not bind the schema" };
+  }
+
+  // Worth it whenever a whole plan still decodes inside the harness's first
+  // attempt with room to spare.
+  const planMs = grammarTps > 0 ? (PLAN_TOKENS / grammarTps) * 1000 : Infinity;
+  const ceiling = FIRST_ATTEMPT_MS * CONSTRAINT_BUDGET_SHARE;
+  const used = planMs <= ceiling;
+
+  return {
+    used,
+    supported: true,
+    plainTps,
+    grammarTps,
+    ratio,
+    why: used
+      ? `a ${PLAN_TOKENS}-token plan decodes in about ${Math.round(planMs / 1000)}s with the grammar on`
+      : `a ${PLAN_TOKENS}-token plan would take about ${Math.round(planMs / 1000)}s with the grammar on, past the ${Math.round(ceiling / 1000)}s this may spend`,
+  };
 }
 
 /** One short generation, purely to time this machine. */
@@ -225,8 +278,7 @@ export async function unloadModel() {
   loadedId = null;
   info = null;
   speed = null;
-  constraintWorks = false;
-  constraintAffordable = false;
+  constraint = { used: false, supported: false, plainTps: 0, grammarTps: 0, ratio: null, why: "not measured" };
 }
 
 /**

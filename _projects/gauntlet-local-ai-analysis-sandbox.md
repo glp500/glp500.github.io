@@ -1,5 +1,5 @@
 ---
-title: "Gauntlet — Local AI Analysis Sandbox"
+title: "Gauntlet: a local AI analysis sandbox"
 summary: "An experimental Story Machines prototype that turns a task and local tabular inputs into an inspectable Python analysis bundle."
 date: 2026-04-29
 status: "Experimental prototype"
@@ -36,7 +36,7 @@ visuals:
     source_url: "https://github.com/glp500/Gauntlet"
     source_label: "Public repository"
 ---
-Gauntlet explores a narrow version of agentic analysis: a person supplies a task and local CSV files, the system generates a small Python bundle, and that bundle runs inside a per-run workspace whose artifacts can be inspected afterward.
+Gauntlet is a deliberately narrow version of agentic analysis. You supply a task and some local CSV files, it writes a small Python bundle, and the bundle runs in a workspace of its own, so everything it did is still sitting there when you want to check it.
 
 ## Question
 
@@ -44,8 +44,8 @@ Can a local AI analysis tool remain useful while making its generated code, exec
 
 ## Approach
 
-The prototype separates prompt refinement, bundle generation, sandbox execution, and artifact collection. It supports several model backends—including local runtimes—without treating the model response itself as the final analytical product.
+Prompt refinement, bundle generation, sandbox execution and artifact collection are separate stages. Several model backends work, local runtimes included, and none of them get to treat the model's reply as the finished analysis.
 
 ## Current state
 
-Gauntlet is an experimental Story Machines prototype, not a production security boundary or an autonomous research system. The public repository records a workflow snapshot and sample run structure.
+An experimental Story Machines prototype. It is not a production security boundary and not an autonomous research system, and I would not describe it as either. The public repository holds a workflow snapshot and a sample run structure.

@@ -42,7 +42,7 @@ export async function probeHardware() {
       });
       if (!adapter) {
         report.notes.push(
-          "WebGPU is present but no GPU was granted — usually disabled or blocklisted."
+          "WebGPU is present but no GPU was granted. It is usually disabled or blocklisted."
         );
       } else {
         report.webgpu = true;

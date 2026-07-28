@@ -322,7 +322,7 @@ function scatterModel(spec, table) {
       .map(([g]) => g);
     groups = ordered.slice(0, ALL_PAIRS_SERIES_CAP);
     if (ordered.length > ALL_PAIRS_SERIES_CAP) {
-      warning = `${ordered.length - ALL_PAIRS_SERIES_CAP} smaller groups folded into "Other" — scatter caps at ${ALL_PAIRS_SERIES_CAP} colours for colourblind safety.`;
+      warning = `${ordered.length - ALL_PAIRS_SERIES_CAP} smaller groups folded into "Other". A scatter caps at ${ALL_PAIRS_SERIES_CAP} colours, because past that two of them stop being tellable apart under colourblind safety checks.`;
     }
   }
   const colour = groups

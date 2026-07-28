@@ -22,7 +22,7 @@ export async function readTable(file) {
     throw new IngestError(
       `That file is ${(file.size / 1024 ** 2).toFixed(0)} MB. The Mini-Lab reads up to ${
         MAX_FILE_BYTES_IN / 1024 ** 2
-      } MB in the browser — take a sample of it first.`
+      } MB in the browser. Take a sample of it first.`
     );
   }
   return readTableInner(file);

@@ -35,7 +35,7 @@ visuals:
     caption: "De-identified benchmark diagram. It communicates the comparison contract without publishing private code or participant data."
     source_url: ""
 ---
-This benchmark asks whether methods that explicitly optimize shared cross-view structure produce representations that survive resampling better than methods focused on explained variance alone.
+If a method explicitly optimizes shared cross-view structure, does the representation it produces survive resampling any better than one built for explained variance alone? That is the whole question here.
 
 ## Question
 
@@ -43,8 +43,8 @@ Which latent representations are stable, sample-efficient, and useful for downst
 
 ## Approach
 
-The study separates fold-safe data preparation, benchmark execution, aggregate evaluation, and visualization. Linear and optional nonlinear methods share the same split discipline and reporting contract.
+Fold-safe data preparation, benchmark execution, aggregate evaluation and visualization are kept apart. Linear and nonlinear methods run under the same split discipline and report against the same contract, which is the only way the numbers can be set beside each other.
 
 ## Current state
 
-The approved summary covers the benchmark architecture and research claim. It does not present a universal winning method where the underlying study has not established one.
+What I can show publicly is the benchmark architecture and the research claim. I am not going to name a winning method, because the study underneath has not established one.

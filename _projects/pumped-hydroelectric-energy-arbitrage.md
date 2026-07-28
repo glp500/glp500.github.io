@@ -44,7 +44,7 @@ visuals:
     source_url: "https://github.com/glp500/Dam-Energy-Stock-Trading-with-Q-Learning/blob/main/Code/DQN%20Agent%20(Updated)/training_result.png"
     source_label: "Original result"
 ---
-The environment represents a pumped-hydroelectric reservoir operating against hourly electricity prices. The state includes reservoir volume, price, hour, day, month, and year.
+The environment is a pumped-hydroelectric reservoir trading against hourly electricity prices. Its state is the reservoir volume, the current price, and the hour, day, month and year.
 
 ## Question
 
@@ -52,8 +52,8 @@ Can a reinforcement-learning agent learn when to purchase electricity to pump wa
 
 ## Approach
 
-Positive actions pump water and incur an electricity cost; negative actions release water through the generator and earn revenue. The updated code trains a Double DQN with replay memory, a target network, validation runs, and warm-up experience from a rule-informed baseline.
+A positive action pumps water uphill and costs electricity; a negative one releases it through the generator and earns revenue. I train a Double DQN with replay memory and a target network, run validation episodes alongside, and warm the buffer up with experience from a rule-informed baseline so early training is not pure flailing.
 
 ## Results
 
-The repository includes a training-versus-validation reward image from a 100-episode run. The chart is shown as an experimental snapshot, not evidence of deployment performance or economic profitability outside the supplied simulation.
+The repository has a training-versus-validation reward chart from a 100-episode run. Take it as a snapshot of an experiment. It says nothing about how this would behave outside the supplied simulation, and nothing at all about whether it would make money.

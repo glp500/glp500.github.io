@@ -37,11 +37,11 @@ visuals:
   - type: diagram
     src: /assets/images/projects/pso-game-agents.svg
     alt: "A particle population updating candidate neural controllers through individual and collective search"
-    caption: "Explanatory diagram of the project’s optimization loop; gameplay is available in the embedded demonstration."
+    caption: "Explanatory diagram of the project's optimization loop. Gameplay is in the embedded demonstration."
     source_url: "https://github.com/glp500/Particle-Swarm-Optimisation-for-RL-Game-Environments"
     source_label: "Public repository"
 ---
-This collaborative graduate project uses the Evoman framework as a testbed for optimization algorithms. Candidate neural controllers are represented as particles whose updates combine individual and population-level search.
+A group project from my MSc, using the Evoman framework as a testbed for optimization algorithms. Each candidate neural controller is a particle, and its updates mix what that particle has found with what the population has.
 
 ## Question
 
@@ -49,8 +49,8 @@ How do baseline and adaptive particle-swarm strategies behave when optimizing sp
 
 ## Approach
 
-The repository contains several PSO variants, experimental scripts, competition-result processing, and an Evoman environment. The page describes the shared project without assigning unsupported individual contributions to team members.
+The repository holds several PSO variants, the experimental scripts, competition-result processing and an Evoman environment. It was shared work, so I have not tried to separate out who contributed what.
 
 ## Demonstration
 
-The embedded video shows a trained agent interacting with the game environment. It is evidence of the implemented controller pipeline, not by itself a comparative performance result.
+The video shows a trained agent playing. It is evidence that the controller pipeline works end to end, and nothing more than that; it settles no comparison between the variants.

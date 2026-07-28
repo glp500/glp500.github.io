@@ -1,7 +1,7 @@
 name: Gavin Lip
 title: "Cybernetic Systems, Cultural AI, and Informatics"
-summary: "I study how intelligence, coordination, and culture emerge from interacting people, machines, and institutions."
-bio: "Lifelong learner with experience in computational modelling, multimodal data integration, and transparent artificial intelligence systems for complex real-world contexts. I am drawn to interdisciplinary and open-source projects that make technical systems more legible, useful, and accountable."
+summary: "I study how coordination emerges between people, machines and the institutions they build, and where computational models of it clarify the thing or obscure it."
+bio: "I build computational models, put multimodal data together, and try to leave the result inspectable by someone who did not write it. Most of the work has happened in labs and archives rather than products, and most of it is open source."
 
 images:
   portrait: /assets/images/gavin-lip-portrait.webp
@@ -23,7 +23,7 @@ cv:
   download_url: /assets/docs/gavin-lip-cv.pdf
 
 experience:
-  - dates: Feb 2026 — Jul 2026
+  - dates: Feb 2026 to Jul 2026
     role: AI Research Intern
     institution: Center for Neurogenomics & Cognitive Research
     summary: "Clustered patient features using pairwise correlation similarity to identify stable, prevalent features across a patient cohort. Developed low-dimensional multi-view representations for visualization, downstream modelling, and patient stratification."
@@ -31,15 +31,15 @@ experience:
       - Multi-view learning
       - Patient stratification
       - Computational modelling
-  - dates: Dec 2024 — Dec 2025
+  - dates: Dec 2024 to Dec 2025
     role: AI Research Assistant
     institution: Netherlands Royal Academy of Arts & Sciences
-    summary: "Developed a machine-learning pipeline for boundary detection in archival collections, integrating multiple signals to model document membership at page-scan level. Framed multimodal archival data with historians to support accessible computational analysis of UNESCO-listed colonial archives."
+    summary: "Developed a machine-learning pipeline for boundary detection in archival collections, integrating multiple signals to model document membership at page-scan level. Worked with historians to frame the archival data, so the colonial archives it covers could be read computationally without losing what the historians needed from them."
     methods:
       - Machine learning
       - Multimodal archival data
       - Boundary detection
-  - dates: Sep 2024 — Oct 2025
+  - dates: Sep 2024 to Oct 2025
     role: Data Science Research Assistant
     institution: Network Institute
     summary: "Built a pipeline that transformed documents into validated, queryable datasets through schema-constrained extraction and structured-output parsing, supporting quantitative, historical, and network-oriented research."
@@ -47,7 +47,7 @@ experience:
       - Structured extraction
       - Data validation
       - Computational history
-  - dates: Dec 2023 — Jul 2024
+  - dates: Dec 2023 to Jul 2024
     role: AI Research Intern
     institution: Netherlands Royal Academy of Arts & Sciences
     summary: "Designed a reproducible framework for fine-tuning and evaluating large language models for Early Modern Dutch translation, comparing model variants with preference-based and parameter-efficient methods."
@@ -57,7 +57,7 @@ experience:
       - Reproducible research
 
 education:
-  - dates: Sep 2024 — Jul 2026
+  - dates: Sep 2024 to Jul 2026
     degree: Master of Science, Artificial Intelligence
     institution: Vrije Universiteit Amsterdam
     thesis: "Multi-view Learning for High-Dimensional & Heterogeneous EEG & Phenotype Data"
@@ -66,7 +66,7 @@ education:
       - Advanced Machine Learning
       - Neural Models of Cognition
       - Reinforcement Learning
-  - dates: Sep 2021 — Jul 2024
+  - dates: Sep 2021 to Jul 2024
     degree: Bachelor of Science, Artificial Intelligence
     institution: Vrije Universiteit Amsterdam
     thesis: "Fine-Tuning Large-Language Models for Early Modern Dutch Translation"
@@ -88,21 +88,21 @@ skills:
   - title: Research Practice
     items:
       - Experimental design
-      - Applied computational thinking
+      - Reproducible pipelines
       - Technical writing
-      - System-based problem-solving
+      - Working with historians and domain experts
   - title: Building & Collaboration
     items:
       - Python, C++ & Java
       - Pandas & Matplotlib
       - Project management
-      - Interdisciplinary communication
+      - Technical documentation
 
 interests:
   - Bouldering, climbing & outdoor activities
   - Sound design & music production
   - Board games
-  - Creative, collaborative technology projects
+  - Building things with other people
 
 featured:
   research_limit: 3

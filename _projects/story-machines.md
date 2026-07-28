@@ -1,11 +1,11 @@
 ---
 title: "Story Machines"
-summary: "Building local AI tools for institutions that need to work with their own digital knowledge without surrendering its context."
+summary: "Local AI tools for institutions that want to work with their own records without losing track of where any of it came from."
 date: 2026-06-01
 status: "In development"
 role: "Co-founder"
 context: "Startup"
-dates_display: "2026 — present"
+dates_display: "Since 2026"
 featured_rank: 1
 stack:
   - Local AI
@@ -19,7 +19,7 @@ topics:
 outcomes: []
 featured: true
 image: /assets/images/projects/story-machines.svg
-image_alt: "Diagram of local institutional knowledge nodes converging into a provenance-preserving Story Machines workspace"
+image_alt: "Diagram of institutional collections connected to a local AI workspace that keeps their sources attached"
 demo_url: ""
 repo_url: ""
 paper_url: ""
@@ -32,18 +32,18 @@ visuals:
     caption: "Concept diagram: local collections remain connected to their sources while people and AI tools work across them."
     source_url: ""
 ---
-Story Machines is an early-stage project building local AI tools for institutional digital ecosystems. It focuses on helping organizations connect, interpret, and work with their own knowledge while preserving provenance, privacy, and the social context that gives information meaning.
+Story Machines is early. I am building local AI tools for institutions that hold a great deal of their own material and cannot hand it to somebody else's server. The hard part has not been the model. It is keeping provenance attached to things as they move around, and not flattening the situated knowledge of the people who actually maintain the collection.
 
-The work combines technical prototyping with a larger design question: what should an intelligent institutional memory feel like to the people who sustain it?
+Underneath the prototyping sits a design question I have not answered: what should an intelligent institutional memory feel like to the people who sustain it?
 
 ## Question
 
-How can organizations use local AI across their digital ecosystems without giving up provenance, privacy, or the situated knowledge of the people who maintain those systems?
+How can an organization use local AI across its own systems without giving up provenance, privacy, or the situated knowledge of the people who maintain them?
 
 ## Approach
 
-The current work combines local model infrastructure, structured knowledge services, and interfaces for inspecting where generated material came from. It remains an early-stage venture rather than a finished product.
+Local model infrastructure, structured knowledge services, and an interface that shows where any generated passage came from. It is a prototype. I would not run an institution on it yet.
 
 ## Current state
 
-Story Machines is in development. Public material is intentionally limited while the product direction and institutional partnerships are being formed.
+Still in development. I am keeping the public material thin while the direction is still moving.

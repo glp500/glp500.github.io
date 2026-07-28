@@ -3,7 +3,7 @@ title: Experience / CV
 layout: default
 nav_key: experience
 world_mode: experience
-description: Gavin Lip's research experience, education, methods, skills, publication, and interests.
+description: Where I have worked and studied, what I use, and what I do when I am not doing this.
 ---
 {% assign profile = site.data.profile %}
 {% include page-hero.html mode="experience" %}

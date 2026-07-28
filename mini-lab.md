@@ -28,7 +28,7 @@ description: Small language models running locally in your browser over WebGPU, 
 
         <div class="ml-setup">
           <h2>Model</h2>
-          <p class="ml-status" data-model-progress>Optional — the analysis runs without one.</p>
+          <p class="ml-status" data-model-progress>Optional. The analysis runs without one.</p>
           <ul class="ml-models" data-models></ul>
           <div class="ml-actions">
             <button type="button" data-load-model disabled>Checking…</button>
@@ -117,7 +117,7 @@ description: Small language models running locally in your browser over WebGPU, 
         <div data-panel="retrieval" hidden>
           <section class="ml-step is-open">
             <h2>Retrieval &amp; knowledge graphs</h2>
-            <p>In development. The same local model pointed at literature and code rather than tables — drop in a paper and build outward from it, over OpenAlex, arXiv, Crossref and GitHub.</p>
+            <p>In development. The same local model pointed at literature and code rather than tables. Drop in a paper and build outward from it, over OpenAlex, arXiv, Crossref and GitHub.</p>
             <p class="ml-caveat">Nothing is wired up yet, so no results are shown.</p>
           </section>
         </div>

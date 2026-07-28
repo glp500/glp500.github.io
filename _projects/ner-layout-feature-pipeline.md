@@ -5,7 +5,7 @@ date: 2025-08-25
 status: "Completed research pipeline"
 role: "AI Research Assistant · KNAW"
 context: "Research"
-dates_display: "2024 — 2025"
+dates_display: "2024 to 2025"
 featured: false
 stack:
   - Named entity recognition
@@ -36,7 +36,7 @@ visuals:
     source_url: "https://github.com/glp500/NER-Feature-Extraction-for-Downstream-Document-Analysis"
     source_label: "Public repository"
 ---
-This project creates the data layer used by downstream archival document modelling. It is separate from the segmentation project: its primary output is an aligned, inspectable feature dataset rather than a trained boundary classifier.
+This is the data layer that the archival document modelling sits on. It is separate work from the segmentation project: what comes out of it is an aligned feature dataset you can look through, not a trained boundary classifier.
 
 ## Question
 
@@ -44,8 +44,8 @@ How can heterogeneous annotations and page-layout records be joined without losi
 
 ## Approach
 
-The pipeline merges inventory data, XMI named-entity annotations, PAGE XML structure, and boundary labels. Cleaning stages remove ambiguous duplicate references, enhance boundary annotations, and create separate training and unseen-test materials.
+The pipeline merges inventory data, XMI named-entity annotations, PAGE XML structure and the boundary labels. Cleaning removes ambiguous duplicate references and firms up the boundary annotations, then splits training material from an unseen test set.
 
 ## Outcome
 
-The result is a reusable feature and quality-control workflow for later modelling. Repository notebooks support inspection and correction rather than hiding the dataset-generation process behind a single export.
+What is left is a reusable feature and quality-control workflow for the modelling that comes after. I kept the notebooks in the repository so the dataset can be inspected and corrected, instead of the whole generation process disappearing behind one export.

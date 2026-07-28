@@ -37,7 +37,7 @@ visuals:
     caption: "De-identified aggregate result summary from the approved private study. Strong developmental signal did not translate into a supported symptom-deviation relationship."
     source_url: ""
 ---
-This study asks whether a representation that clearly tracks neurodevelopmental age also captures dimensional clinical variation once age and sex are handled out of sample.
+A representation can track neurodevelopmental age very well and still tell you nothing clinical. I wanted to find out whether this one does, once age and sex are handled out of sample rather than regressed away in place.
 
 ## Question
 
@@ -45,8 +45,8 @@ Does deviation from age-expected source-space EEG structure align with transdiag
 
 ## Approach
 
-Source-space EEG biomarkers are aggregated into network-by-band features. Clinical dimensions are constructed separately, an EEG-to-age model is evaluated on held-out participants, and developmental-deviation scores are cross-fitted before testing symptom associations with multiple-testing correction.
+I aggregate source-space EEG biomarkers into network-by-band features and build the clinical dimensions separately, so neither is fitted to the other. The EEG-to-age model is scored on held-out participants, the developmental-deviation scores are cross-fitted, and only then do I test symptom associations, with correction for multiple testing.
 
 ## Results
 
-In the approved aggregate analysis, EEG strongly encoded age (held-out R² approximately 0.62; Spearman ρ approximately 0.79). The age-adjusted developmental deviation did not significantly track the clinical symptom dimensions after false-discovery-rate correction. That null result is central to the study rather than treated as a failed visualization.
+In the approved aggregate analysis, EEG strongly encoded age (held-out R² approximately 0.62; Spearman ρ approximately 0.79). The age-adjusted developmental deviation did not significantly track the clinical symptom dimensions after false-discovery-rate correction. The null is the finding. I have not filed it away as a figure that did not work out.

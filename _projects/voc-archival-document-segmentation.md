@@ -5,7 +5,7 @@ date: 2025-08-24
 status: "Completed research prototype"
 role: "AI Research Assistant · KNAW"
 context: "Research"
-dates_display: "2024 — 2025"
+dates_display: "2024 to 2025"
 featured: true
 featured_rank: 5
 stack:
@@ -38,7 +38,7 @@ visuals:
     source_url: "https://github.com/glp500/Multi-View-Learning-for-Archival-Document-Segmentation"
     source_label: "Public repository"
 ---
-This project frames archival segmentation as a page-sequence classification problem. Each scan is assigned a state—NONE, START, MIDDLE, or END—so sequences can be reconstructed into candidate documents.
+I framed archival segmentation as a page-sequence classification problem. Every scan gets one of four states (NONE, START, MIDDLE or END), and the sequences can then be reassembled into candidate documents.
 
 ## Question
 
@@ -46,8 +46,8 @@ Can layout structure, named entities, linguistic annotations, and neighbouring-p
 
 ## Approach
 
-The public pipeline builds more than sixty engineered signals from PAGE XML layout data, XMI annotations, and page sequence context. It compares logistic regression, random forest, XGBoost, neural-network, and support-vector approaches.
+The public pipeline builds more than sixty engineered signals out of PAGE XML layout data, XMI annotations and the surrounding page sequence, then puts logistic regression, random forest, XGBoost, a neural network and support-vector approaches against each other on them.
 
 ## Evidence
 
-The repository contains model notebooks with confusion matrices, feature analysis, and comparison outputs. This page uses a pipeline diagram rather than publishing a performance headline because a single canonical model result is not established in the public repository.
+The repository has the model notebooks, with confusion matrices, feature analysis and comparison outputs. I have put a pipeline diagram here instead of a performance headline, because the public repository does not settle on one canonical result and I am not going to invent one for a portfolio page.

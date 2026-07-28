@@ -36,7 +36,7 @@ visuals:
     source_url: "https://github.com/glp500/Document-to-ConceptNet"
     source_label: "Public repository"
 ---
-This graduate group project transforms information extracted from research papers into a small semantic representation connected through ConceptNet.
+A group project from my MSc. We pulled information out of research papers and turned it into a small semantic representation, wired together through ConceptNet.
 
 ## Question
 
@@ -44,8 +44,8 @@ Can commonsense embeddings and explicit RDF relations help connect extracted des
 
 ## Approach
 
-The workflow extracts fields from papers, computes degrees of relatedness with ConceptNet Numberbatch, and generates Turtle instances from the structured output.
+The workflow pulls fields out of each paper, scores how related they are using ConceptNet Numberbatch, and writes Turtle instances from the structured output.
 
 ## Context
 
-The page identifies this as collaborative coursework and does not assign unverified individual responsibilities or collaborator names.
+This was coursework, and it was collaborative. I have not carved up who did which part, because I cannot verify that from the repository.

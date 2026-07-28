@@ -5,7 +5,7 @@ date: 2025-07-14
 status: "Research prototype"
 role: "Data Science Research Assistant · Network Institute"
 context: "Research"
-dates_display: "2024 — 2025"
+dates_display: "2024 to 2025"
 featured: true
 featured_rank: 4
 stack:
@@ -38,7 +38,7 @@ visuals:
     source_url: "https://github.com/glp500/Multi-Shot-Inference-for-NER-and-Relational-Database-Mapping"
     source_label: "Public repository"
 ---
-At the Network Institute, this project supported researchers who needed to move from document collections to structured datasets suitable for quantitative, historical, and network-oriented analysis.
+I built this at the Network Institute, for researchers sitting on a pile of documents who needed a dataset they could actually query, count and draw a network from.
 
 ## Question
 
@@ -46,8 +46,8 @@ How can generative extraction produce data that is convenient to use without hid
 
 ## Approach
 
-The Streamlit application sends document content through a schema-constrained extraction process, validates the structured response, and separates it into related tables. The interface makes the transformation inspectable before the data enters downstream analysis.
+The Streamlit app pushes document content through schema-constrained extraction, validates whatever comes back, and splits it into related tables. You can see the transformation before the data goes anywhere near an analysis.
 
 ## Current state
 
-This is a research prototype. It demonstrates the extraction and relational-mapping workflow but is not presented as a general-purpose document understanding service.
+A research prototype. It shows that the extraction and relational-mapping workflow holds together. Point it at documents unlike the ones it was built for and I would expect it to struggle.

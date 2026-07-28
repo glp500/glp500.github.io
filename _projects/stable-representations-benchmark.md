@@ -35,11 +35,11 @@ visuals:
     caption: "De-identified methods diagram based on the approved private benchmark; no participant records or private paths are shown."
     source_url: ""
 ---
-This study treats feature selection as a representation-stability problem rather than only a search for the highest classification score.
+I treat feature selection here as a question about representation stability, not as a hunt for the highest classification score.
 
 ## Question
 
-Can fixed Leiden feature communities support raw-feature selections that remain compact, stable, interpretable, and useful across resampling?
+Can fixed Leiden feature communities support raw-feature selections that stay small and stable across resampling, and still mean something to a reader?
 
 ## Approach
 
@@ -47,4 +47,4 @@ Mixed-type associations are estimated inside the training data, features are par
 
 ## Evidence policy
 
-The public page describes the validated methodology and aggregate study purpose. It does not expose private code, participant-level data, or internal filesystem information.
+I can describe the validated methodology and what the study was for. The code, the participant-level data and the internal paths stay private.

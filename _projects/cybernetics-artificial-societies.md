@@ -1,11 +1,11 @@
 ---
 title: "Cybernetics & Artificial Societies"
-summary: "Researching how feedback, adaptation, and coordination emerge in societies of artificial agents—and what those models reveal about collective behaviour."
+summary: "How feedback and adaptation produce coordination in societies of artificial agents, and how far the models can be trusted."
 date: 2026-07-01
 status: "Active research"
 role: "Research assistant project"
 context: "Research"
-dates_display: "2026 — present"
+dates_display: "Since 2026"
 stack:
   - Agent-based modelling
   - Cybernetics
@@ -33,9 +33,9 @@ visuals:
     caption: "Explanatory diagram: local interactions, aggregate patterns, and feedback form a coupled artificial society."
     source_url: ""
 ---
-This project investigates the relationship between cybernetic ideas and artificial societies. It asks how simple agent rules produce group-level patterns, how feedback changes those patterns over time, and where computational models clarify—or obscure—the social systems they represent.
+I am reading cybernetics against artificial societies: how simple agent rules produce group-level patterns, how feedback bends those patterns over time, and where a computational model clarifies the social system it represents rather than obscuring it.
 
-The current phase is exploratory. As the work develops, this page can hold model architecture notes, experiments, visualizations, and formal research outputs.
+This is still exploratory.
 
 ## Question
 
@@ -43,8 +43,8 @@ When do local adaptation and feedback produce collective behaviour that is meani
 
 ## Approach
 
-The project uses agent-based modelling, network descriptions, and cybernetic analysis to compare local rules with the collective structures they produce.
+Agent-based modelling and network description, read through cybernetic analysis, so that local rules can be compared against the collective structures they end up producing.
 
 ## Current state
 
-This is a current research-assistant project. Its institutional setting and formal outputs are not listed until they can be confirmed publicly.
+This is a research-assistant project I am working on now. I have left the institutional setting and the formal outputs off until I can point at something public.
