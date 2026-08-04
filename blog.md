@@ -21,3 +21,30 @@ description: Project updates, notes, and whatever else is worth writing down.
     {% endif %}
   </div>
 </section>
+
+{% assign listening = site.data.listening %}
+{% if listening.tracks and listening.tracks.size > 0 %}
+  <section class="listening">
+    <div class="shell">
+      <div class="listening__panel">
+        <p class="kicker">Lately</p>
+        <ul class="listening__list">
+          {% for track in listening.tracks %}
+            <li>
+              <span class="listening__title">
+                {% if track.url and track.url != "" %}
+                  <a href="{{ track.url }}" target="_blank" rel="noreferrer">{{ track.title }}</a>
+                {% else %}{{ track.title }}{% endif %}
+              </span>
+              <span class="listening__artist">{{ track.artist }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+        <p class="listening__note">
+          Recently played, refreshed hourly from Spotify by a scheduled job.
+          Nothing is requested from your browser.
+        </p>
+      </div>
+    </div>
+  </section>
+{% endif %}

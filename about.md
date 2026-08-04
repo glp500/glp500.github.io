@@ -25,6 +25,37 @@ description: Who I am, where I have worked and studied, what I use, and what I d
   </div>
 </section>
 
+{% comment %}
+  Expertise and Foundation: what the work is now, and what it grew out of.
+  The two paragraphs below are placeholders assembled from _data/profile.yml
+  for Gavin to rewrite in his own words. The tool marks between them come from
+  _data/toolmarks.yml.
+{% endcomment %}
+<section class="standing">
+  <div class="shell">
+    <div class="standing__grid">
+      <div class="standing__half">
+        <p class="kicker">Expertise</p>
+        <h2>What I work on</h2>
+        <p>{{ profile.summary }}</p>
+      </div>
+      <div class="standing__half">
+        <p class="kicker">Foundation</p>
+        <h2>Where it comes from</h2>
+        <p>Most of the work has happened in labs and archives rather than products, alongside historians and domain experts. Working from the archive end is what makes me build things that stay inspectable by someone who did not write them.</p>
+      </div>
+    </div>
+    <ul class="toolmarks" aria-label="Tools I build with">
+      {% for mark in site.data.toolmarks %}
+        <li>
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><path d="{{ mark.path }}"/></svg>
+          <span>{{ mark.label }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
 <section class="cv-section section-rule">
   <div class="shell">
     <div class="cv-section__heading"><h2>Research experience</h2></div>
@@ -84,19 +115,5 @@ description: Who I am, where I have worked and studied, what I use, and what I d
         </article>
       {% endfor %}
     </div>
-  </div>
-</section>
-
-<section class="cv-interests">
-  <div class="shell cv-interests__grid">
-    <div>
-      <p class="kicker">Outside the formal record</p>
-      <h2>Interests keep the method porous.</h2>
-    </div>
-    <ol>
-      {% for item in profile.interests %}
-        <li><span>0{{ forloop.index }}</span>{{ item }}</li>
-      {% endfor %}
-    </ol>
   </div>
 </section>

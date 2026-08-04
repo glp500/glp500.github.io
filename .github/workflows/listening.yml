@@ -1,0 +1,53 @@
+# Refreshes the listening strip on /blog/.
+#
+# One-time setup:
+#   1. Create an app at https://developer.spotify.com/dashboard and note its
+#      Client ID and Client Secret. Add a redirect URI of
+#      http://127.0.0.1:8888/callback
+#   2. Get a refresh token with the user-read-recently-played scope. The
+#      shortest route is the authorization-code flow once, by hand; any of the
+#      published one-off helper scripts will do it.
+#   3. Add three repository secrets under Settings -> Secrets and variables ->
+#      Actions:  SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REFRESH_TOKEN
+#
+# Until those exist the script writes nothing and the strip stays hidden, so
+# merging this workflow early is harmless.
+
+name: Refresh listening
+
+on:
+  schedule:
+    - cron: "17 * * * *" # hourly, off the hour to avoid the busy minute
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: listening
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch recently played
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+          SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+        run: python3 tools/spotify_recent.py
+
+      - name: Commit if it changed
+        run: |
+          if [ -n "$(git status --porcelain _data/listening.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add _data/listening.json
+            git commit -m "Refresh listening"
+            git push
+          else
+            echo "no change"
+          fi

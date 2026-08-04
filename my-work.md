@@ -31,17 +31,12 @@ description: Studies, tools and experiments, with the code behind them.
   </div>
 </section>
 
-{% assign field_labels = site.data.fields | map: "label" %}
-{% assign context_options = items | map: "context" | compact | uniq | sort %}
-{% assign filter_options = field_labels | concat: context_options %}
-<section class="archive-section" data-filter-root>
+<section class="archive-section">
   <div class="shell">
-    {% include filter-controls.html label="Filter by field or context" placeholder="Search titles, methods, and topics" options=filter_options %}
-    <div class="project-ledger">
+    <div class="project-grid">
       {% for project in ordered %}
-        {% include project-ledger-item.html project=project index=forloop.index %}
+        {% include project-tile.html project=project %}
       {% endfor %}
     </div>
-    <div class="filter-empty" data-filter-empty hidden>Nothing matches this combination.</div>
   </div>
 </section>

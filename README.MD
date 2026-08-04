@@ -42,7 +42,7 @@ A post supports a lead image, a gallery, an embedded or self-hosted video, and t
 
 `/my-work/` is the single archive for research, projects, and code. Research, Projects, and Open Source used to be three separate destinations; `/research/`, `/projects/`, and `/open-source/` now redirect here. Project detail URLs (`/projects/<slug>/`) are unchanged.
 
-The page opens with a skills and tech-stack panel, then the full ledger with one filter row combining research fields and project contexts. Each ledger row links its repository directly, which is why there is no longer a separate open-source list.
+The page opens with a skills and tech-stack panel, then the projects as a two-column grid of media-led tiles. Each tile links its repository directly, which is why there is no longer a separate open-source list. There is no filter row: at this number of projects it was furniture, and `_includes/filter-controls.html` is still there if the set grows.
 
 A project earns a page by having something real to show. Entries with neither genuine figures nor a public repository were removed rather than carried on placeholder art; see `HANDOFF.md`.
 

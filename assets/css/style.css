@@ -315,7 +315,7 @@ body:not(.page-home) .page-fg {
 
    Keep this list and the ::before list below in step. */
 .feed-card,
-.project-ledger__item,
+.project-tile,
 .publication-entry,
 .media-card,
 .cv-entry,
@@ -323,6 +323,7 @@ body:not(.page-home) .page-fg {
 .skill-card,
 .empty-state,
 .skills-panel,
+.listening__panel,
 .article-sheet,
 .detail-body aside,
 .publication-copy > section,
@@ -341,7 +342,7 @@ body:not(.page-home) .page-fg {
 }
 
 .feed-card::before,
-.project-ledger__item::before,
+.project-tile::before,
 .publication-entry::before,
 .media-card::before,
 .cv-entry::before,
@@ -349,6 +350,7 @@ body:not(.page-home) .page-fg {
 .skill-card::before,
 .empty-state::before,
 .skills-panel::before,
+.listening__panel::before,
 .article-sheet::before,
 .detail-body aside::before,
 .publication-copy > section::before,
@@ -373,7 +375,7 @@ body:not(.page-home) .page-fg {
    land on flat smoked glass: same colour, no window. */
 @media (hover: none), (pointer: coarse), (prefers-reduced-transparency: reduce) {
   .feed-card::before,
-  .project-ledger__item::before,
+  .project-tile::before,
   .publication-entry::before,
   .media-card::before,
   .cv-entry::before,
@@ -381,6 +383,7 @@ body:not(.page-home) .page-fg {
   .skill-card::before,
   .empty-state::before,
   .skills-panel::before,
+  .listening__panel::before,
   .article-sheet::before,
   .detail-body aside::before,
   .publication-copy > section::before,
@@ -930,7 +933,6 @@ body.page-home {
 }
 
 .feed-list,
-.project-ledger,
 .publication-ledger {
   display: grid;
 }
@@ -938,7 +940,6 @@ body.page-home {
 /* Rows are panes now, so they are separated by air rather than by a rule.
    Padding and borders come from the pane recipe above. */
 .feed-list,
-.project-ledger,
 .publication-ledger,
 .cv-timeline {
   gap: var(--s3);
@@ -975,14 +976,12 @@ body.page-home {
 
 .feed-card h2 a,
 .publication-entry h2 a,
-.project-ledger__main h3 a,
 .media-card h2 a {
   text-decoration: none;
 }
 
 .feed-card h2 a:hover,
 .publication-entry h2 a:hover,
-.project-ledger__main h3 a:hover,
 .media-card h2 a:hover {
   text-decoration: underline;
   text-decoration-color: var(--accent);
@@ -1022,38 +1021,82 @@ body.page-home {
   text-transform: uppercase;
 }
 
-/* --- project ledger --- */
+/* --- project tiles ---
+   Two across, media first. Seven projects do not need a filter row, and a
+   picture of the work does more than a row of type. */
 
-.project-ledger__item {
+.project-grid {
   display: grid;
-  gap: var(--s3);
+  gap: var(--s4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
 }
 
-.project-ledger__index {
-  color: var(--ink-faint);
-  font-size: var(--t-sm);
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  text-decoration: none;
+@media (min-width: 62rem) {
+  .project-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.project-ledger__main {
+.project-tile {
   display: grid;
-  gap: var(--s2);
-  max-width: var(--measure);
+  grid-template-rows: auto 1fr;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
-.project-ledger__aside {
+.project-tile__media {
+  display: block;
+  overflow: hidden;
+  border-bottom: 1px solid var(--glass-edge);
+  background: rgba(6, 13, 18, 0.35);
+}
+
+.project-tile__media img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: 50% 22%;
+  transition: transform 0.5s var(--ease);
+}
+
+/* The tile is the affordance; the image leans in slightly on hover.
+   The transform sits on the <img>, never on the pane, because a transform on
+   a pane re-anchors its fixed glass layer. */
+.project-tile:hover .project-tile__media img {
+  transform: scale(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-tile:hover .project-tile__media img {
+    transform: none;
+  }
+}
+
+.project-tile__body {
   display: grid;
   gap: var(--s2);
   align-content: start;
+  justify-items: start;
+  padding: var(--s3) var(--s4) var(--s4);
 }
 
-@media (min-width: 900px) {
-  .project-ledger__item {
-    grid-template-columns: 3rem minmax(0, 1fr) 16rem;
-    gap: var(--s4);
-  }
+.project-tile h2 {
+  font-size: var(--t-xl);
+}
+
+.project-tile h2 a {
+  text-decoration: none;
+}
+
+.project-tile h2 a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+}
+
+.project-tile__summary {
+  color: var(--ink-muted);
+  text-wrap: pretty;
 }
 
 /* --- publications --- */
@@ -1587,6 +1630,140 @@ body.page-home {
   list-style: none;
   color: var(--ink-muted);
   font-size: var(--t-md);
+}
+
+/* ============================================================
+   LATELY
+
+   Recently played, written into _data/listening.json by a scheduled job.
+   Static by the time it reaches the page, so it costs the visitor nothing
+   and reveals nothing about them.
+   ============================================================ */
+
+.listening {
+  padding-top: var(--s5);
+}
+
+.listening__panel {
+  display: grid;
+  gap: var(--s2);
+  justify-items: start;
+}
+
+.listening__list {
+  display: grid;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0;
+  list-style: none;
+}
+
+.listening__list li {
+  display: grid;
+  gap: 0.1rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--rule);
+}
+
+.listening__title {
+  font-weight: 600;
+}
+
+.listening__title a {
+  text-decoration: none;
+}
+
+.listening__title a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+}
+
+.listening__artist {
+  color: var(--ink-muted);
+  font-size: var(--t-md);
+}
+
+.listening__note {
+  color: var(--ink-faint);
+  font-size: var(--t-sm);
+  max-width: var(--measure);
+}
+
+/* ============================================================
+   EXPERTISE AND FOUNDATION
+
+   Two halves of the same claim: what the work is now, and what it grew out
+   of. The tool marks sit between them, so the row reads as the join rather
+   than as a list bolted onto either side.
+   ============================================================ */
+
+.standing {
+  padding: var(--s5) 0;
+}
+
+.standing__grid {
+  display: grid;
+  gap: var(--s4);
+}
+
+@media (min-width: 54rem) {
+  .standing__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s6);
+  }
+}
+
+.standing__half {
+  display: grid;
+  gap: var(--s2);
+  align-content: start;
+}
+
+.standing__half h2 {
+  font-size: var(--t-xl);
+}
+
+.standing__half p:last-child {
+  color: var(--ink-muted);
+  text-wrap: pretty;
+}
+
+.toolmarks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s3) var(--s4);
+  margin-top: var(--s5);
+  padding: var(--s4) var(--s3) 0;
+  border-top: 1px solid var(--rule);
+  list-style: none;
+}
+
+.toolmarks li {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  width: 4.5rem;
+}
+
+/* One ink colour: the marks say what the work is built with, they are not
+   eleven other brands' palettes dropped onto the page. */
+.toolmarks svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  fill: var(--ink-muted);
+  transition: fill 0.2s var(--ease);
+}
+
+.toolmarks li:hover svg {
+  fill: var(--accent);
+}
+
+.toolmarks span {
+  color: var(--ink-faint);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  text-align: center;
 }
 
 /* ============================================================
@@ -2293,15 +2470,24 @@ body.page-home {
    MOTION
    ============================================================ */
 
+/* Fade only, deliberately.
+
+   Most .reveal elements are also glass panes, and a pane paints its own copy
+   of the photograph with `background-attachment: fixed`. Any transform on an
+   element makes it the containing block for fixed backgrounds inside it, so a
+   `translateY` here re-anchored the pane's glass to the card: the panel filled
+   with a full crop of the photo, then snapped back to viewport alignment the
+   moment the transition ended. That snap was a visible flash on every card.
+
+   Do not add transform, translate, scale, rotate, filter, perspective,
+   will-change or `contain: paint` to a pane or any ancestor of one. */
 .js .reveal {
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+  transition: opacity 0.5s var(--ease);
 }
 
 .js .reveal.is-visible {
   opacity: 1;
-  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2319,6 +2505,5 @@ body.page-home {
 
   .js .reveal {
     opacity: 1;
-    transform: none;
   }
 }

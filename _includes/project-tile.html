@@ -1,0 +1,28 @@
+{% assign project = include.project %}
+{% assign project_stack = project.stack | default: project.tech %}
+<article class="project-tile reveal">
+  {% if project.image and project.image != "" %}
+    <a class="project-tile__media" href="{{ project.url | relative_url }}" tabindex="-1" aria-hidden="true">
+      <img src="{{ project.image | relative_url }}" alt="" loading="lazy" decoding="async">
+    </a>
+  {% endif %}
+  <div class="project-tile__body">
+    <p class="card-meta">
+      <span>{{ project.context | default: project.status }}</span>
+      <span>{% if project.dates_display %}{{ project.dates_display }}{% else %}{{ project.date | date: "%Y" }}{% endif %}</span>
+    </p>
+    <h2><a href="{{ project.url | relative_url }}">{{ project.title }}</a></h2>
+    <p class="project-tile__summary">{{ project.summary }}</p>
+    {% if project_stack and project_stack.size > 0 %}
+      <ul class="tag-list" aria-label="Methods and technologies">
+        {% for tag in project_stack limit: 3 %}<li>{{ tag }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    <div class="link-row">
+      <a class="arrow-link" href="{{ project.url | relative_url }}">Open →</a>
+      {% if project.repo_url and project.repo_url != "" %}
+        <a class="arrow-link" href="{{ project.repo_url }}" target="_blank" rel="noreferrer">Code ↗</a>
+      {% endif %}
+    </div>
+  </div>
+</article>
