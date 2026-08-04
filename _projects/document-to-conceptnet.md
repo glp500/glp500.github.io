@@ -20,8 +20,8 @@ outcomes:
   - Extracts structured fields from research papers
   - Scores semantic relatedness using ConceptNet Numberbatch
   - Exports RDF/Turtle individuals
-image: /assets/images/projects/document-conceptnet.svg
-image_alt: "Research document concepts linked through a small knowledge graph and exported as RDF"
+image: /assets/images/projects/conceptnet-subgraph.webp
+image_alt: "A layered graph linking four papers to their scenarios and the actors extracted from them"
 demo_url: ""
 repo_url: "https://github.com/glp500/Document-to-ConceptNet"
 paper_url: ""
@@ -30,11 +30,10 @@ fields:
 related_publication: ""
 visuals:
   - type: diagram
-    src: /assets/images/projects/document-conceptnet.svg
-    alt: "Extracted document concepts connected to ConceptNet relations and serialized into RDF"
-    caption: "Explanatory diagram of the public group-project pipeline."
-    source_url: "https://github.com/glp500/Document-to-ConceptNet"
-    source_label: "Public repository"
+    src: /assets/images/projects/conceptnet-subgraph.webp
+    alt: "Four HHAI papers on the left, the scenarios they examine in the middle, and the actors involved on the right"
+    caption: "A slice of the graph the pipeline built from the HHAI paper set: paper, then the scenario it examines, then the actors in that scenario. Two papers landing on neighbouring scenarios and sharing actors is the structure worth having; it is what makes the collection queryable rather than just searchable."
+    source_label: "final_ontology_extension.ttl"
 ---
 A group project from my MSc. We pulled information out of research papers and turned it into a small semantic representation, wired together through ConceptNet.
 

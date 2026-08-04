@@ -22,8 +22,8 @@ outcomes:
   - Converts PDF tables into structured JSON and multiple relational CSV files
   - Provides a browser-based workflow for research use
   - Includes tests and formatting checks
-image: /assets/images/projects/pdf-relational-data.svg
-image_alt: "Workflow converting a PDF through schema-constrained extraction into validated relational tables"
+image: /assets/images/projects/pdf-relational-extraction.webp
+image_alt: "A printed directory page beside the normalised Individuals and Events rows extracted from it"
 demo_url: ""
 repo_url: "https://github.com/glp500/Multi-Shot-Inference-for-NER-and-Relational-Database-Mapping"
 paper_url: ""
@@ -31,12 +31,11 @@ fields:
   - computational-history
 related_publication: ""
 visuals:
-  - type: diagram
-    src: /assets/images/projects/pdf-relational-data.svg
-    alt: "PDF pages processed into schema-constrained JSON and linked relational CSV tables"
-    caption: "Sanitized system diagram derived from the public application structure; it contains no source documents or extracted personal records."
-    source_url: "https://github.com/glp500/Multi-Shot-Inference-for-NER-and-Relational-Database-Mapping"
-    source_label: "Public repository"
+  - type: image
+    src: /assets/images/projects/pdf-relational-extraction.webp
+    alt: "Left, a page of a 2023 Dutch missionary-worker directory; right, the Individuals and Events rows the tool produced from it"
+    caption: "One page of the Zendingsarbeiders directory and what comes out of it: an Individuals row with a stable identifier, and Events rows linked back to it by that identifier. The identifier is derived from the name and birth year rather than assigned by the model, so the same person resolves to the same key across runs."
+    source_label: "Tool output"
 ---
 I built this at the Network Institute, for researchers sitting on a pile of documents who needed a dataset they could actually query, count and draw a network from.
 

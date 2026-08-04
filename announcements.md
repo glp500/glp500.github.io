@@ -2,6 +2,6 @@
 title: Announcements
 layout: redirect
 permalink: /announcements/
-redirect_to: /
+redirect_to: /blog/
 sitemap: false
 ---

@@ -322,6 +322,7 @@ body:not(.page-home) .page-fg {
 .education-card,
 .skill-card,
 .empty-state,
+.skills-panel,
 .article-sheet,
 .detail-body aside,
 .publication-copy > section,
@@ -347,6 +348,7 @@ body:not(.page-home) .page-fg {
 .education-card::before,
 .skill-card::before,
 .empty-state::before,
+.skills-panel::before,
 .article-sheet::before,
 .detail-body aside::before,
 .publication-copy > section::before,
@@ -378,6 +380,7 @@ body:not(.page-home) .page-fg {
   .education-card::before,
   .skill-card::before,
   .empty-state::before,
+  .skills-panel::before,
   .article-sheet::before,
   .detail-body aside::before,
   .publication-copy > section::before,
@@ -525,6 +528,23 @@ body.page-home {
   line-height: 1.35;
   letter-spacing: -0.01em;
   text-wrap: balance;
+}
+
+/* --- the corners of the sky ---
+   Portrait left, contact marks right, both on the same line as the wordmark's
+   breathing room and both small enough to stay out of its way. */
+
+.home__portrait {
+  position: absolute;
+  z-index: 3;
+  top: clamp(1.1rem, 3vh, 2rem);
+  left: var(--gutter);
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(239, 231, 219, 0.4);
+  object-fit: cover;
+  box-shadow: 0 2px 14px rgba(9, 18, 25, 0.45);
 }
 
 /* --- contact marks, tucked into a corner of the sky --- */
@@ -973,6 +993,33 @@ body.page-home {
     grid-template-columns: 12rem minmax(0, 1fr);
     align-items: start;
   }
+}
+
+/* --- skills and tech stack ---
+   One pane above the ledger: what the work is made of, before the work. */
+
+.skills-block {
+  padding-bottom: var(--s4);
+}
+
+.skills-panel {
+  display: grid;
+  gap: var(--s4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+
+.skills-group {
+  display: grid;
+  gap: var(--s2);
+  align-content: start;
+}
+
+.skills-group h2 {
+  color: var(--ink-faint);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
 /* --- project ledger --- */

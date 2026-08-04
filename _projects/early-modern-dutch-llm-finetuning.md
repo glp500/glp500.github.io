@@ -22,8 +22,8 @@ outcomes:
   - Reproducible fine-tuning, inference, and evaluation notebooks
   - Open-access article in Computational Humanities Research
   - Nomination for the 2024 Amsterdam AI Thesis Awards
-image: /assets/images/projects/emdutch-evaluation.svg
-image_alt: "Paired bar chart comparing mean BERTScore and METEOR results across Early Modern Dutch translation models"
+image: /assets/images/projects/emdutch-evaluation.webp
+image_alt: "Paired bar chart of mean BERTScore and METEOR for ten Early Modern Dutch translation variants"
 demo_url: ""
 repo_url: "https://github.com/glp500/EMDutch-LLM-Finetune"
 paper_url: "https://doi.org/10.1017/chr.2026.10022"
@@ -32,11 +32,10 @@ fields:
 related_publication: "fine-tuning-early-modern-dutch"
 visuals:
   - type: chart
-    src: /assets/images/projects/emdutch-evaluation.svg
-    alt: "Mean BERTScore and METEOR values for ten evaluated translation model variants"
-    caption: "Mean automatic evaluation scores from the repository's aggregate result tables. These metrics are complementary signals, not complete measures of historical translation quality."
-    source_url: "https://github.com/glp500/EMDutch-LLM-Finetune/tree/main/Findings%3AResults%20from%20paper/BERT%3AMETEOR%20Scores"
-    source_label: "Aggregate score tables"
+    src: /assets/images/projects/emdutch-evaluation.webp
+    alt: "Horizontal paired bars for ten model variants, with fine-tuned Mistral and Llama 3 at the top"
+    caption: "Mean BERTScore and METEOR over the test set, ten variants. Fine-tuned Mistral (0.864 / 0.758) and Llama 3 (0.852 / 0.743) both come out above GPT-4o (0.801 / 0.665). Read as a ranking rather than as absolute quality: both metrics reward surface overlap, which is exactly what fine-tuning on this corpus optimises."
+    source_label: "Thesis result data"
 ---
 I started this as a BSc Artificial Intelligence thesis at Vrije Universiteit Amsterdam, during a research internship at the Netherlands Royal Academy of Arts and Sciences. It grew into an open-access paper with Victor de Boer, Arjan Bosse and Daan Grantsaan.
 

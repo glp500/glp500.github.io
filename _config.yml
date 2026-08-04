@@ -51,3 +51,6 @@ exclude:
   - vendor
   - test
   - "AI Researcher - Software Architect.svg" # 3.7 MB design source, not a site asset
+  - gavin_photo.jpeg # portrait source; the cropped asset is assets/images/gavin-lip-portrait.webp
+  - HANDOFF.md
+  - tools

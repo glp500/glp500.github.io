@@ -1,17 +1,18 @@
-# The roof row on the homepage. Home is not listed: the homepage is where
-# these links live, and every other page carries "Back to Home" instead.
-- key: my-work
-  label: My Work
-  url: /my-work/
-- key: publications
-  label: Publications
-  url: /publications/
-- key: mini-lab
-  label: Mini-Lab
-  url: /mini-lab/
-- key: media
-  label: Media
-  url: /media/
+# The roof row on the homepage, in the order they are read.
+# Home is not listed: the homepage is where these links live, and every other
+# page carries "Back to Home" instead.
 - key: about
   label: About Me
   url: /about/
+- key: my-work
+  label: My Work
+  url: /my-work/
+- key: blog
+  label: Blog
+  url: /blog/
+- key: publications
+  label: Publications
+  url: /publications/
+- key: media
+  label: Media
+  url: /media/
