@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img">
-  <title>Particle swarm optimization for game agents</title>
-  <rect width="1200" height="700" fill="#0b1113"/>
-  <g stroke="#9db7be" stroke-width="2" opacity=".6"><path d="M120 150 330 260 515 145 710 250 930 140M120 150 225 410 430 355 610 480 840 370 1040 500M330 260 430 355M515 145 610 480M710 250 840 370M930 140 1040 500"/></g>
-  <g fill="#9db7be"><circle cx="120" cy="150" r="16"/><circle cx="330" cy="260" r="22"/><circle cx="515" cy="145" r="12"/><circle cx="710" cy="250" r="19"/><circle cx="930" cy="140" r="14"/><circle cx="225" cy="410" r="18"/><circle cx="430" cy="355" r="13"/><circle cx="610" cy="480" r="23"/><circle cx="840" cy="370" r="15"/><circle cx="1040" cy="500" r="20"/></g>
-  <circle cx="610" cy="480" r="42" fill="none" stroke="#f0fd71" stroke-width="8"/>
-  <path d="M80 590h1040" stroke="#f4f1e7" stroke-width="3"/><rect x="760" y="535" width="90" height="55" fill="#f0fd71"/><path d="M850 590h100l-28-42h-44z" fill="#9db7be"/>
-  <text x="80" y="650" fill="#f4f1e7" font-family="Georgia" font-size="30">Individual search · collective update · neural controller</text>
-</svg>

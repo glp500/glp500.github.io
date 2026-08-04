@@ -22,8 +22,8 @@ outcomes:
   - Models page states as NONE, START, MIDDLE, or END
   - Compares five model families with cross-validation
   - Integrates layout, entity, linguistic, and sequence features
-image: /assets/images/projects/segmentation-model-heatmap.webp
-image_alt: "Heatmap comparing accuracy, precision, recall and per-class F1 across five segmentation models"
+image: /assets/images/projects/segmentation-model-comparison.webp
+image_alt: "Accuracy and weighted F1 for five boundary-detection models, and the five features XGBoost relies on most"
 demo_url: ""
 repo_url: "https://github.com/glp500/Multi-View-Learning-for-Archival-Document-Segmentation"
 paper_url: ""
@@ -32,20 +32,10 @@ fields:
 related_publication: ""
 visuals:
   - type: chart
-    src: /assets/images/projects/segmentation-model-heatmap.webp
-    alt: "Heatmap of accuracy, precision, recall and per-class F1 for logistic regression, random forest, XGBoost, a neural network and an SVM"
-    caption: "Five models on the same held-out inventory. XGBoost leads on almost every measure, but the gap to logistic regression is small enough that the cheaper model stayed in the comparison."
-    source_label: "Repository output"
-  - type: chart
-    src: /assets/images/projects/segmentation-classwise.webp
-    alt: "Class-wise precision, recall and F1 for the NONE, START, MIDDLE and END boundary classes"
-    caption: "Broken out by class, the difficulty is obvious: MIDDLE is 77 percent of the pages and is easy, while START and END are each about 9 percent and are where the useful errors live."
-    source_label: "Repository output"
-  - type: chart
-    src: /assets/images/projects/segmentation-rf-importance.webp
-    alt: "Random forest top-15 feature importances, led by layout consistency with neighbouring pages"
-    caption: "What the random forest actually leans on. Consistency of layout with the neighbouring pages outranks anything measured on the page in isolation, which is the whole argument for treating this as a sequence problem."
-    source_label: "Repository output"
+    src: /assets/images/projects/segmentation-model-comparison.webp
+    alt: "XGBoost leads at 0.914 accuracy and 0.909 weighted F1; the neural network trails at 0.812. Beside it, num_words dominates XGBoost's feature importances at 0.213."
+    caption: "Five models on the same held-out inventory. XGBoost wins, but the interesting number is on the right: a plain word count carries four times the weight of anything else, which says the boundary signal is mostly about how much is on the page."
+    source_label: "notebooks/06_model_comparison_analysis.ipynb"
 ---
 I framed archival segmentation as a page-sequence classification problem. Every scan gets one of four states (NONE, START, MIDDLE or END), and the sequences can then be reassembled into candidate documents.
 

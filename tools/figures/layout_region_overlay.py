@@ -22,7 +22,7 @@ COLORS = {
 }
 DEFAULT = (130, 130, 130)
 
-def render(stem, scale=1100):
+def render(stem, scale=2400):
     scan = SRC / "Page Scans" / f"{stem}.jpg"
     coords = SRC / "Coordinate JSON" / f"{stem}.json"
     img = Image.open(scan).convert("RGB")

@@ -1,7 +1,8 @@
 # Handoff: real media for the remaining project pages
 
-Seven of the fourteen project pages now carry real media. This document is for
-whoever picks up the other seven.
+All seven remaining project pages carry real media. The other seven entries were
+removed rather than filled: they had no genuine figures and, in most cases, no
+public repository either. This document is what is left to do.
 
 Read `tools/figures/README.md` first — it has the setup, the palette, and the
 working scripts.
@@ -58,66 +59,53 @@ the former.
 
 ---
 
-## Remaining (7 projects)
+## Removed, not deferred
 
-### Tier 1 — material exists, just needs fetching
-
-Both original Tier 1 entries are done. `tools/figures/evoman_record_match.py`
-shows the pattern for anything else with a pygame front end: force
-`SDL_VIDEODRIVER=dummy`, monkey-patch `pygame.display.flip` to save every other
-frame, then assemble with ImageMagick. It runs headless and needs no display.
-
-### Tier 2 — related material on the T7, needs Gavin to confirm the mapping
-
-The directory names do not match the project slugs. **Ask before assuming.**
-Unmapped candidates worth asking about:
+These seven were deleted from `_projects/` (recoverable from git history) along
+with their placeholder SVGs:
 
 ```
-Globalise Inventory Meta-data Analysis/   728 images
-Renate Inventory Analysis/                histogram_total_regions.png
-binary_renate_classifier/                 8 notebooks
-TANAP Segmentation (Neural Network)/      8 notebooks
-Document Segmentation using NER & Visual Features (Dataset creation)/
-NIAA Project Data Analysis/               8 notebooks
-XML_segmentation_old/                     18 notebooks
-FoB/                                      14 images, bioinformatics
-ML4QS/ · HPML-course-materials/ · archivist/ · youtube_to_mp3/
+age-aware-eeg-developmental-deviation
+connectivity-preserving-eeg-phenotype-dimension-reduction
+story-machines
+gauntlet-local-ai-analysis-sandbox
+cybernetics-artificial-societies
+latent-structure-benchmark
+stable-representations-benchmark
 ```
 
-Several of these are probably earlier stages of projects already on the site
-rather than separate entries. Notebooks often hold rendered plot outputs in
-their JSON — extract those before re-running anything.
-
-**`latent-structure-benchmark`**, **`stable-representations-benchmark`**,
-**`age-aware-eeg-developmental-deviation`**,
-**`connectivity-preserving-eeg-phenotype-dimension-reduction`** · the two EEG
-projects are the CNCR internship and the data is patient data. Do not go looking
-for it. Ask Gavin what he is permitted to show; the answer may be nothing but a
-method diagram, in which case leave the panel without an image rather than
-inventing one.
-
-### Tier 3 — needs Gavin, and needs a recording
-
-**`story-machines`** and **`gauntlet-local-ai-analysis-sandbox`** are the two
-startup entries and the two most poorly served by a static image. Both are
-software that does something visible. The EvoMan recording shows the standard
-to match: a real run, captured, with the actual result stated in the caption.
-
-Ask him to record 10–20 seconds of each, silently, at 1280×720 or larger:
-drop a file in, let it work, show the result. `ffmpeg` can convert:
+If any of them comes back, it needs real media first, not a placeholder. The
+two EEG projects are the CNCR internship and the data is patient data: ask
+Gavin what he is permitted to show before going looking. Story Machines and
+Gauntlet are software that does something visible, so they want recordings —
+`tools/figures/evoman_record_match.py` shows the headless-capture pattern, and
+for a browser tool:
 
 ```bash
 ffmpeg -i raw.mov -vf "fps=15,scale=1000:-2" -c:v libwebp -lossless 0 -q:v 70 -loop 0 out.webp
 ```
 
-An animated WebP under about 2 MB is the right target. The post template already
-supports `video_url` and `video_embed` if he would rather host a real video.
+Under about 2 MB is the right target for an animated WebP.
+
+`cybernetics-feedback` was dropped from `_data/fields.yml` when its only
+project went; add it back if a project claims it again.
+
+---
+
+## What is actually outstanding
+
+- **Nothing on this site has been checked in a browser.** See the note below.
+- The Hydro DDQN and PSO galleries still use the repositories' own matplotlib
+  PNGs on a white ground. They are legible, and now enlargeable, but they do
+  not match the page. Redrawing them needs the underlying series, which is not
+  committed separately in either repo.
+- `_posts/` has one entry. The Blog works and has nothing to show.
 
 ---
 
 ## Style template for a project entry
 
-Match what the seven completed ones do.
+Match what the seven live ones do.
 
 ```yaml
 image: /assets/images/projects/<slug>-<what-it-shows>.webp
@@ -183,9 +171,9 @@ that claims a result.
 
 ## Also outstanding, unrelated to projects
 
-- The Mini-Lab page is still live at `/mini-lab/` but no longer linked from the
-  homepage. That was deliberate. It still works.
-- `_posts/` has exactly one entry, now listed at `/blog/`. The Blog is built and
-  empty-stated but has nothing to show yet.
-- The static chart image on the Early Modern Dutch project detail page's hero
-  slot was replaced, but the light-ground repository PNGs on other pages remain.
+- The Mini-Lab page is still live at `/mini-lab/` but is no longer linked from
+  the homepage. That was deliberate. It still works.
+- Figures open full-screen on click (native `<dialog>`, Escape closes, second
+  click on the image shows actual pixels and lets it scroll). The archive scans
+  are shipped at 2200px so that zoom is worth taking. Any new figure that
+  rewards close reading should be shipped large for the same reason.

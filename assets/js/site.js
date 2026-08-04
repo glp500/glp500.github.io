@@ -114,6 +114,72 @@
     });
   });
   /* ----------------------------------------------------------
+     Enlarging a figure.
+
+     Archive scans and dense charts are unreadable at panel size, so any
+     figure image opens full-screen. A native <dialog> is used rather than a
+     hand-rolled overlay: Escape, focus handling and the inert backdrop all
+     come from the browser.
+
+     Two sizes inside the dialog: fitted to the viewport first, then actual
+     pixels on a second click, with the dialog scrolling so a manuscript can
+     be read line by line.
+     ---------------------------------------------------------- */
+
+  const zoomable = document.querySelectorAll(
+    ".project-gallery__item img, .detail-hero__visual img, .post-media img, .prose img"
+  );
+
+  if (zoomable.length && typeof HTMLDialogElement === "function") {
+    const dialog = document.createElement("dialog");
+    dialog.className = "lightbox";
+    dialog.innerHTML =
+      '<button class="lightbox__close" type="button" aria-label="Close">Close</button>' +
+      '<figure class="lightbox__figure"><img alt=""><figcaption></figcaption></figure>';
+    document.body.appendChild(dialog);
+
+    const frame = dialog.querySelector(".lightbox__figure");
+    const full = dialog.querySelector("img");
+    const cap = dialog.querySelector("figcaption");
+
+    const close = () => dialog.close();
+    dialog.querySelector(".lightbox__close").addEventListener("click", close);
+    // Clicking the backdrop closes; clicking the image itself toggles zoom.
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) close();
+    });
+    full.addEventListener("click", () => {
+      dialog.classList.toggle("is-actual-size");
+    });
+    dialog.addEventListener("close", () => {
+      dialog.classList.remove("is-actual-size");
+      full.removeAttribute("src");
+    });
+
+    zoomable.forEach((image) => {
+      image.classList.add("is-zoomable");
+      image.tabIndex = 0;
+      image.setAttribute("role", "button");
+      const open = () => {
+        full.src = image.currentSrc || image.src;
+        full.alt = image.alt || "";
+        const caption = image.closest("figure")?.querySelector("figcaption");
+        cap.textContent = caption ? caption.textContent.trim() : "";
+        cap.hidden = !cap.textContent;
+        frame.scrollTop = 0;
+        dialog.showModal();
+      };
+      image.addEventListener("click", open);
+      image.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          open();
+        }
+      });
+    });
+  }
+
+  /* ----------------------------------------------------------
      The flock.
 
      A small number of birds, drawn as two strokes each, held

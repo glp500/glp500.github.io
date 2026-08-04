@@ -2193,6 +2193,103 @@ body.page-home {
 }
 
 /* ============================================================
+   ENLARGING A FIGURE
+
+   A scan of a 1755 hand is useless at panel width, so every figure opens
+   full-screen. Fitted to the viewport first; clicking again shows actual
+   pixels and lets the dialog scroll, which is the only way to read the
+   marginalia.
+   ============================================================ */
+
+.is-zoomable {
+  cursor: zoom-in;
+}
+
+.lightbox {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(9, 16, 22, 0.94);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.lightbox::backdrop {
+  background: rgba(9, 16, 22, 0.9);
+}
+
+.lightbox__figure {
+  display: grid;
+  place-items: center;
+  gap: var(--s2);
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: clamp(1rem, 4vh, 3rem) clamp(1rem, 4vw, 4rem);
+  overflow: auto;
+}
+
+.lightbox img {
+  max-width: 100%;
+  max-height: calc(100dvh - 11rem);
+  width: auto;
+  border-radius: var(--radius);
+  cursor: zoom-in;
+}
+
+/* Actual pixels: the figure scrolls in both directions around the image. */
+.lightbox.is-actual-size .lightbox__figure {
+  place-items: start;
+}
+
+.lightbox.is-actual-size img {
+  max-width: none;
+  max-height: none;
+  cursor: zoom-out;
+}
+
+.lightbox figcaption {
+  max-width: 62ch;
+  color: var(--ink-muted);
+  font-size: var(--t-md);
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.lightbox.is-actual-size figcaption {
+  display: none;
+}
+
+.lightbox__close {
+  position: fixed;
+  z-index: 2;
+  top: clamp(0.75rem, 2vh, 1.5rem);
+  right: clamp(0.75rem, 2vw, 1.5rem);
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--glass-edge);
+  border-radius: 100px;
+  background: rgba(27, 43, 54, 0.9);
+  color: var(--ink);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lightbox__close:hover {
+  border-color: var(--ink);
+}
+
+/* A hint that the panel image is not the whole story. */
+.project-gallery__item,
+.detail-hero__visual {
+  position: relative;
+}
+
+/* ============================================================
    MOTION
    ============================================================ */
 

@@ -25,7 +25,7 @@ Long-form entries are Markdown files:
 
 - `_projects/`: studies, tools, ventures, and experiments. These are the site's core content and appear at `/my-work/`.
 - `_publications/`: papers and formal outputs.
-- `_posts/`: dated announcements, essays, project updates, and reading notes.
+- `_posts/`: dated announcements, essays, project updates, and reading notes. These are the Blog.
 - `_media/`: Read, Watch, Listen, and Use shelf entries.
 
 Copy the corresponding starter file from `content-templates/`, remove `.sample` from the filename, complete the front matter, and write any longer content below it. A post filename must begin with `YYYY-MM-DD-`.
@@ -34,7 +34,7 @@ Use `published: false` in front matter to keep a draft out of the built site. Se
 
 ### Posts
 
-**The homepage is the blog.** Everything in `_posts/` appears at `/` newest-first, filtered by the `kind` field: `Announcement`, `Essay`, `Project Update`, or `Reading Note`. `/announcements/` and `/blog/` redirect to `/`; individual post URLs are unchanged.
+Everything in `_posts/` appears at `/blog/` newest-first, tagged by the `kind` field: `Announcement`, `Essay`, `Project Update`, or `Reading Note`. `/announcements/` redirects there. The homepage is no longer the feed — it is one screen with five links, and Blog is one of them.
 
 A post supports a lead image, a gallery, an embedded or self-hosted video, and titled external links. Reading time, share buttons, and previous/next paging are generated. Any field left blank is skipped, so a plain post needs only `title`, `date`, `kind`, and `excerpt`. See `content-templates/post.sample.md` for every field.
 
@@ -42,7 +42,9 @@ A post supports a lead image, a gallery, an embedded or self-hosted video, and t
 
 `/my-work/` is the single archive for research, projects, and code. Research, Projects, and Open Source used to be three separate destinations; `/research/`, `/projects/`, and `/open-source/` now redirect here. Project detail URLs (`/projects/<slug>/`) are unchanged.
 
-The page shows featured projects, then the full ledger with one filter row combining research fields and project contexts. Each ledger row links its repository directly, which is why there is no longer a separate open-source list.
+The page opens with a skills and tech-stack panel, then the full ledger with one filter row combining research fields and project contexts. Each ledger row links its repository directly, which is why there is no longer a separate open-source list.
+
+A project earns a page by having something real to show. Entries with neither genuine figures nor a public repository were removed rather than carried on placeholder art; see `HANDOFF.md`.
 
 Research fields live in `_data/fields.yml` as `key` + `label` pairs. A project joins a field by listing that key under `fields:` in its front matter; a project may belong to several. Field labels must slugify to their own key (`Machine Learning` → `machine-learning`), since the filter buttons derive their values that way.
 

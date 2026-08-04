@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img">
-  <title>Document to ConceptNet knowledge graph</title>
-  <rect width="1200" height="700" fill="#9db7be"/>
-  <rect x="60" y="145" width="260" height="390" fill="#f4f1e7" stroke="#0b1113" stroke-width="3"/>
-  <g stroke="#0b1113" stroke-width="10"><path d="M100 215h170M100 270h145M100 350h170M100 405h120"/></g>
-  <g stroke="#0b1113" stroke-width="3" fill="none"><path d="M320 335h150M540 190 720 330 540 490M720 330 915 175M720 330 930 500M915 175 1070 330M930 500 1070 330"/></g>
-  <g fill="#f0fd71" stroke="#0b1113" stroke-width="3"><circle cx="540" cy="190" r="52"/><circle cx="540" cy="490" r="52"/><circle cx="720" cy="330" r="65"/><circle cx="915" cy="175" r="52"/><circle cx="930" cy="500" r="52"/><circle cx="1070" cy="330" r="60"/></g>
-  <g fill="#0b1113" font-family="Arial" text-anchor="middle" font-size="17"><text x="540" y="196">TASK</text><text x="540" y="496">METHOD</text><text x="720" y="336">SCENARIO</text><text x="915" y="181">AGENT</text><text x="930" y="506">OUTPUT</text><text x="1070" y="336">RDF</text></g>
-</svg>
