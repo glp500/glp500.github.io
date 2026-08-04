@@ -1,12 +1,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#9db7be">
+<meta name="theme-color" content="{% if page.nav_key == 'home' %}#2d4353{% else %}#dde7ec{% endif %}">
 <meta name="color-scheme" content="light">
 <link rel="icon" href="{{ '/assets/images/orbit-mark.svg' | relative_url }}" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Libre+Caslon+Display&family=Manrope:ital,wght@0,400;0,500;0,600;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 {% assign asset_version = site.time | date: "%Y%m%d%H%M%S" %}
 <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ asset_version }}">
+{% if page.nav_key == 'home' %}
+  <link rel="preload" as="image" href="{{ '/assets/images/roofline-wide.webp' | relative_url }}" media="(min-width: 761px)">
+  <link rel="preload" as="image" href="{{ '/assets/images/roofline-tall.webp' | relative_url }}" media="(max-width: 760px)">
+{% endif %}
 {% seo %}
 {% feed_meta %}

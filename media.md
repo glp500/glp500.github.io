@@ -2,13 +2,12 @@
 title: Media & Literature
 layout: default
 nav_key: media
-world_mode: media
 description: Books, papers, talks and tools worth returning to.
 ---
-{% include page-hero.html mode="media" %}
+{% include page-hero.html %}
 
 {% assign items = site.media | where_exp: "item", "item.published != false" | sort: "date" | reverse %}
-<section class="archive-section media-archive" data-world-mode="media">
+<section class="archive-section media-archive">
   <div class="shell">
     {% if items.size > 0 %}
       <div class="media-grid">

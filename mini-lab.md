@@ -3,12 +3,11 @@ title: Mini-Lab
 layout: default
 permalink: /mini-lab/
 nav_key: mini-lab
-world_mode: research
 description: Small language models running locally in your browser over WebGPU, applied to data that never leaves your machine.
 ---
-{% include page-hero.html mode="research" %}
+{% include page-hero.html %}
 
-<section class="minilab" data-world-mode="research">
+<section class="minilab">
   <div class="shell">
 
     <p class="minilab__lead">A language model runs on your own graphics card, in this tab. Drop in a file and it decides how the data should be analysed. Nothing is uploaded.</p>

@@ -1,24 +1,17 @@
-- key: home
-  label: Home
-  url: /
-  world_mode: home
+# The roof row on the homepage. Home is not listed: the homepage is where
+# these links live, and every other page carries "Back to Home" instead.
 - key: my-work
   label: My Work
   url: /my-work/
-  world_mode: projects
 - key: publications
   label: Publications
   url: /publications/
-  world_mode: publications
 - key: mini-lab
   label: Mini-Lab
   url: /mini-lab/
-  world_mode: research
 - key: media
-  label: Media & Literature
+  label: Media
   url: /media/
-  world_mode: media
 - key: experience
-  label: Experience / CV
+  label: Experience
   url: /experience/
-  world_mode: experience

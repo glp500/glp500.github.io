@@ -2,13 +2,12 @@
 title: Experience / CV
 layout: default
 nav_key: experience
-world_mode: experience
 description: Where I have worked and studied, what I use, and what I do when I am not doing this.
 ---
 {% assign profile = site.data.profile %}
-{% include page-hero.html mode="experience" %}
+{% include page-hero.html %}
 
-<section class="cv-intro section-rule" data-world-mode="experience">
+<section class="cv-intro section-rule">
   <div class="shell cv-intro__grid">
     <div>
       <p class="cv-intro__lead">{{ profile.bio }}</p>
@@ -25,9 +24,9 @@ description: Where I have worked and studied, what I use, and what I do when I a
   </div>
 </section>
 
-<section class="cv-section section-rule" data-world-mode="experience">
+<section class="cv-section section-rule">
   <div class="shell">
-    <div class="cv-section__heading"><span>02</span><h2>Research experience</h2></div>
+    <div class="cv-section__heading"><h2>Research experience</h2></div>
     <div class="cv-timeline">
       {% for item in profile.experience %}
         <article class="cv-entry reveal">
@@ -46,9 +45,9 @@ description: Where I have worked and studied, what I use, and what I do when I a
   </div>
 </section>
 
-<section class="cv-section cv-section--paper section-rule" data-world-mode="experience">
+<section class="cv-section cv-section--paper section-rule">
   <div class="shell">
-    <div class="cv-section__heading"><span>03</span><h2>Education</h2></div>
+    <div class="cv-section__heading"><h2>Education</h2></div>
     <div class="education-grid">
       {% for item in profile.education %}
         <article class="education-card reveal">
@@ -66,16 +65,16 @@ description: Where I have worked and studied, what I use, and what I do when I a
 </section>
 
 {% assign publication = site.publications | first %}
-<section class="cv-section section-rule" data-world-mode="publications">
+<section class="cv-section section-rule">
   <div class="shell">
-    <div class="cv-section__heading"><span>04</span><h2>Selected publication</h2></div>
+    <div class="cv-section__heading"><h2>Selected publication</h2></div>
     {% include publication-card.html publication=publication %}
   </div>
 </section>
 
-<section class="cv-section cv-section--skills section-rule" data-world-mode="experience">
+<section class="cv-section cv-section--skills section-rule">
   <div class="shell">
-    <div class="cv-section__heading"><span>05</span><h2>Methods & skills</h2></div>
+    <div class="cv-section__heading"><h2>Methods & skills</h2></div>
     <div class="skill-grid">
       {% for group in profile.skills %}
         <article class="skill-card reveal">
@@ -87,7 +86,7 @@ description: Where I have worked and studied, what I use, and what I do when I a
   </div>
 </section>
 
-<section class="cv-interests" data-world-mode="media">
+<section class="cv-interests">
   <div class="shell cv-interests__grid">
     <div>
       <p class="kicker">Outside the formal record</p>

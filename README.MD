@@ -1,6 +1,8 @@
 # Gavin Lip — Research Portfolio
 
-A custom Jekyll portfolio for research work, publications, posts, media, a web CV, and the Mini-Lab. The visual system is based on Gavin's Canva layouts and includes a persistent interactive multi-agent field.
+A custom Jekyll portfolio for research work, publications, posts, media, a web CV, and the Mini-Lab.
+
+The homepage is one screen and does not scroll: a photograph of a tiled roof under a deep sky, the name, the tagline, and five links riding the roofline. Every other page is a quiet pale-sky reading surface with a single `Back to Home` anchor. One typeface throughout (Manrope, weights only) and one palette, sampled from the photograph.
 
 The canonical public homepage is **https://glp500.github.io/**. Do not append the repository name to the URL; `https://glp500.github.io/glp500.github.io/` is not the site root.
 
@@ -150,23 +152,33 @@ Everything under `assets/js/minilab/` is dynamically imported only on
 1. Add JPG, PNG, WebP, AVIF, or SVG files under `assets/images/`.
 2. Set the entry's `image` or `feature_image` field to a site path such as `/assets/images/my-image.webp`.
 3. Write meaningful `image_alt` or `feature_image_alt` text.
-4. Leave the image field blank to use the site's original procedural specimen instead.
+4. Leave the image field blank and no visual is rendered for that entry.
 
 Project gallery visuals belong under `assets/images/projects/`. Every gallery entry should include a caption explaining whether it is a result, screenshot, or explanatory diagram. Add `source_url` when a public repository or paper supports the visual. Private-source aggregate figures must remain de-identified and must not link to the private repository.
 
-The homepage portrait is configured in `_data/profile.yml`. WebP or AVIF is recommended for photographs.
+The homepage background is `assets/images/roofline-wide.webp` (wide screens) and `assets/images/roofline-tall.webp` (narrow screens, cropped to the chimney). Both are referenced from `_layouts/home.html`. The site palette in `assets/css/style.css` is sampled from that photograph, so replacing it means resampling the tokens at the top of the stylesheet.
 
 ## Profile, navigation, and CV
 
 - `_data/profile.yml` contains identity, contact links, CV experience, education, methods, and interests.
-- `_data/navigation.yml` controls the six primary navigation links and their agent-world modes.
+- `_data/navigation.yml` controls the five links along the roof on the homepage. Home is deliberately not among them: every other page carries a single `Back to Home` anchor instead.
 - The downloadable PDF is `assets/docs/gavin-lip-cv.pdf`.
 
 Blank profile URLs are not rendered. The public HTML intentionally omits the phone number; the downloadable source CV contains the contact information present in the original document.
 
 ## Interactive field
 
-The fixed canvas in `assets/js/site.js` changes species and organization by page or section. Pointer movement creates currents, clicks create temporary attractors, dragging paints a flow field, and double-clicking triggers a coordinated regime shift. A compact state is stored in `sessionStorage` so movement continues across internal navigation.
+A small flock of birds is drawn on the fixed canvas in `assets/js/site.js`. On each
+load they enter from one randomly chosen point on the edge of the sky, then hold
+together on the usual three boid rules and swerve away from the pointer.
+
+They are confined to the sky. On the homepage the sky ends at the roofline of the
+photograph, which the script derives from the image's own dimensions
+(`ROOF_FRACTION`, the share of the photo below the roofline) rather than from a
+hard-coded pixel offset, so it stays correct at any window size. On every other
+page the sky is the whole window and the canvas is dimmed to a trace.
+
+`prefers-reduced-motion` renders one static frame instead of animating.
 
 Visitors using reduced-motion preferences, and small touch-only devices, receive a static procedural field. The canvas is decorative, ignores pointer input, and is hidden from assistive technology.
 

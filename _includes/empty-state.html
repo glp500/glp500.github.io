@@ -1,11 +1,8 @@
 <div class="empty-state reveal">
-  <div class="specimen specimen--empty" aria-hidden="true"><span></span></div>
-  <div>
-    <p class="kicker">Archive ready · awaiting material</p>
-    <h2>{{ include.title }}</h2>
-    {% if include.body %}<p>{{ include.body }}</p>{% endif %}
-    {% if include.link_label and include.link_url %}
-      <a class="arrow-link" href="{{ include.link_url | relative_url }}">{{ include.link_label }} →</a>
-    {% endif %}
-  </div>
+  <p class="kicker">Nothing here yet</p>
+  <h2>{{ include.title }}</h2>
+  {% if include.body %}<p>{{ include.body }}</p>{% endif %}
+  {% if include.link_label and include.link_url %}
+    <a class="arrow-link" href="{{ include.link_url | relative_url }}">{{ include.link_label }} →</a>
+  {% endif %}
 </div>

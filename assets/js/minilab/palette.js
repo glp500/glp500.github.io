@@ -1,12 +1,17 @@
 // Chart colour, as parameters rather than taste.
 //
 // Every value here was checked with the data-viz validator against this site's
-// own paper surface (#edeced), not chosen by eye:
+// own paper surface, not chosen by eye:
 //
 //   8 slots, adjacent pairs : PASS  (worst CVD dE 9.1, normal-vision dE 19.6)
 //   first 3, --pairs all    : PASS  (CVD dE 9.2, normal-vision dE 24.0)
 //   contrast                : WARN  -> relief required, satisfied by the table
 //                                     view and direct labels, both of which ship
+//
+// The surface moved from #edeced to the chart tile's own ground (#eef3f6) when
+// the site was restyled. Series separation does not depend on the surface at
+// all, and the new ground is marginally lighter, so the one surface-dependent
+// check moves in the safe direction. The hues below are unchanged.
 //
 // Consequences that must not be quietly undone:
 //   * Slot ORDER is the colourblind-safety mechanism, not decoration. Assign in
@@ -16,14 +21,16 @@
 //   * Sequential is one hue light-to-dark. Diverging is two hues with a GRAY
 //     midpoint — never a rainbow, never a hue in the middle.
 
-export const SURFACE = { light: "#edeced", dark: "#1a1a19" };
+export const SURFACE = { light: "#eef3f6", dark: "#1a1a19" };
 
+// The light values are --ink at 100 / 66 / 44 percent over the surface above,
+// so chart labels read as the same voice as the page around them.
 export const TEXT = {
-  light: { primary: "#0b0b0b", secondary: "#52514e", muted: "#6f6e6a" },
+  light: { primary: "#101a21", secondary: "#5c6469", muted: "#8c9498" },
   dark: { primary: "#ffffff", secondary: "#c3c2b7", muted: "#9b9a92" },
 };
 
-export const GRID = { light: "#d8d7d4", dark: "#333330" };
+export const GRID = { light: "#cfd5d9", dark: "#333330" };
 
 /** Fixed order. Assign by index; never cycle. */
 export const CATEGORICAL = {

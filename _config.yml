@@ -1,6 +1,6 @@
 title: Gavin Lip
 email: "lip.gavin@gmail.com"
-description: Research on cybernetic systems, cultural AI, informatics and computational history, with the code behind it.
+description: Information retrieval, computational social sciences and cultural AI, with the code behind it.
 url: "https://glp500.github.io"
 baseurl: ""
 lang: en
@@ -29,19 +29,16 @@ defaults:
       type: posts
     values:
       layout: post
-      world_mode: notes
   - scope:
       path: ""
       type: projects
     values:
       layout: project-detail
-      world_mode: projects
   - scope:
       path: ""
       type: publications
     values:
       layout: publication-detail
-      world_mode: publications
   - scope:
       path: ""
       type: pages
@@ -52,3 +49,5 @@ exclude:
   - README.MD
   - content-templates
   - vendor
+  - test
+  - "AI Researcher - Software Architect.svg" # 3.7 MB design source, not a site asset

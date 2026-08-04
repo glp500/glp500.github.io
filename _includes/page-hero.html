@@ -1,11 +1,6 @@
-<header class="page-hero" data-world-mode="{{ include.mode | default: page.world_mode }}">
-  <div class="shell page-hero__grid">
-    <div class="page-hero__content reveal">
-      <h1>{{ page.title }}</h1>
-      {% if include.intro %}<p>{{ include.intro }}</p>{% endif %}
-    </div>
-    <div class="page-hero__specimen">
-      {% include specimen.html kind=include.mode %}
-    </div>
+<header class="page-hero">
+  <div class="shell page-hero__grid reveal">
+    <h1>{{ page.title }}</h1>
+    {% if include.intro and include.intro != "" %}<p>{{ include.intro }}</p>{% endif %}
   </div>
 </header>

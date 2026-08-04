@@ -3,10 +3,9 @@ title: My Work
 layout: default
 permalink: /my-work/
 nav_key: my-work
-world_mode: projects
 description: Studies, tools and experiments, with the code behind them.
 ---
-{% include page-hero.html mode="projects" %}
+{% include page-hero.html %}
 
 {% assign items = site.projects | where_exp: "item", "item.published != false" | sort: "date" | reverse %}
 {% assign featured_items = items | where: "featured", true | sort: "featured_rank" %}
@@ -16,7 +15,7 @@ description: Studies, tools and experiments, with the code behind them.
 {% assign field_labels = site.data.fields | map: "label" %}
 {% assign context_options = items | map: "context" | compact | uniq | sort %}
 {% assign filter_options = field_labels | concat: context_options %}
-<section class="archive-section" data-filter-root data-world-mode="research">
+<section class="archive-section" data-filter-root>
   <div class="shell">
     {% include filter-controls.html label="Filter by field or context" placeholder="Search titles, methods, and topics" options=filter_options %}
     <div class="project-ledger">
