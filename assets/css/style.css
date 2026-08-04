@@ -1,14 +1,16 @@
 /* ============================================================
-   Gavin Lip — one palette, one typeface, two grounds.
+   Gavin Lip — one photograph, one typeface, one palette.
 
-   Every colour below is sampled from the roofline photograph on
-   the homepage: the sky above the tiles, the tiles themselves,
-   and the lit face of the chimney. Nothing is imported from
-   elsewhere, so nothing can clash with the picture.
+   Every colour below is sampled from the roofline photograph:
+   the sky above the tiles, the tiles themselves, and the lit
+   face of the chimney. Nothing is imported from elsewhere, so
+   nothing can clash with the picture.
 
-   The site commits to a single light ground on purpose. The
-   homepage is a photograph taken in daylight; a dark variant of
-   it would be a different photograph.
+   Every page stands on that photograph. The homepage shows it at
+   full strength; every other page holds it back and floats
+   smoked-glass panes over it. The site is single-theme by
+   choice: it is a daylight photograph, and a second theme would
+   be a second photograph.
    ============================================================ */
 
 :root {
@@ -22,21 +24,29 @@
   --chimney: #efe7db;
   --pale-sky: #9fbccb;
 
-  /* --- page grounds --- */
-  --ground: #dde7ec;        /* pale sky, washed out, for reading pages */
-  --ground-raised: #eef3f6; /* cards and panels lifted off it */
-  --ink: #101a21;           /* near-black, biased to the sky's blue */
-  --ink-muted: rgba(16, 26, 33, 0.66);
-  --ink-faint: rgba(16, 26, 33, 0.44);
-  --rule: rgba(16, 26, 33, 0.16);
-  --rule-strong: rgba(16, 26, 33, 0.3);
-  --accent: #a8501f;        /* the roof, darkened until it holds text */
-  --accent-soft: rgba(168, 80, 31, 0.12);
+  /* --- the glass ---
+     A pane is the photograph, warped and blurred, under a slate
+     wash. --glass is that wash; --glass-solid is the same colour
+     opaque, for anywhere the photo must not show through. */
+  --glass: rgba(23, 38, 49, 0.52);
+  --glass-solid: #1b2b36;
+  --glass-lift: rgba(239, 231, 219, 0.05); /* light catching the top edge */
+  --glass-edge: rgba(239, 231, 219, 0.16);
+
+  /* --- text on the glass and on the photograph --- */
+  --ground: #16242e;        /* the field behind everything, before the photo loads */
+  --ink: #eef2f4;           /* off-white, biased to the sky's blue */
+  --ink-muted: rgba(238, 242, 244, 0.72);
+  --ink-faint: rgba(238, 242, 244, 0.5);
+  --rule: rgba(239, 231, 219, 0.16);
+  --rule-strong: rgba(239, 231, 219, 0.34);
+  --accent: #e88950;        /* the sunlit tile, the one warm thing */
+  --accent-soft: rgba(232, 137, 80, 0.16);
 
   /* --- semantic, for the Mini-Lab only --- */
-  --ok: #2f6b4a;
-  --warn: #8a5a12;
-  --bad: #97331f;
+  --ok: #62c295;
+  --warn: #e5b863;
+  --bad: #f08a76;
 
   /* --- type --- */
   --sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -221,7 +231,7 @@ body:not(.page-home) main {
   left: 0.75rem;
   padding: 0.65rem 1rem;
   background: var(--ink);
-  color: var(--ground);
+  color: var(--glass-solid);
   font-size: var(--t-sm);
   font-weight: 600;
   text-decoration: none;
@@ -233,20 +243,169 @@ body:not(.page-home) main {
   transform: translateY(0);
 }
 
-/* ---------- the flock ---------- */
+/* ============================================================
+   THE BACKDROP AND THE GLASS
+   ============================================================ */
 
-.bird-sky {
+/* The photograph, in two layers with the flock sandwiched between them:
+
+     -3  .page-sky   the whole scene
+     -2  .bird-sky   the flock, held above the roofline
+     -1  .page-fg    the roof and chimney again, cut out
+
+   A bird crossing the chimney therefore passes behind it. Both image layers
+   share identical cover geometry so they register pixel for pixel.
+
+   The cover is bottom-anchored, so the roofline and the tiles are never
+   cropped away and the homepage navigation always lands on the roof. Any
+   overflow is taken off the top of the sky, which has nothing in it. */
+.page-sky,
+.page-fg {
   position: fixed;
   inset: 0;
-  z-index: 1;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  object-position: 50% 100%;
   pointer-events: none;
 }
 
-/* On reading pages the birds are a trace, not a subject. */
-body:not(.page-home) .bird-sky {
-  opacity: 0.3;
+.page-sky {
+  z-index: -3;
+}
+
+.page-fg {
+  z-index: -1;
+}
+
+/* Only a subpage holds the photograph back; the homepage runs it at full
+   strength. Both layers must be dimmed by the same amount or the cut-out
+   would show as a bright seam along the roofline. */
+body:not(.page-home) .page-sky,
+body:not(.page-home) .page-fg {
+  filter: brightness(0.66) saturate(0.82);
+}
+
+/* --- a pane ---
+
+   A pane is a window onto a refracted copy of the same photograph. Both the
+   backdrop and the panes use `background-attachment: fixed` against the same
+   `cover` geometry, so the two images stay registered with each other and the
+   panes read as glass set into one continuous scene rather than as cards each
+   holding their own crop.
+
+   The refraction is baked into `roofline-*-glass.webp` (a turbulence
+   displacement map applied offline; see README) rather than done in CSS. Two
+   dead ends ruled that out, and both are easy to walk back into:
+
+     * `backdrop-filter: url(#f)` — no browser resolves an SVG filter
+       reference in a backdrop, only the shorthand functions.
+     * `filter: url(#f)` on the pane's own pseudo-element — this works, and
+       genuinely warps, but any `filter` on an element re-anchors its
+       `background-attachment: fixed` to that element's own box. Every pane
+       then showed a full crop of the photo instead of the part behind it.
+
+   Baking it costs one 55 KB asset and buys correct registration, no runtime
+   filter cost, and identical output in every browser.
+
+   The panes are listed rather than given a class in the markup, because
+   several of them (chart tiles, Mini-Lab steps) are generated in JavaScript.
+   Headings and short intros are deliberately absent: they sit bare on the
+   photograph, which is what ties a subpage to the homepage.
+
+   Keep this list and the ::before list below in step. */
+.feed-card,
+.project-ledger__item,
+.publication-entry,
+.media-card,
+.cv-entry,
+.education-card,
+.skill-card,
+.empty-state,
+.article-sheet,
+.detail-body aside,
+.publication-copy > section,
+.ml-setup,
+.ml-step,
+.viz-tile,
+.filter-controls {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--glass-edge);
+  border-radius: 10px;
+  background-image: linear-gradient(var(--glass-lift), transparent 5rem);
+  box-shadow: 0 1px 24px rgba(6, 14, 20, 0.22);
+}
+
+.feed-card::before,
+.project-ledger__item::before,
+.publication-entry::before,
+.media-card::before,
+.cv-entry::before,
+.education-card::before,
+.skill-card::before,
+.empty-state::before,
+.article-sheet::before,
+.detail-body aside::before,
+.publication-copy > section::before,
+.ml-setup::before,
+.ml-step::before,
+.viz-tile::before,
+.filter-controls::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(var(--glass), var(--glass)), var(--sky-glass);
+  background-attachment: fixed, fixed;
+  background-position: 50% 100%, 50% 100%;
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+}
+
+/* Touch devices do not honour `background-attachment: fixed` — the copy would
+   sit still while the page scrolled and every pane would show the wrong crop.
+   Anyone who has asked for less transparency gets the same treatment. Both
+   land on flat smoked glass: same colour, no window. */
+@media (hover: none), (pointer: coarse), (prefers-reduced-transparency: reduce) {
+  .feed-card::before,
+  .project-ledger__item::before,
+  .publication-entry::before,
+  .media-card::before,
+  .cv-entry::before,
+  .education-card::before,
+  .skill-card::before,
+  .empty-state::before,
+  .article-sheet::before,
+  .detail-body aside::before,
+  .publication-copy > section::before,
+  .ml-setup::before,
+  .ml-step::before,
+  .viz-tile::before,
+  .filter-controls::before {
+    background-image: linear-gradient(var(--glass-solid), var(--glass-solid));
+    filter: none;
+  }
+}
+
+
+/* ---------- the flock ---------- */
+
+/* Full strength on every page: the sky behind a subpage is the same sky.
+
+   The flock sits between the two image layers, so it is occluded by the
+   chimney and by the glass panes, and is seen only through open sky. Panes
+   paint their own copy of the photograph rather than sampling the live page,
+   so a bird passing behind one disappears rather than warping. */
+.bird-sky {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* ---------- back to home ---------- */
@@ -297,27 +456,6 @@ body.page-home {
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
-}
-
-/* The <picture> is a source switch, not a layout box: take it out of flow
-   with the image it wraps, so it cannot be counted as a flex item. */
-.home picture {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-/* Bottom-anchored cover: the roofline and the tiles are never cropped,
-   so the navigation always lands on the roof. Overflow is taken off the
-   top of the sky, which is an even gradient with nothing in it. */
-.home__photo {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 100%;
 }
 
 /* Holds the wordmark legible against a bright sky and darkens the tiles
@@ -535,8 +673,8 @@ body.page-home {
 
 .prose pre {
   padding: var(--s3);
-  background: var(--ink);
-  color: var(--ground);
+  background: rgba(6, 13, 18, 0.55);
+  border: 1px solid var(--glass-edge);
   border-radius: var(--radius);
   overflow-x: auto;
 }
@@ -549,10 +687,20 @@ body.page-home {
   text-decoration-color: var(--accent);
 }
 
-/* --- page heading --- */
+/* --- page heading ---
+   Bare on the photograph, like the homepage wordmark. The shadow is what
+   lets it cross the roofline without losing its edge. */
 
 .page-hero {
-  padding-bottom: var(--s5);
+  padding-bottom: var(--s4);
+}
+
+.page-hero h1,
+.page-hero p,
+.back-home,
+.detail-hero__index,
+.site-footer {
+  text-shadow: 0 1px 12px rgba(9, 18, 25, 0.5);
 }
 
 .page-hero__grid {
@@ -639,22 +787,24 @@ body.page-home {
 
 .button:hover {
   background: var(--ink);
-  color: var(--ground);
+  color: var(--glass-solid);
 }
 
 .button--dark {
   background: var(--ink);
-  color: var(--ground);
+  color: var(--glass-solid);
 }
 
 .button--dark:hover {
   background: var(--accent);
   border-color: var(--accent);
-  color: #fff;
+  color: var(--glass-solid);
 }
 
+/* Kept as a hook, but it draws nothing: on the photograph a full-bleed
+   hairline reads as leftover chrome, and the panes carry the structure. */
 .section-rule {
-  border-top: 1px solid var(--rule);
+  border-top: 0;
 }
 
 .section-heading {
@@ -673,13 +823,13 @@ body.page-home {
 .filter-controls {
   display: grid;
   gap: var(--s2);
-  padding-bottom: var(--s4);
+  margin-bottom: var(--s4);
 }
 
 .filter-search {
   display: grid;
   gap: 0.35rem;
-  max-width: 24rem;
+  width: min(24rem, 100%);
 }
 
 .filter-search span {
@@ -694,7 +844,7 @@ body.page-home {
   padding: 0.55rem 0.75rem;
   border: 1px solid var(--rule-strong);
   border-radius: var(--radius);
-  background: var(--ground-raised);
+  background: rgba(255, 255, 255, 0.06);
   font-size: var(--t-md);
 }
 
@@ -724,7 +874,7 @@ body.page-home {
 .filter-buttons button.is-active {
   border-color: var(--ink);
   background: var(--ink);
-  color: var(--ground);
+  color: var(--glass-solid);
 }
 
 .filter-status {
@@ -765,12 +915,13 @@ body.page-home {
   display: grid;
 }
 
-/* One shared rule between rows, drawn once, so nothing double-borders. */
-.feed-card,
-.project-ledger__item,
-.publication-entry {
-  padding: var(--s4) 0;
-  border-top: 1px solid var(--rule);
+/* Rows are panes now, so they are separated by air rather than by a rule.
+   Padding and borders come from the pane recipe above. */
+.feed-list,
+.project-ledger,
+.publication-ledger,
+.cv-timeline {
+  gap: var(--s3);
 }
 
 .feed-card {
@@ -958,7 +1109,6 @@ body.page-home {
   gap: var(--s2);
   justify-items: start;
   max-width: var(--measure);
-  padding: var(--s5) 0;
 }
 
 /* ============================================================
@@ -1031,7 +1181,15 @@ body.page-home {
   display: grid;
   gap: var(--s2);
   align-content: start;
+  padding: var(--s3);
   font-size: var(--t-md);
+}
+
+@media (min-width: 900px) {
+  .detail-body aside {
+    position: sticky;
+    top: var(--s3);
+  }
 }
 
 .detail-body aside .kicker:not(:first-child) {
@@ -1068,7 +1226,7 @@ body.page-home {
 
 .project-facts div {
   display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr);
+  grid-template-columns: 4.5rem minmax(0, 1fr);
   gap: var(--s2);
 }
 
@@ -1084,8 +1242,8 @@ body.page-home {
 
 @media (min-width: 900px) {
   .detail-body {
-    grid-template-columns: 16rem minmax(0, 1fr);
-    gap: var(--s6);
+    grid-template-columns: 20rem minmax(0, 1fr);
+    gap: var(--s4);
   }
 
   .detail-hero__grid {
@@ -1109,10 +1267,10 @@ body.page-home {
 }
 
 .citation-box {
-  padding: var(--s3);
-  background: var(--ground-raised);
+  padding: var(--s2) var(--s3);
   border-left: 2px solid var(--accent);
-  border-radius: var(--radius);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: rgba(6, 13, 18, 0.4);
   font-size: var(--t-md);
 }
 
@@ -1292,9 +1450,7 @@ body.page-home {
   font-variant-numeric: tabular-nums;
 }
 
-.cv-section--paper {
-  background: var(--ground-raised);
-}
+
 
 .cv-timeline {
   display: grid;
@@ -1303,8 +1459,6 @@ body.page-home {
 .cv-entry {
   display: grid;
   gap: var(--s2);
-  padding: var(--s4) 0;
-  border-top: 1px solid var(--rule);
 }
 
 .cv-entry__date {
@@ -1353,8 +1507,6 @@ body.page-home {
   display: grid;
   gap: var(--s2);
   align-content: start;
-  padding-top: var(--s3);
-  border-top: 1px solid var(--rule);
 }
 
 .education-card h3,
@@ -1513,16 +1665,12 @@ body.page-home {
 .ml-apps button.is-active {
   border-color: var(--ink);
   background: var(--ink);
-  color: var(--ground);
+  color: var(--glass-solid);
 }
 
 .ml-setup {
   display: grid;
   gap: var(--s2);
-  padding: var(--s3);
-  background: var(--ground-raised);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
 }
 
 .ml-setup h2 {
@@ -1610,7 +1758,7 @@ body.page-home {
   border: 1px solid var(--ink);
   border-radius: var(--radius);
   background: var(--ink);
-  color: var(--ground);
+  color: var(--glass-solid);
   font-size: var(--t-sm);
   font-weight: 600;
   cursor: pointer;
@@ -1618,9 +1766,9 @@ body.page-home {
 }
 
 .minilab button:disabled {
-  border-color: var(--rule-strong);
-  background: none;
-  color: var(--ink-faint);
+  border-color: var(--rule);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(238, 242, 244, 0.62);
   cursor: not-allowed;
 }
 
@@ -1650,7 +1798,7 @@ body.page-home {
   padding: 0.45rem 0.6rem;
   border: 1px solid var(--rule-strong);
   border-radius: var(--radius);
-  background: var(--ground);
+  background: rgba(6, 13, 18, 0.4);
   font-size: var(--t-sm);
 }
 
@@ -1667,10 +1815,6 @@ body.page-home {
 .ml-step {
   display: grid;
   gap: var(--s2);
-  padding: var(--s3);
-  background: var(--ground-raised);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
   min-width: 0;
 }
 
@@ -1712,7 +1856,7 @@ body.page-home {
   padding: 0.5rem 0.65rem;
   border: 1px solid var(--rule-strong);
   border-radius: var(--radius);
-  background: var(--ground);
+  background: rgba(6, 13, 18, 0.4);
   font-size: var(--t-md);
 }
 
@@ -1819,8 +1963,8 @@ body.page-home {
 .ml-code-block,
 .ml-code {
   padding: var(--s2);
-  background: var(--ink);
-  color: var(--ground);
+  background: rgba(6, 13, 18, 0.55);
+  border: 1px solid var(--glass-edge);
   border-radius: var(--radius);
   font-size: var(--t-sm);
   overflow-x: auto;
@@ -1838,12 +1982,7 @@ body.page-home {
 }
 
 .viz-tile {
-  position: relative;
   min-width: 0; /* grid items default to min-content; without this the SVG cannot shrink */
-  padding: var(--s3);
-  background: var(--ground-raised);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
 }
 
 /* An expanded tile spans every column, so the detail is worth the click. */
@@ -1993,7 +2132,7 @@ body.page-home {
   padding: 0.35rem 0.45rem;
   border: 1px solid var(--rule-strong);
   border-radius: var(--radius);
-  background: var(--ground);
+  background: rgba(6, 13, 18, 0.4);
   color: var(--ink);
   font-size: var(--t-sm);
   font-weight: 400;

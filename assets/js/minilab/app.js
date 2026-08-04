@@ -652,7 +652,7 @@ function renderResults(root, plan, results) {
   }
 
   state.specs = specs.map((c, i) =>
-    normaliseSpec({ ...c, id: `chart-${i}`, mode: state.chartMode || "light" })
+    normaliseSpec({ ...c, id: `chart-${i}`, mode: state.chartMode || "dark" })
   );
 
   $("[data-plan]", root).innerHTML = `

@@ -2,7 +2,7 @@
 
 A custom Jekyll portfolio for research work, publications, posts, media, a web CV, and the Mini-Lab.
 
-The homepage is one screen and does not scroll: a photograph of a tiled roof under a deep sky, the name, the tagline, and five links riding the roofline. Every other page is a quiet pale-sky reading surface with a single `Back to Home` anchor. One typeface throughout (Manrope, weights only) and one palette, sampled from the photograph.
+The homepage is one screen and does not scroll: a photograph of a tiled roof under a deep sky, the name, the tagline, and five links riding the roofline. Every other page stands on that same photograph, held back, with the content floating on smoked-glass panes and a single `Back to Home` anchor. Headings sit bare on the photo; only content gets glass. One typeface throughout (Manrope, weights only) and one palette, sampled from the photograph.
 
 The canonical public homepage is **https://glp500.github.io/**. Do not append the repository name to the URL; `https://glp500.github.io/glp500.github.io/` is not the site root.
 
@@ -162,25 +162,72 @@ The homepage background is `assets/images/roofline-wide.webp` (wide screens) and
 
 - `_data/profile.yml` contains identity, contact links, CV experience, education, methods, and interests.
 - `_data/navigation.yml` controls the five links along the roof on the homepage. Home is deliberately not among them: every other page carries a single `Back to Home` anchor instead.
+- The CV lives at `/about/` under the heading **About Me**. `/experience/` redirects there, so older links keep working.
 - The downloadable PDF is `assets/docs/gavin-lip-cv.pdf`.
 
 Blank profile URLs are not rendered. The public HTML intentionally omits the phone number; the downloadable source CV contains the contact information present in the original document.
 
-## Interactive field
+## The photograph, the flock, and the glass
 
-A small flock of birds is drawn on the fixed canvas in `assets/js/site.js`. On each
-load they enter from one randomly chosen point on the edge of the sky, then hold
-together on the usual three boid rules and swerve away from the pointer.
+Every page stands on the same photograph. It is fixed to the viewport and split
+into two layers with the flock between them:
 
-They are confined to the sky. On the homepage the sky ends at the roofline of the
-photograph, which the script derives from the image's own dimensions
+| z-index | layer | what it is |
+| --- | --- | --- |
+| `-3` | `.page-sky` | the whole scene |
+| `-2` | `.bird-sky` | the flock |
+| `-1` | `.page-fg` | the roof and chimney again, cut out |
+
+A bird crossing the chimney passes behind it. Both image layers use identical
+bottom-anchored `cover` geometry, so they register pixel for pixel and the
+cut-out leaves no seam along the roofline. The homepage shows the photograph at
+full strength; every other page dims **both** layers by the same amount.
+
+The flock is in `assets/js/site.js`. On each load the birds enter from one
+randomly chosen point on the edge of the sky, hold together on the usual three
+boid rules, and swerve away from the pointer. They are confined to the sky,
+whose lower edge the script derives from the image's own dimensions
 (`ROOF_FRACTION`, the share of the photo below the roofline) rather than from a
-hard-coded pixel offset, so it stays correct at any window size. On every other
-page the sky is the whole window and the canvas is dimmed to a trace.
+hard-coded pixel offset, so it stays correct at any window size.
+`prefers-reduced-motion` renders one static frame. The canvas is decorative,
+ignores pointer input, and is hidden from assistive technology.
 
-`prefers-reduced-motion` renders one static frame instead of animating.
+Subpage content sits on smoked-glass panes. Each pane is a window onto a
+**refracted** copy of the photograph, fixed to the same geometry as the backdrop
+so the panes read as glass set into one continuous scene. The refraction is
+baked into the image rather than computed in CSS, because two CSS routes do not
+work and are easy to walk back into:
 
-Visitors using reduced-motion preferences, and small touch-only devices, receive a static procedural field. The canvas is decorative, ignores pointer input, and is hidden from assistive technology.
+- `backdrop-filter: url(#f)` — no browser resolves an SVG filter reference in a
+  backdrop, only the shorthand functions.
+- `filter: url(#f)` on the pane's own pseudo-element — this genuinely warps, but
+  any `filter` on an element re-anchors its `background-attachment: fixed` to
+  that element's own box, so every pane shows a full crop of the photo instead
+  of the part behind it.
+
+Touch devices (which do not honour `background-attachment: fixed`) and anyone
+who has asked for `prefers-reduced-transparency` get flat smoked glass instead:
+same colour, no window.
+
+### Regenerating the derived images
+
+If the photograph changes, three assets are derived from it. `roofline-wide.webp`
+and `roofline-tall.webp` are the sources; the rest are built with ImageMagick:
+
+```bash
+# the refracted copy the glass panes show
+magick -size WxH -seed 11 plasma:fractal -blur 0x20 -colorspace Gray -auto-level noise.png
+magick roofline-wide.webp noise.png noise.png \
+  -compose displace -define compose:args=0.9x1.3% -composite \
+  -blur 0x2 -brightness-contrast -16x-8 -modulate 100,86 \
+  -quality 80 -define webp:method=6 roofline-wide-glass.webp
+```
+
+The cut-out (`roofline-*-fg.webp`) is built by finding, for each column, the
+lowest row that is still sky, and masking everything below it. Scan **upward**
+from the bottom: scanning down from the top catches the contrail, which is pale
+against the blue and would be read as a roofline several hundred pixels too
+high.
 
 ## GitHub Pages
 

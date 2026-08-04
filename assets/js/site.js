@@ -131,7 +131,9 @@
       if (!this.ctx) return;
 
       this.canvas = canvas;
-      this.photo = document.querySelector(".home__photo");
+      // Every page stands on the photograph now, so the roofline is always
+      // measurable; the homepage just shows it undimmed.
+      this.photo = document.querySelector("[data-sky-photo]");
       this.isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       this.pointer = { x: -999, y: -999, active: false };
       this.last = performance.now();
@@ -165,13 +167,13 @@
         floor = this.height - ROOF_FRACTION * shown;
       }
       this.skyBottom = clamp(floor, this.height * 0.2, this.height);
-      this.onHome = Boolean(this.photo);
+      // A subpage holds the photograph back, so its birds are drawn a shade
+      // lighter to stay readable as silhouettes against the dimmed sky.
+      this.dimmedSky = !document.body.classList.contains("page-home");
     }
 
     count() {
-      const wide = this.width > 900;
-      if (!this.onHome) return wide ? 7 : 4;
-      return wide ? 15 : 9;
+      return this.width > 900 ? 15 : 9;
     }
 
     /* Every bird enters from one shared point on the edge of the sky,
@@ -322,7 +324,7 @@
     draw() {
       const ctx = this.ctx;
       ctx.clearRect(0, 0, this.width, this.height);
-      ctx.strokeStyle = this.onHome ? "rgba(7, 12, 17, 0.92)" : "rgba(16, 26, 33, 0.85)";
+      ctx.strokeStyle = this.dimmedSky ? "rgba(9, 16, 22, 0.95)" : "rgba(7, 12, 17, 0.92)";
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
 

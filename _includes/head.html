@@ -1,16 +1,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="{% if page.nav_key == 'home' %}#2d4353{% else %}#dde7ec{% endif %}">
-<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#1c2b36">
+<meta name="color-scheme" content="dark">
 <link rel="icon" href="{{ '/assets/images/orbit-mark.svg' | relative_url }}" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 {% assign asset_version = site.time | date: "%Y%m%d%H%M%S" %}
 <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v={{ asset_version }}">
-{% if page.nav_key == 'home' %}
-  <link rel="preload" as="image" href="{{ '/assets/images/roofline-wide.webp' | relative_url }}" media="(min-width: 761px)">
-  <link rel="preload" as="image" href="{{ '/assets/images/roofline-tall.webp' | relative_url }}" media="(max-width: 760px)">
-{% endif %}
+{% comment %}
+  Every page stands on the same photograph. The glass panes paint a refracted
+  copy of it, baked offline, fixed to the same viewport geometry as the
+  backdrop so the two stay registered. The paths live here so baseurl stays
+  authoritative instead of being hard-coded in the stylesheet.
+{% endcomment %}
+<style>
+  :root {
+    --sky-glass: url("{{ '/assets/images/roofline-wide-glass.webp' | relative_url }}");
+  }
+  @media (max-width: 760px) {
+    :root {
+      --sky-glass: url("{{ '/assets/images/roofline-tall-glass.webp' | relative_url }}");
+    }
+  }
+</style>
+<link rel="preload" as="image" href="{{ '/assets/images/roofline-wide.webp' | relative_url }}" media="(min-width: 761px)">
+<link rel="preload" as="image" href="{{ '/assets/images/roofline-tall.webp' | relative_url }}" media="(max-width: 760px)">
+<link rel="preload" as="image" href="{{ '/assets/images/roofline-wide-fg.webp' | relative_url }}" media="(min-width: 761px)">
+<link rel="preload" as="image" href="{{ '/assets/images/roofline-tall-fg.webp' | relative_url }}" media="(max-width: 760px)">
 {% seo %}
 {% feed_meta %}

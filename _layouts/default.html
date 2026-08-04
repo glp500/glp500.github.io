@@ -8,7 +8,26 @@
     data-page="{{ page.nav_key | default: page.layout | default: 'default' | slugify }}"
   >
     <a class="skip-link" href="#main-content">Skip to content</a>
+
+    {% comment %}
+      The photograph is split in two so the flock can fly between the halves:
+      the whole scene underneath, then the roof and chimney again on top as a
+      cut-out. A bird crossing the chimney passes behind it. Both layers use
+      identical cover geometry, so they register exactly.
+
+      The flock reads the roofline off the lower layer, hence data-sky-photo.
+    {% endcomment %}
+    <picture>
+      <source media="(max-width: 760px)" srcset="{{ '/assets/images/roofline-tall.webp' | relative_url }}">
+      <img class="page-sky" data-sky-photo src="{{ '/assets/images/roofline-wide.webp' | relative_url }}" alt="" fetchpriority="high">
+    </picture>
+
     <canvas class="bird-sky" data-bird-sky aria-hidden="true"></canvas>
+
+    <picture>
+      <source media="(max-width: 760px)" srcset="{{ '/assets/images/roofline-tall-fg.webp' | relative_url }}">
+      <img class="page-fg" src="{{ '/assets/images/roofline-wide-fg.webp' | relative_url }}" alt="" aria-hidden="true">
+    </picture>
 
     {% unless page.nav_key == 'home' %}
       <a class="back-home" href="{{ '/' | relative_url }}">Back to Home</a>

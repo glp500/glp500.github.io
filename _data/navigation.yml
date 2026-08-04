@@ -12,6 +12,6 @@
 - key: media
   label: Media
   url: /media/
-- key: experience
-  label: Experience
-  url: /experience/
+- key: about
+  label: About Me
+  url: /about/
